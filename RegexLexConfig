@@ -1,0 +1,152 @@
+//LexParse内的成员变量
+//嵌套标签栈
+vector<LexTag>StackList;
+%%
+//需要跳过的当作注释的
+//StartTag EndTag 
+	(#			)
+%%
+//成对的Tag
+//StartTag		EndTag
+	(				)		
+	{				}
+	{				}?
+	[				]
+	[^				]		
+
+
+//先读取启动位置,然后向后获取几个字符,再去匹配,执行函数的时候
+//,先记录当前启动位置,再把重启位置后移到正确位置
+%% 
+	//TagName 					RegexRule 					动作
+//函数签名: 
+//标签和规则bimap映射 标签和动作map映射
+	SimpleUnNamedCatch_Start			(				{defalut}				
+	StringHead							^				{return std::move(StringHeadBody(ReStartIndex,CatchContent,PatternStr));}
+	StringTail							$				{return std::move(StringTailBody(ReStartIndex,CatchContent,PatternStr));}
+	Mitipute_End						)				{defalut}
+	Closures_UnGreedy					*				{defalut}
+	PositiveClosures_UnGreedy			+				{defalut}
+	ChoseClosures_UnGreedy				?				{defalut}
+	Closures_Greedy						*?				{defalut}
+	PositiveClosures_Greedy				+?				{defalut}
+	ChoseClosures_Greedy				??				{defalut}
+	Repeat_Start						{				{defalut}
+	Repeat_And_BackRefer_End			}				{defalut}
+	Repeat_End_Greedy					}?				{defalut}
+	CharSet_Start						[				{defalut}
+	CharSet_End							]				{defalut}
+	CharSet_Back_Start					[^				{defalut}
+	//^字符集取反那个要处理
+	AllCharSet							.				{defalut}
+	AllRealCharSet						\\w				{defalut}
+	AllSpaceCharSet						\\s				{defalut}
+	AllNumberCharSet					\\d				{defalut}
+	NoneAllRealCharSet					\\W				{defalut}
+	NoneAllSpaceCharSet					\\S				{defalut}
+	NoneAllNumberCharSet				\\d				{defalut}
+	ChangeMeanChar						\\				{return std::move(ChangeMeanCharBody(ReStartIndex,CatchContent,PatternStr));}
+	ChoseSymbol							|				{defalut}
+	CharSetComponent					-				{return std::move(CharSetComponentBody(ReStartIndex,CatchContent,PatternStr));}
+	Comma								,				{return std::move(CommaBody(ReStartIndex,CatchContent,PatternStr));}
+//	NormalString						else			{}
+%%
+// UserDefine Function  函数
+shared_ptr<Token>Named_EndBody(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)
+{
+	ReStartIndex +=1;
+	if(StackList.back() == RuleToTagList[wstring(L"(:<")])
+	{
+		return std::move(shared_ptr<Token>(new Token(LexTag::Named_End,CatchContent,ReStartIndex - 1)));
+	}
+	else
+	{
+		return std::move(shared_ptr<Token>(new Token(LexTag::NormalString,CatchContent,ReStartIndex - 1)));
+	}
+}
+
+shared_ptr<Token>CommaBody(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)
+{
+	ReStartIndex +=1;
+	if(StackList.back() == RuleToTagList[wstring(L"{")])
+	{
+		return std::move(shared_ptr<Token>(new Token(LexTag::Comma,CatchContent,ReStartIndex - 1)));
+	}
+	else
+	{
+		return std::move(shared_ptr<Token>(new Token(LexTag::NormalString,CatchContent,ReStartIndex - 1)));
+	}
+}
+shared_ptr<Token> CharSetComponentBody(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)
+{
+	ReStartIndex +=1;
+//-只能出现在[]内部时作为关键词 so
+
+	if(StackList.back() == RuleToTagList[wstring(L"[")])
+	{
+		return std::move(shared_ptr<Token>(new Token(LexTag::CharSetComponent,CatchContent,ReStartIndex - 1)));
+	}
+	else
+	{
+		return std::move(shared_ptr<Token>(new Token(LexTag::NormalString,CatchContent,ReStartIndex - 1)));
+	}
+
+}
+bool CheckStringHead(int ReStartIndex)
+{
+	if(ReStartIndex == 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+shared_ptr<Token> StringHeadBody(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)
+{
+	if(CheckStringHead(ReStartIndex))
+	{
+		ReStartIndex +=1;
+		return std::move(shared_ptr<Token>(new Token(LexTag::StringHead,CatchContent,ReStartIndex - 1)));
+	}
+	else
+	{
+		ReStartIndex +=1;
+		return std::move(shared_ptr<Token>(new Token(LexTag::NormalString,CatchContent,ReStartIndex - 1)));
+	}
+}
+
+bool CheckStringTail(int ReStartIndex,wstring& PatternStr)
+{
+	if(ReStartIndex == PatternStr.size() - 1)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+shared_ptr<Token> StringTailBody(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)
+{
+	if(CheckStringTail(ReStartIndex,PatternStr))
+	{
+		ReStartIndex +=1;
+		return std::move(shared_ptr<Token>(new Token(LexTag::StringTail,CatchContent,ReStartIndex - 1)));
+	}
+	else
+	{
+		ReStartIndex +=1;
+		return std::move(shared_ptr<Token>(new Token(LexTag::NormalString,CatchContent,ReStartIndex - 1)));
+	}
+}
+wstring GetOneCharBuff(wchar_t Char)
+{
+	return std::move(wstring(1, Char));
+}
+shared_ptr<Token> ChangeMeanCharBody(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)
+{
+	ReStartIndex += 2;
+	return std::move(shared_ptr<Token>(new Token(LexTag::NormalString,GetOneCharBuff(Pattern[ReStartIndex - 1]),ReStartIndex - 1)));
+}

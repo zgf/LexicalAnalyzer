@@ -1,0 +1,15 @@
+<Grammer>
+	Start => Factor;
+	CompleteCharSet => CharSet | CharSet Repeat;
+	Factor => "(" Express ")" | CompleteCharSet | NormalStringComplete;
+	CompleteFactor => Factor Repeat | Factor;
+	Term => Term CompleteFactor | CompleteFactor;
+	Express => Express "|" Term | Term;
+	Repeat => "{" SumNumber "}" | "{"SumNumber" "," "}"| "{" "," SumNumber "}" | "{" SumNumber "," SumNumber "}";
+	SumNumber => SumNumber Number;
+	NormalStringComplete => NormalString Repeat|NormalString;
+	NormalString => NormalString NormalChar|NormalChar;
+	NormalChar => NumberChar | RealWordChar| OtherCahr;
+	CharSet=> "[" CharSetString "]" |"[^" CharSetString "]";
+	CharSetString => CharSetString "-" NormalString | CharSetString NormalString | NormalString;
+</Grammer>

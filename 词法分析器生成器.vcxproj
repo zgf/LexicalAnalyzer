@@ -81,13 +81,14 @@
     <ClCompile Include="CodeGenComplier.cpp" />
     <ClCompile Include="LexConfigTemplate.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RegexLexParseTemplate.h" />
+    <ClCompile Include="RegexParseTemplate.h" />
     <ClCompile Include="RegexParseCodeGen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodeGenComplier.h" />
     <ClInclude Include="RegexLexParse.h" />
     <ClInclude Include="RegexParseCodeGen.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="RegexLexConfig" />

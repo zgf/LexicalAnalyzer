@@ -84,8 +84,6 @@ LexParse类结构
 using namespace std;
 //这里是声明部分 RegexToken类型 enum类型都在这里定义
 
-
-
 //Tag名
 enum class LexTag
 {
@@ -133,8 +131,6 @@ public:
 	{
 	}
 };
-
-
 
 /*
 注释需要跳过

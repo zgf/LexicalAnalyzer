@@ -1,15 +1,44 @@
-<Grammer>
+<TokenDefine>
+/*这里是写入非终结符号在词法解析时候的Tag表示*/
+//形式 "LexTag" : "非终结符号" ;
+"OtherChar " : "OtherChar";
+"NumberChar" : "NumberChar";
+"RealWordChar" : "RealWordChar";
+"SimpleUnNamedCatch_Start" : "(";
+"StringHead" : "^";
+"StringTail" : "$";
+"Mitipute_End" : ")";
+"Closures_UnGreedy" : "*?";
+"PositiveClosures_UnGreedy" : "+?";
+"ChoseClosures_UnGreedy" : "??";
+"Closures_Greedy" : "*";
+"PositiveClosures_Greedy" : "+";
+"ChoseClosures_Greedy" : "?";
+"Repeat_Start" : "{";
+"Repeat_And_BackRefer_End" : "}";
+"Repeat_End_Greedy" : "}?";
+"CharSet_Start" : "[";
+"CharSet_End" : "]";
+"CharSet_Back_Start" : "[^";
+"ChoseSymbol" : "|";
+"CharSetComponent" : "-";
+"Comma" : ",";
+</TokenDefine>
+//第一个产生式是产生式开始.
+<Grammar>
 	Start => Factor;
 	CompleteCharSet => CharSet | CharSet Repeat;
 	Factor => "(" Express ")" | CompleteCharSet | NormalStringComplete;
 	CompleteFactor => Factor Repeat | Factor;
 	Term => Term CompleteFactor | CompleteFactor;
 	Express => Express "|" Term | Term;
-	Repeat => "{" SumNumber "}" | "{"SumNumber" "," "}"| "{" "," SumNumber "}" | "{" SumNumber "," SumNumber "}";
+	Repeat => "{" RepeatRight RepeatEnd | "*?"| "*" | "+" | "+?" | "?" | "??";
+	RepeatRight => "," SumNumber | SumNumber "," | SumNumber | SumNumber "," SumNumber;
+	RepeatEnd => "}" | "}?";
 	SumNumber => SumNumber Number;
 	NormalStringComplete => NormalString Repeat|NormalString;
 	NormalString => NormalString NormalChar|NormalChar;
-	NormalChar => NumberChar | RealWordChar| OtherCahr;
-	CharSet=> "[" CharSetString "]" |"[^" CharSetString "]";
+	NormalChar => "NumberChar" | "RealWordChar"| "OtherChar";
+	CharSet=> "[" CharSetString "]" | "[^" CharSetString "]";
 	CharSetString => CharSetString "-" NormalString | CharSetString NormalString | NormalString;
-</Grammer>
+</Grammar>

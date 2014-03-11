@@ -35,6 +35,7 @@ public:
 	Termination(bool Chose, LexTag Tag) : Symbol(Chose), TermTag(Tag)
 	{
 	}
+
 };
 
 template<typename X, typename Y, typename Z>
@@ -92,54 +93,52 @@ private:
 	void initGrammarList()
 	{
 		//GrammarList = {vector<Symbol>({}), vector<Symbol>({})};
-		GrammarList =
-		{
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CharSet")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::CharSet_Start)), shared_ptr<Symbol>(new Nonterminal(false, "CharSetString")), shared_ptr<Symbol>(new Termination(true, LexTag::CharSet_End))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CharSet")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::CharSet_Back_Start)), shared_ptr<Symbol>(new Nonterminal(false, "CharSetString")), shared_ptr<Symbol>(new Termination(true, LexTag::CharSet_End))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CharSetString ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "CharSetString")), shared_ptr<Symbol>(new Termination(true, LexTag::CharSetComponent)), shared_ptr<Symbol>(new Nonterminal(false, "NormalString"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CharSetString ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "CharSetString")), shared_ptr<Symbol>(new Nonterminal(false, "NormalString"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CharSetString ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "NormalString"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CompleteCharSet ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "CharSet"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CompleteCharSet ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "CharSet")), shared_ptr<Symbol>(new Nonterminal(false, "Repeat"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CompleteFactor ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "Factor")), shared_ptr<Symbol>(new Nonterminal(false, "Repeat"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "CompleteFactor ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "Factor"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Express ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "Express")), shared_ptr<Symbol>(new Termination(true, LexTag::ChoseSymbol)), shared_ptr<Symbol>(new Nonterminal(false, "Term"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Express ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "Term"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Factor ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::SimpleUnNamedCatch_Start)), shared_ptr<Symbol>(new Nonterminal(false, "Express")), shared_ptr<Symbol>(new Termination(true, LexTag::Mitipute_End))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Factor ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "CompleteCharSet"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Factor ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "NormalStringComplete"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalChar ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::NumberChar))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalChar ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::RealWordChar))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalChar ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::OtherChar))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalString ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "NormalString")), shared_ptr<Symbol>(new Nonterminal(false, "NormalChar"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalString ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "NormalChar"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalStringComplete ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "NormalString")), shared_ptr<Symbol>(new Nonterminal(false, "Repeat"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "NormalStringComplete ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "NormalString"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::Repeat_Start)), shared_ptr<Symbol>(new Nonterminal(false, "RepeatRight")), shared_ptr<Symbol>(new Nonterminal(false, "RepeatEnd"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::Closures_UnGreedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::Closures_Greedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::PositiveClosures_Greedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::PositiveClosures_UnGreedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::ChoseClosures_Greedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Repeat ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::ChoseClosures_UnGreedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "RepeatEnd ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::Repeat_And_BackRefer_End))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "RepeatEnd ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::Repeat_End_Greedy))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "RepeatRight ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true, LexTag::Comma)), shared_ptr<Symbol>(new Nonterminal(false, "SumNumber"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "RepeatRight ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "SumNumber")), shared_ptr<Symbol>(new Termination(true, LexTag::Comma))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "RepeatRight ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "SumNumber"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "RepeatRight ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "SumNumber")), shared_ptr<Symbol>(new Termination(true, LexTag::Comma)), shared_ptr<Symbol>(new Nonterminal(false, "SumNumber"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Start ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "Factor"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "SumNumber ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "SumNumber")), shared_ptr<Symbol>(new Nonterminal(false, "Number"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Term ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "Term")), shared_ptr<Symbol>(new Nonterminal(false, "CompleteFactor"))})),
-			Production(shared_ptr<Nonterminal>(new Nonterminal(false, "Term ")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false, "CompleteFactor"))})),
-		};
+		GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Start")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"Factor"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CharSet")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::CharSet_Start )),shared_ptr<Symbol>(new Nonterminal(false,"CharSetString")),shared_ptr<Symbol>(new Termination(true,LexTag::CharSet_End ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CharSet")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::CharSet_Back_Start )),shared_ptr<Symbol>(new Nonterminal(false,"CharSetString")),shared_ptr<Symbol>(new Termination(true,LexTag::CharSet_End ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CharSetString")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"CharSetString")),shared_ptr<Symbol>(new Termination(true,LexTag::CharSetComponent )),shared_ptr<Symbol>(new Nonterminal(false,"NormalString"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CharSetString")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"CharSetString")),shared_ptr<Symbol>(new Nonterminal(false,"NormalString"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CharSetString")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"NormalString"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CompleteCharSet")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"CharSet"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CompleteCharSet")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"CharSet")),shared_ptr<Symbol>(new Nonterminal(false,"Repeat"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CompleteFactor")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"Factor")),shared_ptr<Symbol>(new Nonterminal(false,"Repeat"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"CompleteFactor")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"Factor"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Express")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"Express")),shared_ptr<Symbol>(new Termination(true,LexTag::ChoseSymbol )),shared_ptr<Symbol>(new Nonterminal(false,"Term"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Express")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"Term"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Factor")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::SimpleUnNamedCatch_Start )),shared_ptr<Symbol>(new Nonterminal(false,"Express")),shared_ptr<Symbol>(new Termination(true,LexTag::Mitipute_End ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Factor")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"CompleteCharSet"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Factor")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"NormalStringComplete"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalChar")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::NumberChar ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalChar")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::RealWordChar ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalChar")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::OtherChar  ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalString")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"NormalString")),shared_ptr<Symbol>(new Nonterminal(false,"NormalChar"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalString")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"NormalChar"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalStringComplete")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"NormalString")),shared_ptr<Symbol>(new Nonterminal(false,"Repeat"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"NormalStringComplete")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"NormalString"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::Repeat_Start )),shared_ptr<Symbol>(new Nonterminal(false,"RepeatRight")),shared_ptr<Symbol>(new Nonterminal(false,"RepeatEnd"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::Closures_UnGreedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::Closures_Greedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::PositiveClosures_Greedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::PositiveClosures_UnGreedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::ChoseClosures_Greedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Repeat")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::ChoseClosures_UnGreedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"RepeatEnd")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::Repeat_And_BackRefer_End ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"RepeatEnd")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::Repeat_End_Greedy ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"RepeatRight")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Termination(true,LexTag::Comma )),shared_ptr<Symbol>(new Nonterminal(false,"SumNumber"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"RepeatRight")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"SumNumber")),shared_ptr<Symbol>(new Termination(true,LexTag::Comma ))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"RepeatRight")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"SumNumber"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"RepeatRight")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"SumNumber")),shared_ptr<Symbol>(new Termination(true,LexTag::Comma )),shared_ptr<Symbol>(new Nonterminal(false,"SumNumber"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"SumNumber")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"SumNumber")),shared_ptr<Symbol>(new Nonterminal(false,"Number"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Term")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"Term")),shared_ptr<Symbol>(new Nonterminal(false,"CompleteFactor"))})));
+GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,"Term")),vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Nonterminal(false,"CompleteFactor"))})));
+
 	}
 
 	void initGrammarMap()
 	{
 		for(int i = 0; i < GrammarList.size(); i++)
 		{
-			GrammarMap.insert(make_pair(GrammarList[i].Head,i));
+			GrammarMap.insert(make_pair(GrammarList[i].Head->Name, i));
 		}
 	}
 	//创建LR(0)核心项集
@@ -151,26 +150,71 @@ private:
 		//开始产生式
 		StartSet.ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>({0, 0}));
 		//第一个项集压栈
+		CreatItemClourse(StartSet.ItemList);
 	}
 	//计算项集的闭包并加入项集
-	void CreatItemClourse(vector<Triple<int, int, Termination>>& ItemList, vector<Production>& Grammar)
+	void CreatItemClourse(vector<Triple<int, int, shared_ptr<Symbol>>>& ItemList)
 	{
 		for(int i = 0; i < ItemList.size(); i++)
 		{
 			auto& CurrentItem = ItemList[i];
-			if(CouldExpand(CurrentItem.First, CurrentItem.Second, GrammarList))
+			if(CouldExpand(CurrentItem.First, CurrentItem.Second))
 			{
 				//说明是非终结符号
+				auto FindIter = GrammarMap.equal_range(GetNonTermName(CurrentItem.First, CurrentItem.Second));
+				if(FindIter.first == FindIter.second)
+				{
+					//非终结符号找不到索引肿么可能- -;
+					abort();
+				}
+				else
+				{
+					for(auto Iter = FindIter.first; Iter != FindIter.second; Iter++)
+					{
+						//获取的是产生式的编号
+						//查看该产生式是否已经加入;
+						if(!HasAddThisProduct(ItemList, Iter->second))
+						{
+							ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>(Iter->second, 0));
+						}
+					}
+				}
 			}
 		}
 	}
-	//判断是不是.号后面是非终结符号
-	//Index 是文法编号 Position是第X个位置的点
-	bool CouldExpand(int Index, int Position, vector<Production>& Grammar)
+
+	//查看该编号产生式是否已经加入
+	bool HasAddThisProduct(vector<Triple<int, int, shared_ptr<Symbol>>>& ItemList, int Number)
 	{
-		return Grammar[Index].Body[Position]->IsTerminal == false;
+		for(auto i = 0; i < ItemList.size(); i++)
+		{
+			if(ItemList[i].First == Number)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
+	//判断是不是.号后面是非终结符号
+	//Index 是文法编号 Position是第X个位置的点
+	bool CouldExpand(int Index, int Position)
+	{
+		return GrammarList[Index].Body[Position]->IsTerminal == false;
+	}
+	//获取非终结符号的名字,如果是终结符号,挂掉
+	string GetNonTermName(int Index, int Position)
+	{
+		if(CouldExpand(Index, Position))
+		{
+			return std::move(static_cast<Nonterminal*>( GrammarList[Index].Body[Position].get() )->Name);
+		}
+		else
+		{
+			abort();
+			return string();
+		}
+	}
 private:
 	//文法 0号是产生式头
 	vector<Production> GrammarList;
@@ -179,5 +223,5 @@ private:
 	vector<Stauts> LRItemSet;
 
 	//文法头到产生式体的映射表
-	unordered_multimap<shared_ptr<Symbol>, int> GrammarMap;
+	unordered_multimap<string, int> GrammarMap;
 };

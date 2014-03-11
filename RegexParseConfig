@@ -25,8 +25,10 @@
 "Comma" : ",";
 </TokenDefine>
 //第一个产生式是产生式开始.
-<Grammar>
+<FirstGrammar>
 	Start => Factor;
+</FirstGrammar>
+<Grammar>
 	CompleteCharSet => CharSet | CharSet Repeat;
 	Factor => "(" Express ")" | CompleteCharSet | NormalStringComplete;
 	CompleteFactor => Factor Repeat | Factor;

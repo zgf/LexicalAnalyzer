@@ -27,9 +27,6 @@
     <ClCompile Include="RegexParseCodeGen.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="RegexParseTemplate.h">
-      <Filter>资源文件</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodeGenComplier.h">
@@ -42,6 +39,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Test.h">
+      <Filter>资源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="RegexParseTemplate.h">
       <Filter>资源文件</Filter>
     </ClInclude>
   </ItemGroup>

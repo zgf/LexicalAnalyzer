@@ -35,6 +35,7 @@ public:
 	Termination(bool Chose, LexTag Tag) : Symbol(Chose), TermTag(Tag)
 	{
 	}
+
 };
 
 template<typename X, typename Y, typename Z>
@@ -85,6 +86,7 @@ public:
 	RegexParse()
 	{
 		initGrammarList();
+		initGrammarMap();
 		CreatLR0ItemSet();
 	}
 private:
@@ -98,7 +100,7 @@ private:
 	{
 		for(int i = 0; i < GrammarList.size(); i++)
 		{
-			GrammarList[i].Head;
+			GrammarMap.insert(make_pair(GrammarList[i].Head->Name, i));
 		}
 	}
 	//创建LR(0)核心项集
@@ -110,26 +112,71 @@ private:
 		//开始产生式
 		StartSet.ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>({0, 0}));
 		//第一个项集压栈
+		CreatItemClourse(StartSet.ItemList);
 	}
 	//计算项集的闭包并加入项集
-	void CreatItemClourse(vector<Triple<int, int, Termination>>& ItemList, vector<Production>& Grammar)
+	void CreatItemClourse(vector<Triple<int, int, shared_ptr<Symbol>>>& ItemList)
 	{
 		for(int i = 0; i < ItemList.size(); i++)
 		{
 			auto& CurrentItem = ItemList[i];
-			if(CouldExpand(CurrentItem.First, CurrentItem.Second, GrammarList))
+			if(CouldExpand(CurrentItem.First, CurrentItem.Second))
 			{
 				//说明是非终结符号
+				auto FindIter = GrammarMap.equal_range(GetNonTermName(CurrentItem.First, CurrentItem.Second));
+				if(FindIter.first == FindIter.second)
+				{
+					//非终结符号找不到索引肿么可能- -;
+					abort();
+				}
+				else
+				{
+					for(auto Iter = FindIter.first; Iter != FindIter.second; Iter++)
+					{
+						//获取的是产生式的编号
+						//查看该产生式是否已经加入;
+						if(!HasAddThisProduct(ItemList, Iter->second))
+						{
+							ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>(Iter->second, 0));
+						}
+					}
+				}
 			}
 		}
 	}
-	//判断是不是.号后面是非终结符号
-	//Index 是文法编号 Position是第X个位置的点
-	bool CouldExpand(int Index, int Position, vector<Production>& Grammar)
+
+	//查看该编号产生式是否已经加入
+	bool HasAddThisProduct(vector<Triple<int, int, shared_ptr<Symbol>>>& ItemList, int Number)
 	{
-		return Grammar[Index].Body[Position]->IsTerminal == false;
+		for(auto i = 0; i < ItemList.size(); i++)
+		{
+			if(ItemList[i].First == Number)
+			{
+				return true;
+			}
+		}
+		return false;
 	}
 
+	//判断是不是.号后面是非终结符号
+	//Index 是文法编号 Position是第X个位置的点
+	bool CouldExpand(int Index, int Position)
+	{
+		return GrammarList[Index].Body[Position]->IsTerminal == false;
+	}
+	//获取非终结符号的名字,如果是终结符号,挂掉
+	string GetNonTermName(int Index, int Position)
+	{
+		if(CouldExpand(Index, Position))
+		{
+			return std::move(static_cast<Nonterminal*>( GrammarList[Index].Body[Position].get() )->Name);
+		}
+		else
+		{
+			abort();
+			return string();
+		}
+	}
 private:
 	//文法 0号是产生式头
 	vector<Production> GrammarList;
@@ -138,5 +185,5 @@ private:
 	vector<Stauts> LRItemSet;
 
 	//文法头到产生式体的映射表
-	//unordered_multimap<Nonterminal, int> GrammarMap;
+	unordered_multimap<string, int> GrammarMap;
 };

@@ -18,7 +18,7 @@ private:
 	//	vector<RegexToken> TokenStream;
 public:
 
-	RegexParseCodeGen(string& ConfigFileName, string TemplateName)
+	RegexParseCodeGen(string& ConfigFileName, string& TemplateName)
 	{
 		this->ParseConfig = ReadFileContent(ConfigFileName);
 		this->ParseTemplate = ReadFileContent(TemplateName);
@@ -29,20 +29,24 @@ public:
 		ParseConfig = DeleteNoteSign(ParseConfig, string("/*"), string("*/"));
 		ParseConfig = DeleteNoteSign(ParseConfig, string("//"), string("\n"));
 
-		auto GammarStr = GetNoteSignContent(ParseConfig, string("<Grammar>"), string("</Grammar>"));
-		//获得语句
-		vector<string>Statement = CutByDefineCharacter(GammarStr, string(";"));
-		//最后一个逗号后面的不必要
-		Statement.pop_back();
+		//获得<Grammar>区域的文法映射
+		map<string, vector<string>> StatementMap = GetSpecStateMap(ParseConfig, string("<Grammar>"), string("</Grammar>"), string(";"));
+		//获得<FirstGrammar>区域开始产生式语句映射
+		auto StartStatementMap  = GetSpecStateMap(ParseConfig, string("<FirstGrammar>"), string("</FirstGrammar>"), string(";"));
 		//获取文法产生式头和体的映射
-		map<string, vector<string>> StatementMap = GetStatementMap(Statement);
 
-		//lextag 和 终结符号的映射
+		//获取lexTag 和 终结符号的映射
 		auto TokenDefineStr = GetNoteSignContent(ParseConfig, string("<TokenDefine>"), string("</TokenDefine>"));
 		auto TermToTagMap = CreatTermToTagMap(TokenDefineStr);
+		
+		//插入模板
+		auto Test = CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap);
+		auto Result = ReplaceDefinePostion(ParseTemplate, string("//</initGrammarMap>"), Test);
 
-		auto Result = ReplaceDefinePostion(ParseTemplate, string("//</initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap));
+		//创建文件
 		CreateCppFile(string("Test.h"), Result);
+		
+		
 	}
 	//所有类型都转换为字符串
 	template<typename T>
@@ -64,6 +68,9 @@ public:
 	string GetNoteSignContent(string& SrcStr, string& StartNote, string& EndNote);
 	//去除字符串两端的空白和换行符
 	string Trim(const string& Src);
+	//获取指定区域内的文法产生式头到体的映射
+	map<string, vector<string>> GetSpecStateMap(string Src, string StartNode, string StatementCutSign, string EndNote);
+
 	//获取文法的产生式头到体的映射
 	map<string, vector<string>> GetStatementMap(vector<string>&Statement);
 
@@ -73,7 +80,7 @@ public:
 	//获取被空白分割的Token
 	vector<string> GetSpaceCutToken(string Src);
 	//创建添入模板initGrammarMap的内容
-	string CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap);
+	string CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap,map<string,vector<string>>& StartStateMap);
 
 	//是空白字符?
 	bool IsWhiteSpaceChar(char i);
@@ -83,6 +90,8 @@ public:
 	//替换Tempalte指定标记的位置的字符串.
 	string RegexParseCodeGen::ReplaceDefinePostion(string& Template, string& TemplateSign, string& RePalceData);
 
+	//创建模板文件中文法List的语句
+	string CreatGrammarListContentStr(map<string, string>&TermToTagMap,map<string, vector<string>>& StatementMap);
 	//输出内容到文件
 	void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent);
 };

@@ -226,7 +226,7 @@ vector<string> RegexParseCodeGen::GetSpaceCutToken(string Src)
 
 string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap)
 {
-	string TemplateStr = "GrammarMap = \n{\n ";
+	string TemplateStr = "GrammarList = \n{\n ";
 	for(auto& Iter : StatementMap)
 	{
 		//StrIter 是每一个产生式体的字符串
@@ -234,7 +234,7 @@ string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, m
 		for(auto StrIter : Iter.second)
 		{
 			//放vector<Symbol>字符串
-			string TempSymbolStr = "Production(Nonterminal(false,\"" + HeadStr + "\"),vector<Symbol>({";
+			string TempSymbolStr = "Production(  shared_ptr<Nonterminal>( new Nonterminal(false,\"" + HeadStr + "\")),vector<shared_ptr<Symbol>>({";
 			auto ProductTokenList = GetSpaceCutToken(StrIter);
 			for(auto TokenIter : ProductTokenList)
 			{
@@ -256,11 +256,11 @@ string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, m
 					{
 					int a = 0;
 					}*/
-					TempSymbolStr = TempSymbolStr + "Termination(true,LexTag::" + test->second + "),";
+					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Termination(true,LexTag::" + test->second + ")),";
 				}
 				else
 				{
-					TempSymbolStr = TempSymbolStr + "Nonterminal(false,\"" + TokenIter + "\"),";
+					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Nonterminal(false,\"" + TokenIter + "\")),";
 				}
 			}
 			//清除最后一个逗号

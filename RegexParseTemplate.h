@@ -1,3 +1,4 @@
+#pragma once
 #include "RegexLexParse.h"
 //语法分析符号
 //基类
@@ -28,6 +29,9 @@ class Termination : public Symbol
 public:
 	LexTag TermTag;
 public:
+	Termination(bool Chose) :Symbol(Chose)
+	{
+	}
 	Termination(bool Chose, LexTag Tag) : Symbol(Chose), TermTag(Tag)
 	{
 	}
@@ -43,25 +47,33 @@ public:
 	Y Second;
 	//向前看的字符
 	Z Third;
+	Triple(X a, Y b) : First(a), Second(b)
+	{
+	}
+	Triple(X a, Y b, Z c) : First(a), Second(b), Third(c)
+	{
+	}
+	Triple(Z c) :Third(c)
+	{
+	}
 };
 //状态集
 class Stauts
 {
-	/*int Item;
-	int Position;*/
+public:
 	//z状态集编号
 	int Index;
-	vector<Triple<int, int, Termination>> ItemList;
+	vector<Triple<int, int, shared_ptr<Symbol>>> ItemList;
 	map<Symbol, int> NextStauts;
 };
 //产生式
 class Production
 {
 public:
-	Symbol Head;
-	vector<Symbol> Body;
+	shared_ptr<Nonterminal> Head;
+	vector<shared_ptr<Symbol>> Body;
 	int BodySize;
-	Production(Symbol& tHead, vector<Symbol>& tBody) : Head(tHead), Body(tBody)
+	Production(shared_ptr<Nonterminal>& tHead, vector<shared_ptr<Symbol>>& tBody) : Head(tHead), Body(tBody)
 	{
 		BodySize = Body.size();
 	}
@@ -69,14 +81,62 @@ public:
 
 class RegexParse
 {
-private:
-	//文法映射表 0号是产生式头
-	vector<Production> GrammarMap;
-
-private:
-	void initGrammarMap()
+public:
+	RegexParse()
 	{
-		//GrammarMap = {vector<Symbol>({}), vector<Symbol>({})};
+		initGrammarList();
+		CreatLR0ItemSet();
+	}
+private:
+	void initGrammarList()
+	{
+		//GrammarList = {vector<Symbol>({}), vector<Symbol>({})};
 		//</initGrammarMap>
 	}
+
+	void initGrammarMap()
+	{
+		for(int i = 0; i < GrammarList.size(); i++)
+		{
+			GrammarList[i].Head;
+		}
+	}
+	//创建LR(0)核心项集
+	void CreatLR0ItemSet()
+	{
+		//构造第一个Lr(0)核心项集
+		Stauts StartSet;
+		StartSet.Index = 0;
+		//开始产生式
+		StartSet.ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>({0, 0}));
+		//第一个项集压栈
+	}
+	//计算项集的闭包并加入项集
+	void CreatItemClourse(vector<Triple<int, int, Termination>>& ItemList, vector<Production>& Grammar)
+	{
+		for(int i = 0; i < ItemList.size(); i++)
+		{
+			auto& CurrentItem = ItemList[i];
+			if(CouldExpand(CurrentItem.First, CurrentItem.Second, GrammarList))
+			{
+				//说明是非终结符号
+			}
+		}
+	}
+	//判断是不是.号后面是非终结符号
+	//Index 是文法编号 Position是第X个位置的点
+	bool CouldExpand(int Index, int Position, vector<Production>& Grammar)
+	{
+		return Grammar[Index].Body[Position]->IsTerminal == false;
+	}
+
+private:
+	//文法 0号是产生式头
+	vector<Production> GrammarList;
+
+	//LR(0)项集
+	vector<Stauts> LRItemSet;
+
+	//文法头到产生式体的映射表
+	//unordered_multimap<Nonterminal, int> GrammarMap;
 };

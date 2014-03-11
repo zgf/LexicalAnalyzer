@@ -1,6 +1,7 @@
 <TokenDefine>
 /*这里是写入非终结符号在词法解析时候的Tag表示*/
-//形式 "LexTag" : "非终结符号" ;
+//禁止LexTag和非终结符号重名
+//形式 "LexTag" : "终结符号" ;
 "OtherChar " : "OtherChar";
 "NumberChar" : "NumberChar";
 "RealWordChar" : "RealWordChar";
@@ -37,7 +38,7 @@
 	Repeat => "{" RepeatRight RepeatEnd | "*?"| "*" | "+" | "+?" | "?" | "??";
 	RepeatRight => "," SumNumber | SumNumber "," | SumNumber | SumNumber "," SumNumber;
 	RepeatEnd => "}" | "}?";
-	SumNumber => SumNumber Number;
+	SumNumber => SumNumber NumberChar;
 	NormalStringComplete => NormalString Repeat|NormalString;
 	NormalString => NormalString NormalChar|NormalChar;
 	NormalChar => "NumberChar" | "RealWordChar"| "OtherChar";

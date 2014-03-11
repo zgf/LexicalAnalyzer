@@ -30,23 +30,25 @@ public:
 		ParseConfig = DeleteNoteSign(ParseConfig, string("//"), string("\n"));
 
 		//获得<Grammar>区域的文法映射
-		map<string, vector<string>> StatementMap = GetSpecStateMap(ParseConfig, string("<Grammar>"), string("</Grammar>"), string(";"));
+		auto StatementMap = GetSpecStateMap(ParseConfig, string("<Grammar>"), string("</Grammar>"), string(";"));
 		//获得<FirstGrammar>区域开始产生式语句映射
-		auto StartStatementMap  = GetSpecStateMap(ParseConfig, string("<FirstGrammar>"), string("</FirstGrammar>"), string(";"));
+		auto StartStatementMap = GetSpecStateMap(ParseConfig, string("<FirstGrammar>"), string("</FirstGrammar>"), string(";"));
 		//获取文法产生式头和体的映射
 
 		//获取lexTag 和 终结符号的映射
-		auto TokenDefineStr = GetNoteSignContent(ParseConfig, string("<TokenDefine>"), string("</TokenDefine>"));
-		auto TermToTagMap = CreatTermToTagMap(TokenDefineStr);
-		
+		auto TermToTagMap = CreatTermToTagMap(GetNoteSignContent(ParseConfig, string("<TokenDefine>"), string("</TokenDefine>")));
+
+		//获取所有符号名
+		auto NameList = GetAllSymbolName(TermToTagMap, StartStatementMap, StatementMap);
+		auto NameEnumStr = CreatParseTagEnumStr(NameList);
+		//初始化ParseTag Enum类
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<ParseTag>"), NameEnumStr);
+
 		//插入模板
-		auto Test = CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap);
-		auto Result = ReplaceDefinePostion(ParseTemplate, string("//</initGrammarMap>"), Test);
+		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap));
 
 		//创建文件
-		CreateCppFile(string("Test.h"), Result);
-		
-		
+		CreateCppFile(string("Test.h"), Content);
 	}
 	//所有类型都转换为字符串
 	template<typename T>
@@ -80,7 +82,7 @@ public:
 	//获取被空白分割的Token
 	vector<string> GetSpaceCutToken(string Src);
 	//创建添入模板initGrammarMap的内容
-	string CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap,map<string,vector<string>>& StartStateMap);
+	string CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap, map<string, vector<string>>& StartStateMap);
 
 	//是空白字符?
 	bool IsWhiteSpaceChar(char i);
@@ -91,7 +93,26 @@ public:
 	string RegexParseCodeGen::ReplaceDefinePostion(string& Template, string& TemplateSign, string& RePalceData);
 
 	//创建模板文件中文法List的语句
-	string CreatGrammarListContentStr(map<string, string>&TermToTagMap,map<string, vector<string>>& StatementMap);
+	string CreatGrammarListContentStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap);
+
+	//从Map中获取定义的非终结符号和终结符号名List
+	vector<string> GetAllSymbolName(map<string, string>&TermToTagMap, map<string, vector<string>>& StartStatementMap, map<string, vector<string>>& StatementMap);
+	//获取定义区域中的终结符号名
+	vector<string> GetTermSymbol(map<string, string>& DefineMap);
+	//获取Map的key的符号名,key ->string.
+	template<typename T>
+	vector<string> GetMapStringKey(T& DefineMap)
+	{
+		vector<string> Result;
+		for(auto i = DefineMap.begin(); i != DefineMap.end(); i++)
+		{
+			Result.push_back(i->first);
+		}
+		return move(Result);
+	}
+
+	//用所有的符号名去定义生成文件中的ParseTag枚举类
+	string CreatParseTagEnumStr(vector<string>& NameList);
 	//输出内容到文件
 	void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent);
 };

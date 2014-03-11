@@ -178,7 +178,7 @@ map<string, vector<string>> RegexParseCodeGen::GetStatementMap(vector<string>&St
 		}*/
 		auto StatementBlock = CutByDefineCharacter(Iter, string("=>"));
 		auto BodyList = CutByDefineCharacter(StatementBlock.back(), string("|"));
-		StatementMap.insert(make_pair(StatementBlock.front(), BodyList));
+		StatementMap.insert(make_pair(Trim(StatementBlock.front()), BodyList));
 		i++;
 	}
 	return std::move(StatementMap);
@@ -193,7 +193,7 @@ map<string, string> RegexParseCodeGen::CreatTermToTagMap(string DefinePairStr)
 	for(auto& Iter : PairStr)
 	{
 		auto TempList = CutByDefineCharacter(Iter, string(":"));
-		Map.insert(make_pair(GetNoteSignContent(TempList[1], string("\""), string("\"")), GetNoteSignContent(TempList[0], string("\""), string("\""))));
+		Map.insert(make_pair(Trim(GetNoteSignContent(TempList[1], string("\""), string("\""))), Trim(GetNoteSignContent(TempList[0], string("\""), string("\"")))));
 	}
 	return std::move(Map);
 }
@@ -234,7 +234,7 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 		for(auto StrIter : Iter.second)
 		{
 			//放vector<Symbol>字符串
-			string TempSymbolStr = "GrammarList.push_back(Production(  shared_ptr<Nonterminal>( new Nonterminal(false,\"" + HeadStr + "\")),vector<shared_ptr<Symbol>>({";
+			string TempSymbolStr = "GrammarList.push_back(Production(  shared_ptr<Symbol>( new Symbol(false,ParseTag::" + HeadStr + ")),vector<shared_ptr<Symbol>>({";
 			auto ProductTokenList = GetSpaceCutToken(StrIter);
 			for(auto TokenIter : ProductTokenList)
 			{
@@ -248,11 +248,11 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 					//需要替换的终结符号
 					auto re = GetNoteSignContent(TokenIter, string("\""), string("\""));
 					auto& test = TermToTagMap.find(re);
-					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Termination(true,LexTag::" + test->second + ")),";
+					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Symbol(true,ParseTag::" + test->second + ")),";
 				}
 				else
 				{
-					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Nonterminal(false,\"" + TokenIter + "\")),";
+					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Symbol(false,ParseTag::" + TokenIter + ")),";
 				}
 			}
 			//清除最后一个逗号
@@ -267,7 +267,7 @@ string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, m
 {
 	auto One = CreatGrammarListContentStr(TermToTagMap, StartStateMap);
 	auto Two = CreatGrammarListContentStr(TermToTagMap, StatementMap);
-	return std::move(One +Two );
+	return std::move(One + Two);
 	//return std::move(TemplateStr);
 }
 string RegexParseCodeGen::ReplaceDefinePostion(string& Template, string& TemplateSign, string& RePalceData)
@@ -289,4 +289,33 @@ map<string, vector<string>> RegexParseCodeGen::GetSpecStateMap(string Src, strin
 	//最后一个分号不需要
 	StartStatement.pop_back();
 	return 	std::move(GetStatementMap(StartStatement));
+}
+vector<string> RegexParseCodeGen::GetTermSymbol(map<string, string>& DefineMap)
+{
+	vector<string>Result;
+	for(auto i = DefineMap.begin(); i != DefineMap.end(); i++)
+	{
+		Result.push_back(i->second);
+	}
+	return Result;
+}
+
+vector<string> RegexParseCodeGen::GetAllSymbolName(map<string, string>&TermToTagMap, map<string, vector<string>>& StartStatementMap, map<string, vector<string>>& StatementMap)
+{
+	auto TermToTagList = GetTermSymbol(TermToTagMap);
+	auto StartStatementList = GetMapStringKey(StartStatementMap);
+	auto StatementList = GetMapStringKey(StatementMap);
+	TermToTagList.insert(TermToTagList.end(), StartStatementList.begin(), StartStatementList.end());
+	TermToTagList.insert(TermToTagList.end(), StatementList.begin(), StatementList.end());
+	return std::move(TermToTagList);
+}
+
+string RegexParseCodeGen::CreatParseTagEnumStr(vector<string>& NameList)
+{
+	string ResultStr = "";
+	for(auto Iter : NameList)
+	{
+		ResultStr = ResultStr + Iter + ",\n";
+	}
+	return std::move(ResultStr);
 }

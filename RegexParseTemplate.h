@@ -41,8 +41,6 @@ enum class ParseTag
 	RepeatRight,
 	SumNumber,
 	Term,
-
-	
 };
 //语法分析符号
 
@@ -73,7 +71,37 @@ struct EqualTo
 	}
 };
 
-
+template<typename X, typename Y>
+class Pair
+{
+public:
+	//第几条文法
+	X first;
+	//第X条文法的第Y项
+	Y second;
+	Pair(X a, Y b) : first(a), second(b)
+	{
+	}
+	bool operator!=( Pair& a )
+	{
+		return this->first != a.first || this->second != a.second;
+	}
+	friend bool operator==( Pair& a, Pair& b )
+	{
+		return a.first == b.first && a.second == b.second;
+	}
+	friend bool operator<( Pair& a, Pair& b )
+	{
+		if(a.first == b.first)
+		{
+			return a.second < b.second;
+		}
+		else
+		{
+			return a.first < b.first;
+		}
+	}
+};
 
 template<typename X, typename Y, typename Z>
 class Triple
@@ -85,24 +113,74 @@ public:
 	Y Second;
 	//向前看的字符
 	Z Third;
-	Triple(X a, Y b) :.first(a),.second(b)
+	Triple(X a, Y b) :First(a), Second(b)
 	{
 	}
-	Triple(X a, Y b, Z c) :.first(a),.second(b), Third(c)
+	Triple(X a, Y b, Z c) :First(a), Second(b), Third(c)
 	{
 	}
 	Triple(Z c) :Third(c)
 	{
 	}
 };
+
 //状态集
 class Stauts
 {
 public:
 	//z状态集编号
 	int Index;
-	vector<pair<int,int>> ItemList;
+	vector<Pair<int, int>> ItemList;
 	map<Symbol, int> NextStauts;
+	friend bool operator== ( Stauts& Left, Stauts&Right )
+	{
+		if(Left.ItemList.size() == Right.ItemList.size())
+		{
+			for(auto i = 0; i < Left.ItemList.size(); i++)
+			{
+				if(Left.ItemList[i] != Right.ItemList[i])
+				{
+					return false;
+				}
+			}
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	friend	bool operator<( Stauts&Left, Stauts& Right )
+	{
+		if(Left.ItemList.size() == Right.ItemList.size())
+		{
+			for(auto i = 0; i < Left.ItemList.size(); i++)
+			{
+				if(Left.ItemList[i].first == Right.ItemList[i].first)
+				{
+					if(Left.ItemList[i].second == Right.ItemList[i].second)
+					{
+						continue;
+					}
+					else
+					{
+						return Left.ItemList[i].second < Right.ItemList[i].second;
+					}
+				}
+				else
+				{
+					return Left.ItemList[i].first < Right.ItemList[i].first;
+				}
+			}
+		}
+		else
+		{
+			return Left.ItemList.size() < Right.ItemList.size();
+		}
+
+		abort();
+		return false;
+	}
 };
 //产生式
 class Production
@@ -177,9 +255,9 @@ private:
 			GrammarMap.insert(make_pair(GrammarList[i].Head.Tag, i));
 		}
 	}
-	
+
 	//计算项集的闭包并加入项集
-	void CreatItemClourse(vector<pair<int,int>>& ItemList)
+	void CreatItemClourse(vector<Pair<int, int>>& ItemList)
 	{
 		for(int i = 0; i < ItemList.size(); i++)
 		{
@@ -194,7 +272,7 @@ private:
 					//查看该产生式是否已经加入;
 					if(!HasAddThisProduct(ItemList, Iter->second))
 					{
-						ItemList.push_back(pair<int,int>(Iter->second, 0));
+						ItemList.push_back(Pair<int, int>(Iter->second, 0));
 					}
 				}
 			}
@@ -205,7 +283,7 @@ private:
 	}
 
 	//查看该编号产生式是否已经加入
-	bool HasAddThisProduct(vector<pair<int,int>>& ItemList, int Number)
+	bool HasAddThisProduct(vector<Pair<int, int>>& ItemList, int Number)
 	{
 		for(auto i = 0; i < ItemList.size(); i++)
 		{
@@ -249,35 +327,42 @@ private:
 		StartSet.Index = 0;
 		//开始产生式
 		//第一个项压入项集
-		StartSet.ItemList.push_back(pair<int, int>({0, 0}));
+		StartSet.ItemList.push_back(Pair<int, int>({0, 0}));
 		//第一个项集的闭包计算
 		CreatItemClourse(StartSet.ItemList);
 
 		//第一个项集压栈
 		LR0ItemSet.push_back(StartSet);
-		for(int i = 0; i < LR0ItemSet.size();i++)
+		for(int i = 0; i < LR0ItemSet.size(); i++)
 		{
 			LR0GOTO(LR0ItemSet[i]);
 		}
+		auto Finish = CheckLR0GOTO();
 	}
-
+	//检测LR0项集是否正确 不存在重复项集
+	bool CheckLR0GOTO()
+	{
+		auto Length = LR0ItemSet.size();
+		LR0ItemSet.erase(unique(LR0ItemSet.begin(), LR0ItemSet.end()), LR0ItemSet.end());
+		return LR0ItemSet.size() == Length;
+	}
 
 	void LR0GOTO(Stauts& Target)
 	{
 		//今日做
 		//存放当前Stauts的后一个符号集合
-		
-		unordered_multimap<ParseTag, pair<int,int>> XSet;
+
+		unordered_multimap<ParseTag, Pair<int, int>> XSet;
 		for(auto& Iter : Target.ItemList)
 		{
 			//说明没到产生式尾部
 			if(Iter.second != ProductionSize(Iter.first))
 			{
-				XSet.insert(make_pair(GetSymbolTag(Iter.first, Iter.second),pair<int,int>(Iter.first,Iter.second + 1)));
+				XSet.insert(make_pair(GetSymbolTag(Iter.first, Iter.second), Pair<int, int>(Iter.first, Iter.second + 1)));
 			}
 		}
-		//根据key分类,同key到同一个项集		
-		for(auto KeyIter =XSet.begin(); KeyIter != XSet.end(); KeyIter = XSet.upper_bound(KeyIter->first))
+		//根据key分类,同key到同一个项集
+		for(auto KeyIter = XSet.begin(); KeyIter != XSet.end(); KeyIter = XSet.upper_bound(KeyIter->first))
 		{
 			Stauts CurrentStauts;
 			auto KeyCount = XSet.count(KeyIter->first);
@@ -289,7 +374,7 @@ private:
 			CreatItemClourse(CurrentStauts.ItemList);
 			//判断是否新状态在项集集合中;
 			auto result = HasThisItemSet(CurrentStauts);
-			if (result == -1)
+			if(result == -1)
 			{
 				CurrentStauts.Index = LR0ItemSet.size();
 				LR0ItemSet.push_back(CurrentStauts);
@@ -300,9 +385,9 @@ private:
 	//判断项集集合中是否存在该项集,如果存在就返回索引,不存在就返回-1
 	int HasThisItemSet(Stauts& Target)
 	{
-		for(int i = 0; i < LR0ItemSet.size();i++)
+		for(int i = 0; i < LR0ItemSet.size(); i++)
 		{
-			if (HasSameItemList(Target,LR0ItemSet[i]))
+			if(HasSameItemList(Target, LR0ItemSet[i]))
 			{
 				return i;
 			}
@@ -316,9 +401,9 @@ private:
 		auto Length = Left.ItemList.size();
 		if(Length == Right.ItemList.size())
 		{
-			for(auto i = 0; i < Length;i++)
+			for(auto i = 0; i < Length; i++)
 			{
-				if (Left.ItemList[i] != Right.ItemList[i])
+				if(Left.ItemList[i] != Right.ItemList[i])
 				{
 					return false;
 				}
@@ -330,7 +415,7 @@ private:
 			return false;
 		}
 	}
-	Symbol GetSymbol(int Index,int Position)
+	Symbol GetSymbol(int Index, int Position)
 	{
 		return GrammarList[Index].Body[Position];
 	}
@@ -344,4 +429,3 @@ private:
 	//文法头到产生式体的映射表
 	unordered_multimap<ParseTag, int> GrammarMap;
 };
-

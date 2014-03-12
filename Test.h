@@ -41,6 +41,44 @@ enum class ParseTag
 	RepeatRight,
 	SumNumber,
 	Term,
+
+	StringTail,
+	SimpleUnNamedCatch_Start,
+	Mitipute_End,
+	Closures_Greedy,
+	Closures_UnGreedy,
+	PositiveClosures_Greedy,
+	PositiveClosures_UnGreedy,
+	Comma,
+	CharSetComponent,
+	ChoseClosures_Greedy,
+	ChoseClosures_UnGreedy,
+	NumberChar,
+	OtherChar,
+	RealWordChar,
+	CharSet_Start,
+	CharSet_Back_Start,
+	CharSet_End,
+	StringHead,
+	Repeat_Start,
+	ChoseSymbol,
+	Repeat_And_BackRefer_End,
+	Repeat_End_Greedy,
+	Start,
+	CharSet,
+	CharSetString,
+	CompleteCharSet,
+	CompleteFactor,
+	Express,
+	Factor,
+	NormalChar,
+	NormalString,
+	NormalStringComplete,
+	Repeat,
+	RepeatEnd,
+	RepeatRight,
+	SumNumber,
+	Term,
 };
 
 //语法分析符号
@@ -55,31 +93,6 @@ public:
 	{
 	}
 };
-////非终结符号
-//class Symbol :public Symbol
-//{
-//public:
-//	string Name;
-//	//非终结符号对应的回调函数
-//public:
-//	Symbol(bool Chose, string& NameStr) : Symbol(Chose), Name(NameStr)
-//	{
-//	}
-//
-//};
-////终结符号
-//class Symbol : public Symbol
-//{
-//public:
-//	LexTag TermTag;
-//public:
-//	Symbol(bool Chose) :Symbol(Chose)
-//	{
-//	}
-//	Symbol(bool Chose, LexTag Tag) : Symbol(Chose), TermTag(Tag)
-//	{
-//	}
-//};
 
 template<typename X, typename Y, typename Z>
 class Triple
@@ -107,17 +120,17 @@ class Stauts
 public:
 	//z状态集编号
 	int Index;
-	vector<Triple<int, int, shared_ptr<Symbol>>> ItemList;
-	map<shared_ptr<Symbol>, int> NextStauts;
+	vector<Triple<int, int, Symbol>> ItemList;
+	map<Symbol, int> NextStauts;
 };
 //产生式
 class Production
 {
 public:
-	shared_ptr<Symbol> Head;
-	vector<shared_ptr<Symbol>> Body;
+	Symbol Head;
+	vector<Symbol> Body;
 	int BodySize;
-	Production(shared_ptr<Symbol>& tHead, vector<shared_ptr<Symbol>>& tBody) : Head(tHead), Body(tBody)
+	Production(Symbol& tHead, vector<Symbol>& tBody) : Head(tHead), Body(tBody)
 	{
 		BodySize = Body.size();
 	}
@@ -135,89 +148,52 @@ public:
 private:
 	void initGrammarList()
 	{
-		/*	GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Start")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "Factor"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CharSet")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::CharSet_Start)), shared_ptr<Symbol>(new Symbol(false, "CharSetString")), shared_ptr<Symbol>(new Symbol(true, LexTag::CharSet_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CharSet")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::CharSet_Back_Start)), shared_ptr<Symbol>(new Symbol(false, "CharSetString")), shared_ptr<Symbol>(new Symbol(true, LexTag::CharSet_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CharSetString")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "CharSetString")), shared_ptr<Symbol>(new Symbol(true, LexTag::CharSetComponent)), shared_ptr<Symbol>(new Symbol(false, "NormalString"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CharSetString")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "CharSetString")), shared_ptr<Symbol>(new Symbol(false, "NormalString"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CharSetString")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "NormalString"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CompleteCharSet")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "CharSet"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CompleteCharSet")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "CharSet")), shared_ptr<Symbol>(new Symbol(false, "Repeat"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CompleteFactor")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "Factor")), shared_ptr<Symbol>(new Symbol(false, "Repeat"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "CompleteFactor")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "Factor"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Express")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "Express")), shared_ptr<Symbol>(new Symbol(true, LexTag::ChoseSymbol)), shared_ptr<Symbol>(new Symbol(false, "Term"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Express")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "Term"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Factor")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::SimpleUnNamedCatch_Start)), shared_ptr<Symbol>(new Symbol(false, "Express")), shared_ptr<Symbol>(new Symbol(true, LexTag::Mitipute_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Factor")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "CompleteCharSet"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Factor")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "NormalStringComplete"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalChar")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::NumberChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalChar")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::RealWordChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalChar")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::OtherChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalString")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "NormalString")), shared_ptr<Symbol>(new Symbol(false, "NormalChar"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalString")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "NormalChar"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalStringComplete")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "NormalString")), shared_ptr<Symbol>(new Symbol(false, "Repeat"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "NormalStringComplete")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "NormalString"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::Repeat_Start)), shared_ptr<Symbol>(new Symbol(false, "RepeatRight")), shared_ptr<Symbol>(new Symbol(false, "RepeatEnd"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::Closures_UnGreedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::Closures_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::PositiveClosures_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::PositiveClosures_UnGreedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::ChoseClosures_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Repeat")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::ChoseClosures_UnGreedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "RepeatEnd")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::Repeat_And_BackRefer_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "RepeatEnd")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::Repeat_End_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "RepeatRight")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, LexTag::Comma)), shared_ptr<Symbol>(new Symbol(false, "SumNumber"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "RepeatRight")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "SumNumber")), shared_ptr<Symbol>(new Symbol(true, LexTag::Comma))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "RepeatRight")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "SumNumber"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "RepeatRight")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "SumNumber")), shared_ptr<Symbol>(new Symbol(true, LexTag::Comma)), shared_ptr<Symbol>(new Symbol(false, "SumNumber"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "SumNumber")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "SumNumber")), shared_ptr<Symbol>(new Symbol(false, "Number"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Term")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "Term")), shared_ptr<Symbol>(new Symbol(false, "CompleteFactor"))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, "Term")), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, "CompleteFactor"))})));*/
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Start)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::Factor))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSet)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::CharSet_Start)), shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), shared_ptr<Symbol>(new Symbol(true, ParseTag::CharSet_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSet)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::CharSet_Back_Start)), shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), shared_ptr<Symbol>(new Symbol(true, ParseTag::CharSet_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), shared_ptr<Symbol>(new Symbol(true, ParseTag::CharSetComponent)), shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSetString)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteCharSet)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSet))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteCharSet)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::CharSet)), shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteFactor)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::Factor)), shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteFactor)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::Factor))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Express)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::Express)), shared_ptr<Symbol>(new Symbol(true, ParseTag::ChoseSymbol)), shared_ptr<Symbol>(new Symbol(false, ParseTag::Term))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Express)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::Term))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Factor)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::SimpleUnNamedCatch_Start)), shared_ptr<Symbol>(new Symbol(false, ParseTag::Express)), shared_ptr<Symbol>(new Symbol(true, ParseTag::Mitipute_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Factor)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteCharSet))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Factor)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalStringComplete))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalChar)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::NumberChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalChar)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::RealWordChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalChar)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::OtherChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString)), shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalStringComplete)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString)), shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalStringComplete)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::NormalString))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::Repeat_Start)), shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatRight)), shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatEnd))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::Closures_UnGreedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::Closures_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::PositiveClosures_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::PositiveClosures_UnGreedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::ChoseClosures_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Repeat)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::ChoseClosures_UnGreedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatEnd)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::Repeat_And_BackRefer_End))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatEnd)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::Repeat_End_Greedy))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatRight)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(true, ParseTag::Comma)), shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatRight)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber)), shared_ptr<Symbol>(new Symbol(true, ParseTag::Comma))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatRight)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::RepeatRight)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber)), shared_ptr<Symbol>(new Symbol(true, ParseTag::Comma)), shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::SumNumber)), shared_ptr<Symbol>(new Symbol(false, ParseTag::NumberChar))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Term)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::Term)), shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteFactor))})));
-		GrammarList.push_back(Production(shared_ptr<Symbol>(new Symbol(false, ParseTag::Term)), vector<shared_ptr<Symbol>>({shared_ptr<Symbol>(new Symbol(false, ParseTag::CompleteFactor))})));
+		//<initGrammarMap>
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Start), vector<Symbol>({Symbol(false, ParseTag::Factor)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Back_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSetComponent), Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetString), Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet), Symbol(false, ParseTag::Repeat)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteFactor), vector<Symbol>({Symbol(false, ParseTag::Factor), Symbol(false, ParseTag::Repeat)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteFactor), vector<Symbol>({Symbol(false, ParseTag::Factor)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Express), vector<Symbol>({Symbol(false, ParseTag::Express), Symbol(true, ParseTag::ChoseSymbol), Symbol(false, ParseTag::Term)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Express), vector<Symbol>({Symbol(false, ParseTag::Term)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Factor), vector<Symbol>({Symbol(true, ParseTag::SimpleUnNamedCatch_Start), Symbol(false, ParseTag::Express), Symbol(true, ParseTag::Mitipute_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Factor), vector<Symbol>({Symbol(false, ParseTag::CompleteCharSet)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Factor), vector<Symbol>({Symbol(false, ParseTag::NormalStringComplete)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::NumberChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::RealWordChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::OtherChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(false, ParseTag::NormalChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalStringComplete), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(false, ParseTag::Repeat)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalStringComplete), vector<Symbol>({Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Repeat_Start), Symbol(false, ParseTag::RepeatRight), Symbol(false, ParseTag::RepeatEnd)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Closures_UnGreedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Closures_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::PositiveClosures_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::PositiveClosures_UnGreedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::ChoseClosures_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::ChoseClosures_UnGreedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatEnd), vector<Symbol>({Symbol(true, ParseTag::Repeat_And_BackRefer_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatEnd), vector<Symbol>({Symbol(true, ParseTag::Repeat_End_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(true, ParseTag::Comma), Symbol(false, ParseTag::SumNumber)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(true, ParseTag::Comma)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(true, ParseTag::Comma), Symbol(false, ParseTag::SumNumber)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(false, ParseTag::NumberChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::Term), Symbol(false, ParseTag::CompleteFactor)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor)})));
 	}
 
 	void initGrammarMap()
 	{
 		for(int i = 0; i < GrammarList.size(); i++)
 		{
-			GrammarMap.insert(make_pair(GrammarList[i].Head->Tag, i));
+			GrammarMap.insert(make_pair(GrammarList[i].Head.Tag, i));
 		}
 	}
 	//创建LR(0)核心项集
@@ -228,7 +204,7 @@ private:
 		StartSet.Index = 0;
 		//开始产生式
 		//第一个项压入项集
-		StartSet.ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>({0, 0}));
+		StartSet.ItemList.push_back(Triple<int, int, Symbol>({0, 0}));
 		//第一个项集的闭包计算
 		CreatItemClourse(StartSet.ItemList);
 
@@ -237,7 +213,7 @@ private:
 	}
 
 	//计算项集的闭包并加入项集
-	void CreatItemClourse(vector<Triple<int, int, shared_ptr<Symbol>>>& ItemList)
+	void CreatItemClourse(vector<Triple<int, int, Symbol>>& ItemList)
 	{
 		for(int i = 0; i < ItemList.size(); i++)
 		{
@@ -246,21 +222,13 @@ private:
 			{
 				//说明是非终结符号
 				auto FindIter = GrammarMap.equal_range(GetSymbolTag(CurrentItem.First, CurrentItem.Second));
-				if(FindIter.first == FindIter.second)
+				for(auto Iter = FindIter.first; Iter != FindIter.second; Iter++)
 				{
-					//非终结符号找不到索引肿么可能- -;
-					abort();
-				}
-				else
-				{
-					for(auto Iter = FindIter.first; Iter != FindIter.second; Iter++)
+					//获取的是产生式的编号
+					//查看该产生式是否已经加入;
+					if(!HasAddThisProduct(ItemList, Iter->second))
 					{
-						//获取的是产生式的编号
-						//查看该产生式是否已经加入;
-						if(!HasAddThisProduct(ItemList, Iter->second))
-						{
-							ItemList.push_back(Triple<int, int, shared_ptr<Symbol>>(Iter->second, 0));
-						}
+						ItemList.push_back(Triple<int, int, Symbol>(Iter->second, 0));
 					}
 				}
 			}
@@ -268,7 +236,7 @@ private:
 	}
 
 	//查看该编号产生式是否已经加入
-	bool HasAddThisProduct(vector<Triple<int, int, shared_ptr<Symbol>>>& ItemList, int Number)
+	bool HasAddThisProduct(vector<Triple<int, int, Symbol>>& ItemList, int Number)
 	{
 		for(auto i = 0; i < ItemList.size(); i++)
 		{
@@ -284,24 +252,30 @@ private:
 	//Index 是文法编号 Position是第X个位置的点
 	bool CouldExpand(int Index, int Position)
 	{
-		return GrammarList[Index].Body[Position]->IsTerminal == false;
+		return GrammarList[Index].Body[Position].IsTerminal == false;
 	}
 	ParseTag GetSymbolTag(int Index, int Position)
 	{
-		return GrammarList[Index].Body[Position]->Tag;
+		return GrammarList[Index].Body[Position].Tag;
 	}
-	//获取非终结符号的名字,如果是终结符号,挂掉
-	/*string GetNonTermName(int Index, int Position)
+	//GOTO(int,int,X)
+	int ProductionSize(int Index)
 	{
-	if(CouldExpand(Index, Position))
-	{
-	return std::move(static_cast<Symbol*>( GrammarList[Index].Body[Position].get() )->Name);
+		return GrammarList[Index].BodySize;
 	}
-	else
+	Stauts LR0GOTO(Stauts& Target)
 	{
-	abort();
-	return string();
-	}*/
+		//今日做
+		//存放当前Stauts的后一个符号集合
+		unordered_map<Symbol, vector<int>> XSet;
+		for(auto& Iter : Target.ItemList)
+		{
+			//说明没到产生式尾部
+			if(Iter.Second != ProductionSize(Iter.First))
+			{
+			}
+		}
+	}
 private:
 	//文法 0号是产生式头
 	vector<Production> GrammarList;

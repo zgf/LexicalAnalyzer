@@ -234,7 +234,7 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 		for(auto StrIter : Iter.second)
 		{
 			//放vector<Symbol>字符串
-			string TempSymbolStr = "GrammarList.push_back(Production(  shared_ptr<Symbol>( new Symbol(false,ParseTag::" + HeadStr + ")),vector<shared_ptr<Symbol>>({";
+			string TempSymbolStr = "GrammarList.push_back(Production( Symbol(false,ParseTag::" + HeadStr + "),vector<Symbol>({";
 			auto ProductTokenList = GetSpaceCutToken(StrIter);
 			for(auto TokenIter : ProductTokenList)
 			{
@@ -248,11 +248,11 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 					//需要替换的终结符号
 					auto re = GetNoteSignContent(TokenIter, string("\""), string("\""));
 					auto& test = TermToTagMap.find(re);
-					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Symbol(true,ParseTag::" + test->second + ")),";
+					TempSymbolStr = TempSymbolStr + "Symbol(true,ParseTag::" + test->second + "),";
 				}
 				else
 				{
-					TempSymbolStr = TempSymbolStr + "shared_ptr<Symbol>(new Symbol(false,ParseTag::" + TokenIter + ")),";
+					TempSymbolStr = TempSymbolStr + "Symbol(false,ParseTag::" + TokenIter + "),";
 				}
 			}
 			//清除最后一个逗号

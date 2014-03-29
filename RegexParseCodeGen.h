@@ -44,9 +44,11 @@ public:
 		//初始化ParseTag Enum类
 		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<ParseTag>"), NameEnumStr);
 
+		//初始化TagMap
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<initTagMap>"), CreateTagMapStr(TermToTagMap));
 		//插入模板
 		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap));
-
+		
 		//创建文件
 		CreateCppFile(string("Test.h"), Content);
 	}
@@ -113,6 +115,9 @@ public:
 
 	//用所有的符号名去定义生成文件中的ParseTag枚举类
 	string CreatParseTagEnumStr(vector<string>& NameList);
+
+	//创建TagMap的Str
+	string CreateTagMapStr(map<string,string>& TermToMap);
 	//输出内容到文件
 	void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent);
 };

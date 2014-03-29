@@ -81,6 +81,7 @@ LexParse类结构
 #include <map>
 #include <memory>
 #include <unordered_map>
+#include <iostream>
 using namespace std;
 //这里是声明部分 RegexToken类型 enum类型都在这里定义
 
@@ -123,10 +124,22 @@ enum class LexTag
 //最基础的,选择
 class RegexToken
 {
-	LexTag Tag;
 	wstring Data;
 	int Index;//出现的索引
+	LexTag Tag;
 public:
+	LexTag GetTag()
+	{
+		return Tag;
+	}
+	int GetIndex()
+	{
+		return Index;
+	}
+	wstring GetData()
+	{
+		return Data;
+	}
 	RegexToken(LexTag One, wstring& Two, int Three) :Tag(One), Data(Two), Index(Three)
 	{
 	}
@@ -179,6 +192,10 @@ public:
 		auto StartIndex = 0;
 		//首先对PatternStr预处理,去除注释之类的
 		PatternStr = DeleteNoteSign(PatternStr, StartNote, EndNote);
+		if (PatternStr.back() != '$')
+		{
+			PatternStr.append(L"$");
+		}
 		//结果数组
 		vector<shared_ptr<RegexToken>> ResultList;
 
@@ -193,11 +210,13 @@ public:
 				if(RuleToTagList.find(CurrentStr) != RuleToTagList.end())
 				{
 					ResultList.push_back(ActionMap[RuleToTagList[CurrentStr]](StartIndex, std::ref(CurrentStr), std::ref(PatternStr)));
+					break;
 				}
 				else if(i == 1)
 				{
 					ResultList.push_back(GetCurrentNormalString(CurrentStr, StartIndex));
 					StartIndex += 1;
+					break;
 				}
 			}
 		}
@@ -604,7 +623,11 @@ private:
 		ActionMap.insert(make_pair(LexTag::CharSetComponent, std::bind(&LexParse::CharSetComponent, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		ActionMap.insert(make_pair(LexTag::Comma, std::bind(&LexParse::Comma, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 	}
-
+public:
+	vector<shared_ptr<RegexToken>>& ReturnTokenStream()
+	{
+		return TokenStream;
+	}
 private:
 	//标签到函数的映射
 	//int&是传入的重启位置.进入函数更改至新的重启位置
@@ -622,10 +645,12 @@ private:
 
 	//字母表到字符范围的映射
 
-	vector<shared_ptr<RegexToken>> TokenStream;
+	
 	wstring Pattern;
 	int Length;
 	//嵌套标签栈
 	//vector<LexTag>StackList;
 	vector<LexTag>StackList;
+public:
+	vector<shared_ptr<RegexToken>> TokenStream;
 };

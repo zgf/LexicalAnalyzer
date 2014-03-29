@@ -319,3 +319,12 @@ string RegexParseCodeGen::CreatParseTagEnumStr(vector<string>& NameList)
 	}
 	return std::move(ResultStr);
 }
+string RegexParseCodeGen::CreateTagMapStr(map<string, string>& TermToMap)
+{
+	string Content;
+	for (auto& Iter : TermToMap)
+	{
+		Content = Content + "TagMap.insert(make_pair(LexTag::" + Iter.second + ",ParseTag::" + Iter.second + "));\n";
+	}
+	return std::move(Content);
+}

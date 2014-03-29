@@ -1,7 +1,7 @@
 <TokenDefine>
-/*ÕâÀïÊÇĞ´Èë·ÇÖÕ½á·ûºÅÔÚ´Ê·¨½âÎöÊ±ºòµÄTag±íÊ¾*/
-//½ûÖ¹LexTagºÍ·ÇÖÕ½á·ûºÅÖØÃû
-//ĞÎÊ½ "LexTag" : "ÖÕ½á·ûºÅ" ;
+/*è¿™é‡Œæ˜¯å†™å…¥éç»ˆç»“ç¬¦å·åœ¨è¯æ³•è§£ææ—¶å€™çš„Tagè¡¨ç¤º*/
+//ç¦æ­¢LexTagå’Œéç»ˆç»“ç¬¦å·é‡å
+//å½¢å¼ "LexTag" : "ç»ˆç»“ç¬¦å·" ;
 "OtherChar " : "OtherChar";
 "NumberChar" : "NumberChar";
 "RealWordChar" : "RealWordChar";
@@ -25,23 +25,23 @@
 "CharSetComponent" : "-";
 "Comma" : ",";
 </TokenDefine>
-//µÚÒ»¸ö²úÉúÊ½ÊÇ²úÉúÊ½¿ªÊ¼.
+//ç¬¬ä¸€ä¸ªäº§ç”Ÿå¼æ˜¯äº§ç”Ÿå¼å¼€å§‹.
 <FirstGrammar>
 	Start => Factor;
 </FirstGrammar>
 <Grammar>
-	CompleteCharSet => CharSet | CharSet Repeat;
-	Factor => "(" Express ")" | CompleteCharSet | NormalStringComplete;
-	CompleteFactor => Factor Repeat | Factor;
-	Term => Term CompleteFactor | CompleteFactor;
-	Express => Express "|" Term | Term;
-	Repeat => "{" RepeatRight RepeatEnd | "*?"| "*" | "+" | "+?" | "?" | "??";
-	RepeatRight => "," SumNumber | SumNumber "," | SumNumber | SumNumber "," SumNumber;
-	RepeatEnd => "}" | "}?";
-	SumNumber => SumNumber NumberChar;
-	NormalStringComplete => NormalString Repeat|NormalString;
-	NormalString => NormalString NormalChar|NormalChar;
-	NormalChar => "NumberChar" | "RealWordChar"| "OtherChar";
-	CharSet=> "[" CharSetString "]" | "[^" CharSetString "]";
-	CharSetString => CharSetString "-" NormalString | CharSetString NormalString | NormalString;
+  CompleteCharSet => CharSet | CharSet Repeat;
+  Factor => "(" Express ")" | CompleteCharSet | NormalStringComplete;
+  CompleteFactor => Factor Repeat | Factor;
+  Term => Term CompleteFactor | CompleteFactor;
+  Express => Express "|" Term | Term;
+  Repeat => "{" RepeatRight RepeatEnd | "*?"| "*" | "+" | "+?" | "?" | "??";
+  RepeatRight => "," SumNumber | SumNumber "," | SumNumber | SumNumber "," SumNumber;
+  RepeatEnd => "}" | "}?";
+  SumNumber => NumberChar SumNumber;
+  NormalStringComplete => NormalString Repeat | NormalString;
+  NormalString => NormalChar NormalString  | NormalChar;
+  NormalChar => "NumberChar" | "RealWordChar"| "OtherChar";
+  CharSet=> "[" CharSetString "]" | "[^" CharSetString "]";
+  CharSetString => NormalString "-" CharSetString  | NormalString CharSetString  | NormalString;
 </Grammar>

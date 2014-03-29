@@ -71,26 +71,35 @@ struct EqualTo
 	}
 };
 
-template<typename X, typename Y>
-class Pair
+template<typename X, typename Y, typename Z = set<ParseTag>>
+class Triple
 {
 public:
 	//第几条文法
 	X first;
 	//第X条文法的第Y项
 	Y second;
-	Pair(X a, Y b) : first(a), second(b)
+	Z TagMap;
+	Triple(X a, Y b) : first(a), second(b)
 	{
 	}
-	bool operator!=( Pair& a )
+	Triple(X a, Y b, vector<ParseTag>& tList) :first(a), second(b)
 	{
-		return this->first != a.first || this->second != a.second;
+		TagMap.insert(tList.begin(), tList.end());
 	}
-	friend bool operator==( Pair& a, Pair& b )
+	Triple(X a, Y b, set<ParseTag>& tMap) :first(a), second(b)
 	{
-		return a.first == b.first && a.second == b.second;
+		TagMap.insert(tMap.begin(), tMap.end());
 	}
-	friend bool operator<( Pair& a, Pair& b )
+	bool operator !=( Triple& a )
+	{
+		return this->first != a.first || this->second != a.second || a.TagMap != this->TagMap;
+	}
+	friend bool operator==( Triple& a, Triple& b )
+	{
+		return a.first == b.first && a.second == b.second && a.TagMap == b.TagMap;
+	}
+	friend bool operator<( Triple& a, Triple& b )
 	{
 		if(a.first == b.first)
 		{
@@ -102,37 +111,37 @@ public:
 		}
 	}
 };
-
-template<typename X, typename Y, typename Z>
-class Triple
-{
-public:
-	//第几条文法
-	X First;
-	//第X条文法的第Y项
-	Y Second;
-	//向前看的字符
-	Z Third;
-	Triple(X a, Y b) :First(a), Second(b)
-	{
-	}
-	Triple(X a, Y b, Z c) :First(a), Second(b), Third(c)
-	{
-	}
-	Triple(Z c) :Third(c)
-	{
-	}
-};
-
+//
+//template<typename X, typename Y, typename Z>
+//class Triple
+//{
+//public:
+//	//第几条文法
+//	X First;
+//	//第X条文法的第Y项
+//	Y Second;
+//	//向前看的字符
+//	Z Third;
+//	Triple(X a, Y b) :First(a), Second(b)
+//	{
+//	}
+//	Triple(X a, Y b, Z c) :First(a), Second(b), Third(c)
+//	{
+//	}
+//	Triple(Z c) :Third(c)
+//	{
+//	}
+//};
+//typedef Triple<int, int, vector<ParseTag>> LR1Stauts;
 //状态集
-class Stauts
+class LR1Stauts
 {
 public:
 	//z状态集编号
 	int Index;
-	vector<Pair<int, int>> ItemList;
-	map<Symbol, int> NextStauts;
-	friend bool operator== ( Stauts& Left, Stauts&Right )
+	vector<Triple<int, int, set<ParseTag>>> ItemList;
+	//map<Symbol, int> NextStauts;
+	friend bool operator== ( LR1Stauts& Left, LR1Stauts&Right )
 	{
 		if(Left.ItemList.size() == Right.ItemList.size())
 		{
@@ -150,7 +159,7 @@ public:
 			return false;
 		}
 	}
-	friend	bool operator<( Stauts&Left, Stauts& Right )
+	friend	bool operator<( LR1Stauts&Left, LR1Stauts& Right )
 	{
 		if(Left.ItemList.size() == Right.ItemList.size())
 		{
@@ -202,17 +211,16 @@ public:
 	{
 		initGrammarList();
 		initGrammarMap();
-		CreatLR0ItemSet();
+		CreatLR1ItemSet();
 	}
 private:
 	void initGrammarList()
 	{
-		//<initGrammarMap>
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Start), vector<Symbol>({Symbol(false, ParseTag::Factor)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Back_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSetComponent), Symbol(false, ParseTag::NormalString)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetString), Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(true, ParseTag::CharSetComponent), Symbol(false, ParseTag::CharSetString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(false, ParseTag::CharSetString)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::NormalString)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet), Symbol(false, ParseTag::Repeat)})));
@@ -226,7 +234,7 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::NumberChar)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::RealWordChar)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::OtherChar)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(false, ParseTag::NormalChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalChar), Symbol(false, ParseTag::NormalString)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalChar)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalStringComplete), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(false, ParseTag::Repeat)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalStringComplete), vector<Symbol>({Symbol(false, ParseTag::NormalString)})));
@@ -243,7 +251,7 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(true, ParseTag::Comma)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(true, ParseTag::Comma), Symbol(false, ParseTag::SumNumber)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(false, ParseTag::NumberChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::NumberChar), Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::Term), Symbol(false, ParseTag::CompleteFactor)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor)})));
 	}
@@ -257,7 +265,7 @@ private:
 	}
 
 	//计算项集的闭包并加入项集
-	void CreatItemClourse(vector<Pair<int, int>>& ItemList)
+	void CreatItemClourse(vector<Triple<int, int, set<ParseTag>>>& ItemList)
 	{
 		for(int i = 0; i < ItemList.size(); i++)
 		{
@@ -265,14 +273,38 @@ private:
 			if(CouldExpand(CurrentItem.first, CurrentItem.second))
 			{
 				//说明是非终结符号
-				auto FindIter = GrammarMap.equal_range(GetSymbolTag(CurrentItem.first, CurrentItem.second));
+				//查看在当前产生式体中,该非终结符号是否有后缀
+				set<ParseTag> TermSymbolSet;
+				if(IsProductEnd(CurrentItem.first, CurrentItem.second + 1))
+				{
+					//没有后缀就把终结符号集合符号继承过来
+					TermSymbolSet = CurrentItem.TagMap;
+				}
+				else
+				{
+					//有后缀就把后缀符号加入
+					TermSymbolSet = GetSymbolFirstSet(CurrentItem.first, CurrentItem.second + 1);
+				}
+
+				//在CouldExpand里面已经测试好了,肯定是非终结符号
+				auto GetTag = GetSymbolTag(CurrentItem.first, CurrentItem.second);
+				auto FindIter = GrammarMap.equal_range(GetTag);
+
 				for(auto Iter = FindIter.first; Iter != FindIter.second; Iter++)
 				{
 					//获取的是产生式的编号
 					//查看该产生式是否已经加入;
-					if(!HasAddThisProduct(ItemList, Iter->second))
+					auto ResultIndex = HasAddThisProduct(ItemList, Iter->second);
+					if(-1 == ResultIndex)
 					{
-						ItemList.push_back(Pair<int, int>(Iter->second, 0));
+						ItemList.push_back({Iter->second, 0, TermSymbolSet});
+					}
+					else
+					{
+						//查看该产生式是否缺少还未加入的后缀
+						set<ParseTag> ResultSet;
+						set_union(ItemList[ResultIndex].TagMap.begin(), ItemList[ResultIndex].TagMap.end(), TermSymbolSet.begin(), TermSymbolSet.end(), inserter(ResultSet, ResultSet.begin()));
+						ResultSet.swap(ItemList[ResultIndex].TagMap);
 					}
 				}
 			}
@@ -282,17 +314,55 @@ private:
 		sort(ItemList.begin(), ItemList.end());
 	}
 
+	bool IsProductEnd(int Index, int Position)
+	{
+		return GrammarList[Index].BodySize == Position;
+	}
+
+	//获取Symbol的First集合
+	set<ParseTag> GetSymbolFirstSet(int Index, int Position)
+	{
+		set<ParseTag> Result;
+		auto Sym = GetSymbol(Index, Position);
+		if(Sym.IsTerminal == true)
+		{
+			//终结符号
+			Result.insert(Sym.Tag);
+		}
+		else
+		{
+			//非终结符号
+			for(auto& Iter : GetProductBodyNumber(Sym.Tag))
+			{
+				auto& Find = GetSymbolFirstSet(Iter, 0);
+				Result.insert(Find.begin(), Find.end());
+			}
+		}
+		return std::move(Result);
+	}
+
+	vector<int> GetProductBodyNumber(ParseTag NonTerminal)
+	{
+		vector<int> Result;
+		auto FindIter = GrammarMap.find(NonTerminal);
+		for(auto i = 0; i < GrammarMap.count(NonTerminal); i++, FindIter++)
+		{
+			Result.push_back(FindIter->second);
+		}
+		return std::move(Result);
+	}
+
 	//查看该编号产生式是否已经加入
-	bool HasAddThisProduct(vector<Pair<int, int>>& ItemList, int Number)
+	int HasAddThisProduct(vector<Triple<int, int, set<ParseTag>>>& ItemList, int Number)
 	{
 		for(auto i = 0; i < ItemList.size(); i++)
 		{
 			if(ItemList[i].first == Number)
 			{
-				return true;
+				return i;
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	//判断是不是.号后面是非终结符号
@@ -320,52 +390,54 @@ private:
 
 	//创建LR(0)核心项集
 
-	void CreatLR0ItemSet()
+	void CreatLR1ItemSet()
 	{
 		//构造第一个Lr(0)核心项集
-		Stauts StartSet;
+		LR1Stauts StartSet;
 		StartSet.Index = 0;
 		//开始产生式
 		//第一个项压入项集
-		StartSet.ItemList.push_back(Pair<int, int>({0, 0}));
+		set<ParseTag>TagList;
+		TagList.insert(ParseTag::StringTail);
+		StartSet.ItemList.push_back(Triple<int, int, set<ParseTag>>({0, 0, TagList}));
 		//第一个项集的闭包计算
 		CreatItemClourse(StartSet.ItemList);
 
 		//第一个项集压栈
-		LR0ItemSet.push_back(StartSet);
-		for(int i = 0; i < LR0ItemSet.size(); i++)
+		LR1ItemSet.push_back(StartSet);
+		for(int i = 0; i < LR1ItemSet.size(); i++)
 		{
-			LR0GOTO(LR0ItemSet[i]);
+			LR1GOTO(LR1ItemSet[i]);
 		}
 		auto Finish = CheckLR0GOTO();
 	}
 	//检测LR0项集是否正确 不存在重复项集
 	bool CheckLR0GOTO()
 	{
-		auto Length = LR0ItemSet.size();
-		LR0ItemSet.erase(unique(LR0ItemSet.begin(), LR0ItemSet.end()), LR0ItemSet.end());
-		return LR0ItemSet.size() == Length;
+		auto Length = LR1ItemSet.size();
+		LR1ItemSet.erase(unique(LR1ItemSet.begin(), LR1ItemSet.end()), LR1ItemSet.end());
+		return LR1ItemSet.size() == Length;
 	}
 
-	void LR0GOTO(Stauts& Target)
+	void LR1GOTO(LR1Stauts& Target)
 	{
 		//今日做
-		//存放当前Stauts的后一个符号集合
+		//存放当前LR1Stauts的后一个符号集合
 
-		unordered_multimap<ParseTag, Pair<int, int>> XSet;
+		unordered_multimap<ParseTag, Triple<int, int, set<ParseTag>>> NextSet;
 		for(auto& Iter : Target.ItemList)
 		{
 			//说明没到产生式尾部
 			if(Iter.second != ProductionSize(Iter.first))
 			{
-				XSet.insert(make_pair(GetSymbolTag(Iter.first, Iter.second), Pair<int, int>(Iter.first, Iter.second + 1)));
+				NextSet.insert(make_pair(GetSymbolTag(Iter.first, Iter.second), Triple<int, int, set<ParseTag>>(Iter.first, Iter.second + 1, Iter.TagMap)));
 			}
 		}
 		//根据key分类,同key到同一个项集
-		for(auto KeyIter = XSet.begin(); KeyIter != XSet.end(); KeyIter = XSet.upper_bound(KeyIter->first))
+		for(auto KeyIter = NextSet.begin(); KeyIter != NextSet.end(); KeyIter = NextSet.upper_bound(KeyIter->first))
 		{
-			Stauts CurrentStauts;
-			auto KeyCount = XSet.count(KeyIter->first);
+			LR1Stauts CurrentStauts;
+			auto KeyCount = NextSet.count(KeyIter->first);
 			auto i = 0;
 			for(auto MinIter = KeyIter; i < KeyCount; MinIter++, i++)
 			{
@@ -376,18 +448,18 @@ private:
 			auto result = HasThisItemSet(CurrentStauts);
 			if(result == -1)
 			{
-				CurrentStauts.Index = LR0ItemSet.size();
-				LR0ItemSet.push_back(CurrentStauts);
+				CurrentStauts.Index = LR1ItemSet.size();
+				LR1ItemSet.push_back(CurrentStauts);
 			}
 		}
 	}
 
 	//判断项集集合中是否存在该项集,如果存在就返回索引,不存在就返回-1
-	int HasThisItemSet(Stauts& Target)
+	int HasThisItemSet(LR1Stauts& Target)
 	{
-		for(int i = 0; i < LR0ItemSet.size(); i++)
+		for(int i = 0; i < LR1ItemSet.size(); i++)
 		{
-			if(HasSameItemList(Target, LR0ItemSet[i]))
+			if(HasSameItemList(Target, LR1ItemSet[i]))
 			{
 				return i;
 			}
@@ -396,7 +468,7 @@ private:
 	}
 
 	//是否有同样的项集
-	bool HasSameItemList(Stauts& Left, Stauts& Right)
+	bool HasSameItemList(LR1Stauts& Left, LR1Stauts& Right)
 	{
 		auto Length = Left.ItemList.size();
 		if(Length == Right.ItemList.size())
@@ -424,8 +496,9 @@ private:
 	vector<Production> GrammarList;
 
 	//LR(0)项集
-	vector<Stauts> LR0ItemSet;
+	vector<LR1Stauts> LR1ItemSet;
 
+	//创建LR(1)项集GOTO表
 	//文法头到产生式体的映射表
 	unordered_multimap<ParseTag, int> GrammarMap;
 };

@@ -3,7 +3,7 @@
 int main()
 {
 	//RegexParseCodeGen ParseCodeGen(string("RegexParseConfig"), string("RegexParseTemplate.h"));
-	//	ParseCodeGen.DealAll();
+		//ParseCodeGen.DealAll();
 	RegexParse Parse;
 
 	return 0;

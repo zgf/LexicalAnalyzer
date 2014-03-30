@@ -12,6 +12,119 @@ bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter)
 {
 	return SrcStr[FindIter - 1] == '\\' || ( SrcStr[FindIter - 1] == '"' && SrcStr[FindIter + 1] == '"' );
 }
+int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex)
+{
+	int StackList = 0;
+	StackList = 1;
+	auto StartIndex = SrcIndex;
+	auto Length = 1;
+	while(StackList != 0)
+	{
+		SrcIndex += 1;
+		Length += 1;
+		if(Src[SrcIndex] == NestedSign.first)
+		{
+			StackList += 1;
+		}
+		else if(Src[SrcIndex] == NestedSign.second)
+		{
+			StackList -= 1;
+		}
+	}
+	return StartIndex + Length;
+}
+string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex)
+{
+	string Symbol;
+	SrcIndex = Src.find(NestedSign.first);
+	//这里的Index是超尾
+	auto EndIndex = GetLongestNestedEndIndex(NestedSign, Src, SrcIndex);
+	SrcIndex++;
+	Symbol = Src.substr(SrcIndex, EndIndex - SrcIndex - 1);
+	return std::move(Symbol);
+}
+
+
+vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd)
+{
+	//TODO
+	//获取花括号的嵌套范围
+	 auto StartIndex = 0;
+	 auto FindStartIndex = 0;
+	vector<pair<int, int>> JumpList;
+	while(true)
+	{
+		FindStartIndex = SrcStr.find(JumpStart, StartIndex);
+		if(FindStartIndex == SrcStr.npos)
+		{
+			break;
+			
+		}
+		else if(FindStartIndex != 0 && IsStrLiteral(SrcStr, FindStartIndex))
+		{
+			StartIndex = StartIndex + 1;
+		}
+		else
+		{
+			pair<int, int>Temp;
+			Temp.first = FindStartIndex;
+			auto FindEndIndex = GetLongestNestedEndIndex(pair<char,char>(JumpStart, JumpEnd), SrcStr, FindStartIndex);
+			Temp.second = FindEndIndex;
+			JumpList.push_back(Temp);
+			StartIndex = FindEndIndex;
+		}
+	}
+
+	StartIndex = 0;
+
+	vector<string> Result;
+	vector<int>SignList;
+	SignList.push_back(0 - DefineStr.size());
+	while(true)
+	{
+		auto FindIter = SrcStr.find(DefineStr, StartIndex);
+		if(FindIter == SrcStr.npos)
+		{
+			break;
+		}
+		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter))
+		{
+			StartIndex = FindIter + DefineStr.size();
+		}
+		else
+		{
+			auto FindIndex = IsInTheRangeList(JumpList, (int)FindIter);
+			if(FindIndex != -1)
+			{
+				StartIndex = JumpList[FindIndex].second;
+			}
+			else
+			{
+				SignList.push_back(FindIter);
+				StartIndex = FindIter + DefineStr.size();
+			}
+		}
+	}
+
+	if(SignList.size() != 1)
+	{
+		for(int i = 0; i < SignList.size() - 1; i++)
+		{
+			auto Catch = SrcStr.substr(SignList[i] + DefineStr.size(), SignList[i + 1] - ( SignList[i] + DefineStr.size() ));
+			if(!Catch.empty())
+			{
+				Result.push_back(Catch);
+			}
+		}
+		Result.push_back(SrcStr.substr(SignList.back() + DefineStr.size()));
+	}
+	else
+	{
+		Result.push_back(SrcStr);
+	}
+	return std::move(Result);
+}
+
 vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr)
 {
 	auto StartIndex = 0;
@@ -53,27 +166,6 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 		Result.push_back(SrcStr);
 	}
 	return std::move(Result);
-	//auto FindIter = 0;
-	//vector<string> Result;
-	//auto OldIter = 0;
-	//while(OldIter < SrcStr.size() && FindIter != SrcStr.npos)
-	//{
-	//	FindIter = SrcStr.find(DefineStr, OldIter);
-	//	if (FindIter != SrcStr.npos)
-	//	{
-	//		if(FindIter != 0 && ( SrcStr[FindIter - 1] == '\\' || ( SrcStr[FindIter - 1] == '"' && SrcStr[FindIter + 1] == '"' ) ))
-	//		{
-	//			OldIter = FindIter + DefineStr.size();
-	//		}
-	//		else
-	//		{
-	//			Result.push_back(SrcStr.substr(OldIter, FindIter - OldIter));
-	//			OldIter = FindIter + DefineStr.size();
-	//		}
-	//	}
-	//}
-	//Result.push_back(SrcStr.substr(OldIter));
-	//return std::move(Result);
 }
 string RegexParseCodeGen::DeleteNoteSign(string& SrcStr, string& StartNote, string& EndNote)
 {
@@ -224,9 +316,61 @@ vector<string> RegexParseCodeGen::GetSpaceCutToken(string Src)
 	}
 	return std::move(Result);
 }
+int HasSemanticAction(string& Target)
+{
+	string Sign = "\"{\"";
+	for(auto i = 0; i < Target.size();i++)
+	{
+		auto FindIter = Target.find(Sign);
+		if (FindIter != Target.npos)
+		{
+			//有"{"
+			auto LastIndex = 0;
+			while(FindIter != Target.npos)
+			{
+				FindIter = FindIter + Sign.size();
+				if (FindIter >= Target.size())
+				{
+					break;
+				}
+				else
+				{
+					LastIndex = FindIter;
+					FindIter = Target.find(Sign, FindIter);
+				}
+			}
+			if(auto FindIndex = Target.find('{',LastIndex) != Target.npos)
+			{
+				return FindIndex;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		
+		else
+		{
+			auto FindIndex = Target.find('{');
+			if(FindIndex != Target.npos)
+			{
+				return FindIndex;
+			}
+			else
+			{
+				 return -1;
+			}
+			
+		}
+	}
+	return -1;
+}
 string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap)
 {
+	static int Count = 0;
 	string TemplateStr = "";// "GrammarList = \n{\n ";
+	string FuncStr = "";
+	string BindStr = "";
 	for(auto& Iter : StatementMap)
 	{
 		//StrIter 是每一个产生式体的字符串
@@ -234,7 +378,21 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 		for(auto StrIter : Iter.second)
 		{
 			//放vector<Symbol>字符串
+			
+			auto SemanticStartIndex = HasSemanticAction(StrIter);
+			string SemanticStr;
+			if (SemanticStartIndex != -1)
+			{
+				SemanticStr = GetLongestNestedContent(pair<char, char>('{', '}'), StrIter, SemanticStartIndex);
+				
+				StrIter = StrIter.erase(StrIter.find('{'+SemanticStr+'}'), SemanticStr.size()+2);
+			}
+
+
 			string TempSymbolStr = "GrammarList.push_back(Production( Symbol(false,ParseTag::" + HeadStr + "),vector<Symbol>({";
+			
+			Count++;
+			
 			auto ProductTokenList = GetSpaceCutToken(StrIter);
 			for(auto TokenIter : ProductTokenList)
 			{
@@ -246,8 +404,8 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 				if(FindIter != TokenIter.npos)
 				{
 					//需要替换的终结符号
-					auto re = GetNoteSignContent(TokenIter, string("\""), string("\""));
-					auto& test = TermToTagMap.find(re);
+					/*auto re = GetNoteSignContent(TokenIter, string("\""), string("\""));*/
+					auto& test = TermToTagMap.find(GetNoteSignContent(TokenIter, string("\""), string("\"")));
 					TempSymbolStr = TempSymbolStr + "Symbol(true,ParseTag::" + test->second + "),";
 				}
 				else
@@ -258,11 +416,39 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			//清除最后一个逗号
 			TempSymbolStr.erase(TempSymbolStr.size() - 1);
 			TempSymbolStr = TempSymbolStr + "})));\n";
+
+			
+
+			//将语义片段构造成函数放到指定位置
+			if (!SemanticStr.empty())
+			{
+				string CountStr = to_string(Count);
+				FuncStr = FuncStr + "void Production" + CountStr + "()\n{\n" + SemanticStr + "\n};\n";
+				//添加语义内容的绑定
+
+				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this)));\n ";
+			}
+		
+
 			TemplateStr = TemplateStr + TempSymbolStr;
 		}
 	}
+	FuncStr = FuncStr + "\n//<SemanticFunc>\n";
+	BindStr = BindStr + "\n//<initSemanticMap>\n";
+
+	//加入Action函数
+	ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<SemanticFunc>"), FuncStr);
+
+	//初始化action函数的绑定
+	ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<initSemanticMap>"), BindStr);
+
 	return std::move(TemplateStr);
 }
+string RegexParseCodeGen::CreatIndexToActionStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap)
+{
+	return string();
+}
+
 string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap, map<string, vector<string>>& StartStateMap)
 {
 	auto One = CreatGrammarListContentStr(TermToTagMap, StartStateMap);
@@ -285,7 +471,7 @@ void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent)
 
 map<string, vector<string>> RegexParseCodeGen::GetSpecStateMap(string Src, string StartNode, string EndNote, string StatementCutSign)
 {
-	auto StartStatement = CutByDefineCharacter(GetNoteSignContent(Src, StartNode, EndNote), StatementCutSign);
+	auto StartStatement = CutByDefineCharacter(GetNoteSignContent(Src, StartNode, EndNote), StatementCutSign,'{','}');
 	//最后一个分号不需要
 	StartStatement.pop_back();
 	return 	std::move(GetStatementMap(StartStatement));

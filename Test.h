@@ -119,7 +119,7 @@ public:
 	//z状态集编号
 	//int Index;
 	// 核心项结束index.超尾
-	int CoreEndIndex;
+	int CoreItermNumber;
 	vector<Triple<int, int, set<ParseTag>>> ItemList;
 
 	unordered_map<ParseTag, int> NextStauts;
@@ -186,6 +186,7 @@ public:
 	}
 };
 
+//<Global>
 class RegexParse
 {
 public:
@@ -262,8 +263,19 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::NumberChar), Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor), Symbol(false, ParseTag::Term)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor)})));
-	}
 
+		//SemanticActionMap.insert(make_pair(1, bind(RegexParse::CheckLR1GOTO,this)
+		//));
+	}
+	void initSemanticMap()
+	{
+		SemanticActionMap.insert(make_pair(7, bind(RegexParse::Production7, this)));
+		SemanticActionMap.insert(make_pair(8, bind(RegexParse::Production8, this)));
+		SemanticActionMap.insert(make_pair(13, bind(RegexParse::Production13, this)));
+		SemanticActionMap.insert(make_pair(14, bind(RegexParse::Production14, this)));
+
+		//<initSemanticMap>
+	}
 	void initGrammarMap()
 	{
 		for(int i = 0; i < GrammarList.size(); i++)
@@ -271,7 +283,7 @@ private:
 			GrammarMap.insert(make_pair(GrammarList[i].Head.Tag, i));
 		}
 	}
-
+private:
 	//计算项集的闭包并加入项集
 	void CreatItemClourse(vector<Triple<int, int, set<ParseTag>>>& ItemList)
 	{
@@ -292,10 +304,10 @@ private:
 				{
 					//有后缀就把后缀符号加入
 					TermSymbolSet = GetSymbolFirstSet(CurrentItem.first, CurrentItem.second + 1);
-					if(TermSymbolSet.find(ParseTag::ChoseSymbol) != TermSymbolSet.end())
+					/*if(TermSymbolSet.find(ParseTag::ChoseSymbol) != TermSymbolSet.end())
 					{
-						int a = 0;
-					}
+					int a = 0;
+					}*/
 				}
 
 				//在CouldExpand里面已经测试好了,肯定是非终结符号
@@ -419,7 +431,7 @@ private:
 		set<ParseTag>TagList;
 		TagList.insert(ParseTag::StringTail);
 		StartSet.ItemList.push_back(Triple<int, int, set<ParseTag>>({0, 0, TagList}));
-		StartSet.CoreEndIndex = 1;
+		StartSet.CoreItermNumber = 1;
 		//第一个项集的闭包计算
 		CreatItemClourse(StartSet.ItemList);
 
@@ -489,10 +501,10 @@ private:
 				NextSet.insert(make_pair(GetSymbolTag(Iter.first, Iter.second), Triple<int, int, set<ParseTag>>(Iter.first, Iter.second + 1, Iter.TagMap)));
 			}
 		}
-		if(NextSet.find(ParseTag::ChoseSymbol) != NextSet.end())
-		{
+		/*	if(NextSet.find(ParseTag::ChoseSymbol) != NextSet.end())
+			{
 			int a = 0;
-		}
+			}*/
 		//根据key分类,同key到同一个项集
 		for(auto KeyIter = NextSet.begin(); KeyIter != NextSet.end(); KeyIter = NextSet.upper_bound(KeyIter->first))
 		{
@@ -503,7 +515,7 @@ private:
 			{
 				CurrentStauts.ItemList.push_back(MinIter->second);
 			}
-			CurrentStauts.CoreEndIndex = KeyCount;
+			CurrentStauts.CoreItermNumber = KeyCount;
 			if(LR1ItemSet.size() == 11)
 			{
 				int a = 0;
@@ -555,9 +567,9 @@ private:
 			return false;
 		}
 		/*	if(Left.NextStauts != Right.NextStauts)
-			{
-			return false;
-			}*/
+		{
+		return false;
+		}*/
 		return true;
 	}
 	Symbol GetSymbol(int Index, int Position)
@@ -566,17 +578,18 @@ private:
 	}
 
 	//查看该项集中是否存在到达产生式尾部的核心项,存在返回索引,不存在返回-1;
-	int HasProductTailIterm(vector<Triple<int, int, set<ParseTag>>>& LR1ItermList, int CoreEndIndex)
+	vector<int> HasCurrentProductTailIterm(vector<Triple<int, int, set<ParseTag>>>& LR1ItermList, ParseTag Tag)
 	{
-		for(auto j = 0; j < CoreEndIndex; j++)
+		vector<int> Result;
+		for(auto j = 0; j < LR1ItermList.size(); j++)
 		{
 			auto& CurrentIterm = LR1ItermList[j];
-			if(IsProductEnd(CurrentIterm.first, CurrentIterm.second))
+			if(IsProductEnd(CurrentIterm.first, CurrentIterm.second) && CurrentIterm.TagMap.find(Tag) != CurrentIterm.TagMap.end())
 			{
-				return j;
+				Result.push_back(j);
 			}
 		}
-		return -1;
+		return std::move(Result);
 	}
 public:
 	bool ParsingRegex(vector<shared_ptr<RegexToken>>& TokenStream)
@@ -592,44 +605,51 @@ public:
 			{
 				//无法移入,需要规约后尝试
 				auto& CurrentItermList = LR1ItemSet[GetIndex].ItemList;
-				auto ResultIndex = HasProductTailIterm(CurrentItermList, LR1ItemSet[GetIndex].CoreEndIndex);
-				if(ResultIndex == -1)
+				auto ResultIndexList = HasCurrentProductTailIterm(CurrentItermList, Tag);
+				if(ResultIndexList.empty())
 				{
 					//出现错误字符
-					cout << "Error! Index:" << TokenStream[i]->GetIndex() << " Data:" << endl;
+					cout << "Error! Index:" << TokenStream[i]->GetIndex() << " Data:" << TokenStream[i]->GetData() << endl;
 					abort();
 					//这里应该对错误进行处理
 					// TO DO
 				}
-				else if(ResultIndex == AcceptIndex && Tag == ParseTag::StringTail)
+				else if(ResultIndexList.size() != 1)
 				{
-					return true;
-				}
-				else if(CurrentItermList[ResultIndex].TagMap.find(Tag) != CurrentItermList[ResultIndex].TagMap.end())
-				{
-					//可以规约
-
-					auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
-					auto ProductHead = GrammarList[CurrentItermList[ResultIndex].first].Head;
-					StautsStack.erase(StautsStack.end() - PopNumber, StautsStack.end());
-					auto& FindIter = LR1ItemSet[StautsStack.back()].NextStauts.find(ProductHead.Tag);
-					if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
-					{
-						cout << "Error! pop后移入tag进入新状态失败";
-						abort();
-					}
-					else
-					{
-						StautsStack.push_back(FindIter->second);
-						GetIndex = FindIter->second;
-					}
+					//回头这里修改掉,改成int的函数返回值,而不是vector
+					abort();
 				}
 				else
 				{
-					//无法规约
-					cout << "Error! 规约失败";
-					abort();
+					for(auto&ResultIndex : ResultIndexList)
+					{
+						//需要弹出的状态数量
+						auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
+
+						auto ProductHead = GrammarList[CurrentItermList[ResultIndex].first].Head;
+						StautsStack.erase(StautsStack.end() - PopNumber, StautsStack.end());
+
+						auto& FindIter = LR1ItemSet[StautsStack.back()].NextStauts.find(ProductHead.Tag);
+						if(ProductHead.Tag == ParseTag::Start)
+						{
+							cout << "规约成功!";
+							return true;
+						}
+						if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
+						{
+							cout << "Error! pop后移入tag进入新状态失败";
+							abort();
+						}
+						else
+						{
+							StautsStack.push_back(FindIter->second);
+							GetIndex = FindIter->second;
+
+							//在这里执行语义片段
+						}
+					}
 				}
+				//可以规约
 			}
 			else
 			{
@@ -640,6 +660,29 @@ public:
 		}
 		return false;
 	}
+private:
+	//<UserDefineFunc>
+private:
+
+	void Production7()
+	{
+		语义动作1
+	};
+	void Production8()
+	{
+		语义动作2
+	};
+	void Production13()
+	{
+		语义动作3
+	};
+	void Production14()
+	{
+		语义动作4
+	};
+
+	//<SemanticFunc>
+
 private:
 	//文法 0号是产生式头
 	vector<Production> GrammarList;
@@ -656,4 +699,9 @@ private:
 
 	//LexTag 到ParseTag的映射.
 	unordered_map<LexTag, ParseTag> TagMap;
+
+	//文法列表索引到语义片段的索引
+	unordered_map<int, function<void()>> SemanticActionMap;
+
+	//<DataMember>
 };

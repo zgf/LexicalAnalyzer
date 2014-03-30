@@ -124,7 +124,7 @@ enum class LexTag
 //最基础的,选择
 class RegexToken
 {
-	wstring Data;
+	string Data;
 	int Index;//出现的索引
 	LexTag Tag;
 public:
@@ -136,11 +136,11 @@ public:
 	{
 		return Index;
 	}
-	wstring GetData()
+	string GetData()
 	{
 		return Data;
 	}
-	RegexToken(LexTag One, wstring& Two, int Three) :Tag(One), Data(Two), Index(Three)
+	RegexToken(LexTag One, string& Two, int Three) :Tag(One), Data(Two), Index(Three)
 	{
 	}
 };
@@ -157,13 +157,13 @@ public:
 class LexParse
 {
 public:
-	bool StringBelongToRange(wchar_t CurrentChar, wchar_t start, wchar_t end)
+	bool StringBelongToRange(char CurrentChar, char start, char end)
 	{
 		return CurrentChar >= start && CurrentChar <= end;
 	}
 
 	//因为没有构造NFA和DNA只能这样硬编码来写了- -
-	shared_ptr<RegexToken> GetCurrentNormalString(wstring& CurrentStr, int StartIndex)
+	shared_ptr<RegexToken> GetCurrentNormalString(string& CurrentStr, int StartIndex)
 	{
 		if(StringBelongToRange(CurrentStr[0], 'a', 'z') || StringBelongToRange(CurrentStr[0], 'A', 'Z'))
 		{
@@ -179,22 +179,22 @@ public:
 		}
 	}
 
-	LexParse(wstring& Target) : Pattern(Target), Length(Target.size())
+	LexParse(string& Target) : Pattern(Target), Length(Target.size())
 	{
 		initAll();
 
 		TokenStream = LexParsing(Pattern);
 	}
-	//wstring DeleteNoteSign(wstring& SrcStr, wstring& StartNote, wstring& EndNote);
+	//string DeleteNoteSign(string& SrcStr, string& StartNote, string& EndNote);
 	//解析器模板
-	vector<shared_ptr<RegexToken>> LexParsing(wstring& PatternStr, int LongestSize = 3, wstring& StartNote = wstring(L"(#"), wstring& EndNote = wstring(L")"))
+	vector<shared_ptr<RegexToken>> LexParsing(string& PatternStr, int LongestSize = 3, string& StartNote = string("(#"), string& EndNote = string(")"))
 	{
 		auto StartIndex = 0;
 		//首先对PatternStr预处理,去除注释之类的
 		PatternStr = DeleteNoteSign(PatternStr, StartNote, EndNote);
 		if (PatternStr.back() != '$')
 		{
-			PatternStr.append(L"$");
+			PatternStr.append("$");
 		}
 		//结果数组
 		vector<shared_ptr<RegexToken>> ResultList;
@@ -222,7 +222,7 @@ public:
 		}
 		return move(ResultList);
 	}
-	wstring DeleteNoteSign(wstring& SrcStr, wstring& StartNote, wstring& EndNote)
+	string DeleteNoteSign(string& SrcStr, string& StartNote, string& EndNote)
 	{
 		vector<int> PairList;
 		auto StartIndex = 0;
@@ -238,7 +238,7 @@ public:
 				PairList.push_back(StartIndex);
 			}
 		}
-		wstring NewStr;
+		string NewStr;
 		if(!PairList.empty())
 		{
 			for(auto i = 0; i < PairList.size() - 1; i += 2)
@@ -255,10 +255,10 @@ public:
 	}
 private:
 
-	shared_ptr<RegexToken>CommaBody(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>CommaBody(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex += 1;
-		if(StackList.back() == RuleToTagList[wstring(L"{")])
+		if(StackList.back() == RuleToTagList[string("{")])
 		{
 			return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::Comma, CatchContent, ReStartIndex - 1)));
 		}
@@ -267,11 +267,11 @@ private:
 			return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::OtherChar, CatchContent, ReStartIndex - 1)));
 		}
 	}
-	shared_ptr<RegexToken> CharSetComponentBody(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken> CharSetComponentBody(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex += 1;
 
-		if(StackList.back() == RuleToTagList[wstring(L"[")])
+		if(StackList.back() == RuleToTagList[string("[")])
 		{
 			return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::CharSetComponent, CatchContent, ReStartIndex - 1)));
 		}
@@ -291,7 +291,7 @@ private:
 			return false;
 		}
 	}
-	shared_ptr<RegexToken> StringHeadBody(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken> StringHeadBody(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		if(CheckStringHead(ReStartIndex))
 		{
@@ -305,7 +305,7 @@ private:
 		}
 	}
 
-	bool CheckStringTail(int ReStartIndex, wstring& PatternStr)
+	bool CheckStringTail(int ReStartIndex, string& PatternStr)
 	{
 		if(ReStartIndex == PatternStr.size() - 1)
 		{
@@ -316,7 +316,7 @@ private:
 			return false;
 		}
 	}
-	shared_ptr<RegexToken> StringTailBody(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken> StringTailBody(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		if(CheckStringTail(ReStartIndex, PatternStr))
 		{
@@ -329,33 +329,33 @@ private:
 			return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::OtherChar, CatchContent, ReStartIndex - 1)));
 		}
 	}
-	wstring GetOneCharBuff(wchar_t Char)
+	string GetOneCharBuff(char Char)
 	{
-		return std::move(wstring(1, Char));
+		return std::move(string(1, Char));
 	}
-	shared_ptr<RegexToken> ChangeMeanCharBody(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken> ChangeMeanCharBody(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex += 2;
 		return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::OtherChar, GetOneCharBuff(Pattern[ReStartIndex - 1]), ReStartIndex - 1)));
 	}
 
-	shared_ptr<RegexToken>SimpleUnNamedCatch_Start(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>SimpleUnNamedCatch_Start(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		StackList.push_back(RuleToTagList[L"("]);
+		StackList.push_back(RuleToTagList["("]);
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::SimpleUnNamedCatch_Start, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>StringHead(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>StringHead(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		return std::move(StringHeadBody(ReStartIndex, CatchContent, PatternStr));
 	}
-	shared_ptr<RegexToken>StringTail(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>StringTail(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		return std::move(StringTailBody(ReStartIndex, CatchContent, PatternStr));
 	}
-	shared_ptr<RegexToken>Mitipute_End(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Mitipute_End(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		if(StartToEndList[StackList.back()] == RuleToTagList[wstring(L")")])
+		if(StartToEndList[StackList.back()] == RuleToTagList[string(")")])
 		{
 			StackList.pop_back();
 		}
@@ -366,45 +366,45 @@ private:
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::Mitipute_End, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>Closures_UnGreedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Closures_UnGreedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::Closures_UnGreedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>PositiveClosures_UnGreedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>PositiveClosures_UnGreedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::PositiveClosures_UnGreedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>ChoseClosures_UnGreedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>ChoseClosures_UnGreedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::ChoseClosures_UnGreedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>Closures_Greedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Closures_Greedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::Closures_Greedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>PositiveClosures_Greedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>PositiveClosures_Greedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::PositiveClosures_Greedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>ChoseClosures_Greedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>ChoseClosures_Greedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::ChoseClosures_Greedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>Repeat_Start(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Repeat_Start(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		StackList.push_back(RuleToTagList[L"{"]);
+		StackList.push_back(RuleToTagList["{"]);
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::Repeat_Start, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>Repeat_And_BackRefer_End(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Repeat_And_BackRefer_End(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		if(StartToEndList[StackList.back()] == RuleToTagList[wstring(L"}")])
+		if(StartToEndList[StackList.back()] == RuleToTagList[string("}")])
 		{
 			StackList.pop_back();
 		}
@@ -415,9 +415,9 @@ private:
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::Repeat_And_BackRefer_End, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>Repeat_End_Greedy(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Repeat_End_Greedy(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		if(StartToEndList[StackList.back()] == RuleToTagList[wstring(L"}?")])
+		if(StartToEndList[StackList.back()] == RuleToTagList[string("}?")])
 		{
 			StackList.pop_back();
 		}
@@ -428,15 +428,15 @@ private:
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::Repeat_End_Greedy, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>CharSet_Start(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>CharSet_Start(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		StackList.push_back(RuleToTagList[L"["]);
+		StackList.push_back(RuleToTagList["["]);
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::CharSet_Start, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>CharSet_End(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>CharSet_End(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		if(StartToEndList[StackList.back()] == RuleToTagList[wstring(L"]")])
+		if(StartToEndList[StackList.back()] == RuleToTagList[string("]")])
 		{
 			StackList.pop_back();
 		}
@@ -447,61 +447,61 @@ private:
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::CharSet_End, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>CharSet_Back_Start(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>CharSet_Back_Start(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
-		StackList.push_back(RuleToTagList[L"[^"]);
+		StackList.push_back(RuleToTagList["[^"]);
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::CharSet_Back_Start, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>AllCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>AllCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::AllCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>AllRealCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>AllRealCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::AllRealCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>AllSpaceCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>AllSpaceCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::AllSpaceCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>AllNumberCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>AllNumberCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::AllNumberCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>NoneAllRealCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>NoneAllRealCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::NoneAllRealCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>NoneAllSpaceCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>NoneAllSpaceCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::NoneAllSpaceCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>NoneAllNumberCharSet(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>NoneAllNumberCharSet(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::NoneAllNumberCharSet, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>ChangeMeanChar(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>ChangeMeanChar(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		return std::move(ChangeMeanCharBody(ReStartIndex, CatchContent, PatternStr));
 	}
-	shared_ptr<RegexToken>ChoseSymbol(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>ChoseSymbol(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		ReStartIndex = ReStartIndex + CatchContent.size();
 		return shared_ptr<RegexToken>(new RegexToken(LexTag::ChoseSymbol, CatchContent, ReStartIndex - CatchContent.size()));
 	}
-	shared_ptr<RegexToken>CharSetComponent(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>CharSetComponent(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		return std::move(CharSetComponentBody(ReStartIndex, CatchContent, PatternStr));
 	}
-	shared_ptr<RegexToken>Comma(int& ReStartIndex, wstring& CatchContent, wstring& PatternStr)
+	shared_ptr<RegexToken>Comma(int& ReStartIndex, string& CatchContent, string& PatternStr)
 	{
 		return std::move(CommaBody(ReStartIndex, CatchContent, PatternStr));
 	}
@@ -518,80 +518,80 @@ private:
 
 	void initTagToRule()
 	{
-		TagToRuleList.insert(make_pair(LexTag::SimpleUnNamedCatch_Start, L"("));
-		TagToRuleList.insert(make_pair(LexTag::StringHead, L"^"));
-		TagToRuleList.insert(make_pair(LexTag::StringTail, L"$"));
-		TagToRuleList.insert(make_pair(LexTag::Mitipute_End, L")"));
-		TagToRuleList.insert(make_pair(LexTag::Closures_UnGreedy, L"*"));
-		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_UnGreedy, L"+"));
-		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_UnGreedy, L"?"));
-		TagToRuleList.insert(make_pair(LexTag::Closures_Greedy, L"*?"));
-		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_Greedy, L"+?"));
-		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_Greedy, L"??"));
-		TagToRuleList.insert(make_pair(LexTag::Repeat_Start, L"{"));
-		TagToRuleList.insert(make_pair(LexTag::Repeat_And_BackRefer_End, L"}"));
-		TagToRuleList.insert(make_pair(LexTag::Repeat_End_Greedy, L"}?"));
-		TagToRuleList.insert(make_pair(LexTag::CharSet_Start, L"["));
-		TagToRuleList.insert(make_pair(LexTag::CharSet_End, L"]"));
-		TagToRuleList.insert(make_pair(LexTag::CharSet_Back_Start, L"[^"));
-		TagToRuleList.insert(make_pair(LexTag::AllCharSet, L"."));
-		TagToRuleList.insert(make_pair(LexTag::AllRealCharSet, L"\\w"));
-		TagToRuleList.insert(make_pair(LexTag::AllSpaceCharSet, L"\\s"));
-		TagToRuleList.insert(make_pair(LexTag::AllNumberCharSet, L"\\d"));
-		TagToRuleList.insert(make_pair(LexTag::NoneAllRealCharSet, L"\\W"));
-		TagToRuleList.insert(make_pair(LexTag::NoneAllSpaceCharSet, L"\\S"));
-		TagToRuleList.insert(make_pair(LexTag::NoneAllNumberCharSet, L"\\d"));
-		TagToRuleList.insert(make_pair(LexTag::ChangeMeanChar, L"\\"));
-		TagToRuleList.insert(make_pair(LexTag::ChoseSymbol, L"|"));
-		TagToRuleList.insert(make_pair(LexTag::CharSetComponent, L"-"));
-		TagToRuleList.insert(make_pair(LexTag::Comma, L","));
+		TagToRuleList.insert(make_pair(LexTag::SimpleUnNamedCatch_Start, "("));
+		TagToRuleList.insert(make_pair(LexTag::StringHead, "^"));
+		TagToRuleList.insert(make_pair(LexTag::StringTail, "$"));
+		TagToRuleList.insert(make_pair(LexTag::Mitipute_End, ")"));
+		TagToRuleList.insert(make_pair(LexTag::Closures_UnGreedy, "*"));
+		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_UnGreedy, "+"));
+		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_UnGreedy, "?"));
+		TagToRuleList.insert(make_pair(LexTag::Closures_Greedy, "*?"));
+		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_Greedy, "+?"));
+		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_Greedy, "??"));
+		TagToRuleList.insert(make_pair(LexTag::Repeat_Start, "{"));
+		TagToRuleList.insert(make_pair(LexTag::Repeat_And_BackRefer_End, "}"));
+		TagToRuleList.insert(make_pair(LexTag::Repeat_End_Greedy, "}?"));
+		TagToRuleList.insert(make_pair(LexTag::CharSet_Start, "["));
+		TagToRuleList.insert(make_pair(LexTag::CharSet_End, "]"));
+		TagToRuleList.insert(make_pair(LexTag::CharSet_Back_Start, "[^"));
+		TagToRuleList.insert(make_pair(LexTag::AllCharSet, "."));
+		TagToRuleList.insert(make_pair(LexTag::AllRealCharSet, "\\w"));
+		TagToRuleList.insert(make_pair(LexTag::AllSpaceCharSet, "\\s"));
+		TagToRuleList.insert(make_pair(LexTag::AllNumberCharSet, "\\d"));
+		TagToRuleList.insert(make_pair(LexTag::NoneAllRealCharSet, "\\W"));
+		TagToRuleList.insert(make_pair(LexTag::NoneAllSpaceCharSet, "\\S"));
+		TagToRuleList.insert(make_pair(LexTag::NoneAllNumberCharSet, "\\d"));
+		TagToRuleList.insert(make_pair(LexTag::ChangeMeanChar, "\\"));
+		TagToRuleList.insert(make_pair(LexTag::ChoseSymbol, "|"));
+		TagToRuleList.insert(make_pair(LexTag::CharSetComponent, "-"));
+		TagToRuleList.insert(make_pair(LexTag::Comma, ","));
 	}
 	void initRuleToTag()
 	{
-		RuleToTagList.insert(make_pair(L"(", LexTag::SimpleUnNamedCatch_Start));
-		RuleToTagList.insert(make_pair(L"^", LexTag::StringHead));
-		RuleToTagList.insert(make_pair(L"$", LexTag::StringTail));
-		RuleToTagList.insert(make_pair(L")", LexTag::Mitipute_End));
-		RuleToTagList.insert(make_pair(L"*", LexTag::Closures_UnGreedy));
-		RuleToTagList.insert(make_pair(L"+", LexTag::PositiveClosures_UnGreedy));
-		RuleToTagList.insert(make_pair(L"?", LexTag::ChoseClosures_UnGreedy));
-		RuleToTagList.insert(make_pair(L"*?", LexTag::Closures_Greedy));
-		RuleToTagList.insert(make_pair(L"+?", LexTag::PositiveClosures_Greedy));
-		RuleToTagList.insert(make_pair(L"??", LexTag::ChoseClosures_Greedy));
-		RuleToTagList.insert(make_pair(L"{", LexTag::Repeat_Start));
-		RuleToTagList.insert(make_pair(L"}", LexTag::Repeat_And_BackRefer_End));
-		RuleToTagList.insert(make_pair(L"}?", LexTag::Repeat_End_Greedy));
-		RuleToTagList.insert(make_pair(L"[", LexTag::CharSet_Start));
-		RuleToTagList.insert(make_pair(L"]", LexTag::CharSet_End));
-		RuleToTagList.insert(make_pair(L"[^", LexTag::CharSet_Back_Start));
-		RuleToTagList.insert(make_pair(L".", LexTag::AllCharSet));
-		RuleToTagList.insert(make_pair(L"\\w", LexTag::AllRealCharSet));
-		RuleToTagList.insert(make_pair(L"\\s", LexTag::AllSpaceCharSet));
-		RuleToTagList.insert(make_pair(L"\\d", LexTag::AllNumberCharSet));
-		RuleToTagList.insert(make_pair(L"\\W", LexTag::NoneAllRealCharSet));
-		RuleToTagList.insert(make_pair(L"\\S", LexTag::NoneAllSpaceCharSet));
-		RuleToTagList.insert(make_pair(L"\\d", LexTag::NoneAllNumberCharSet));
-		RuleToTagList.insert(make_pair(L"\\", LexTag::ChangeMeanChar));
-		RuleToTagList.insert(make_pair(L"|", LexTag::ChoseSymbol));
-		RuleToTagList.insert(make_pair(L"-", LexTag::CharSetComponent));
-		RuleToTagList.insert(make_pair(L",", LexTag::Comma));
+		RuleToTagList.insert(make_pair("(", LexTag::SimpleUnNamedCatch_Start));
+		RuleToTagList.insert(make_pair("^", LexTag::StringHead));
+		RuleToTagList.insert(make_pair("$", LexTag::StringTail));
+		RuleToTagList.insert(make_pair(")", LexTag::Mitipute_End));
+		RuleToTagList.insert(make_pair("*", LexTag::Closures_UnGreedy));
+		RuleToTagList.insert(make_pair("+", LexTag::PositiveClosures_UnGreedy));
+		RuleToTagList.insert(make_pair("?", LexTag::ChoseClosures_UnGreedy));
+		RuleToTagList.insert(make_pair("*?", LexTag::Closures_Greedy));
+		RuleToTagList.insert(make_pair("+?", LexTag::PositiveClosures_Greedy));
+		RuleToTagList.insert(make_pair("??", LexTag::ChoseClosures_Greedy));
+		RuleToTagList.insert(make_pair("{", LexTag::Repeat_Start));
+		RuleToTagList.insert(make_pair("}", LexTag::Repeat_And_BackRefer_End));
+		RuleToTagList.insert(make_pair("}?", LexTag::Repeat_End_Greedy));
+		RuleToTagList.insert(make_pair("[", LexTag::CharSet_Start));
+		RuleToTagList.insert(make_pair("]", LexTag::CharSet_End));
+		RuleToTagList.insert(make_pair("[^", LexTag::CharSet_Back_Start));
+		RuleToTagList.insert(make_pair(".", LexTag::AllCharSet));
+		RuleToTagList.insert(make_pair("\\w", LexTag::AllRealCharSet));
+		RuleToTagList.insert(make_pair("\\s", LexTag::AllSpaceCharSet));
+		RuleToTagList.insert(make_pair("\\d", LexTag::AllNumberCharSet));
+		RuleToTagList.insert(make_pair("\\W", LexTag::NoneAllRealCharSet));
+		RuleToTagList.insert(make_pair("\\S", LexTag::NoneAllSpaceCharSet));
+		RuleToTagList.insert(make_pair("\\d", LexTag::NoneAllNumberCharSet));
+		RuleToTagList.insert(make_pair("\\", LexTag::ChangeMeanChar));
+		RuleToTagList.insert(make_pair("|", LexTag::ChoseSymbol));
+		RuleToTagList.insert(make_pair("-", LexTag::CharSetComponent));
+		RuleToTagList.insert(make_pair(",", LexTag::Comma));
 	}
 
 	void initStartToEnd()
 	{
-		StartToEndList.insert(make_pair(RuleToTagList[L"("], RuleToTagList[L")"]));
-		StartToEndList.insert(make_pair(RuleToTagList[L"{"], RuleToTagList[L"}"]));
-		StartToEndList.insert(make_pair(RuleToTagList[L"{"], RuleToTagList[L"}?"]));
-		StartToEndList.insert(make_pair(RuleToTagList[L"["], RuleToTagList[L"]"]));
-		StartToEndList.insert(make_pair(RuleToTagList[L"[^"], RuleToTagList[L"]"]));
+		StartToEndList.insert(make_pair(RuleToTagList["("], RuleToTagList[")"]));
+		StartToEndList.insert(make_pair(RuleToTagList["{"], RuleToTagList["}"]));
+		StartToEndList.insert(make_pair(RuleToTagList["{"], RuleToTagList["}?"]));
+		StartToEndList.insert(make_pair(RuleToTagList["["], RuleToTagList["]"]));
+		StartToEndList.insert(make_pair(RuleToTagList["[^"], RuleToTagList["]"]));
 	}
 	void initEndToStart()
 	{
-		EndToStartList.insert(make_pair(RuleToTagList[L")"], RuleToTagList[L"("]));
-		EndToStartList.insert(make_pair(RuleToTagList[L"}"], RuleToTagList[L"{"]));
-		EndToStartList.insert(make_pair(RuleToTagList[L"}?"], RuleToTagList[L"{"]));
-		EndToStartList.insert(make_pair(RuleToTagList[L"]"], RuleToTagList[L"["]));
-		EndToStartList.insert(make_pair(RuleToTagList[L"]"], RuleToTagList[L"[^"]));
+		EndToStartList.insert(make_pair(RuleToTagList[")"], RuleToTagList["("]));
+		EndToStartList.insert(make_pair(RuleToTagList["}"], RuleToTagList["{"]));
+		EndToStartList.insert(make_pair(RuleToTagList["}?"], RuleToTagList["{"]));
+		EndToStartList.insert(make_pair(RuleToTagList["]"], RuleToTagList["["]));
+		EndToStartList.insert(make_pair(RuleToTagList["]"], RuleToTagList["[^"]));
 	}
 	void initActionMap()
 	{
@@ -631,22 +631,22 @@ public:
 private:
 	//标签到函数的映射
 	//int&是传入的重启位置.进入函数更改至新的重启位置
-	//	unordered_map<LexTag, function<shared_ptr<RegexToken>(int& ReStartIndex,wstring& CatchContent,wstring& PatternStr)>> ActionMap;
-	unordered_map<LexTag, function<shared_ptr<RegexToken>(int&, wstring&, wstring&)>> ActionMap;
+	//	unordered_map<LexTag, function<shared_ptr<RegexToken>(int& ReStartIndex,string& CatchContent,string& PatternStr)>> ActionMap;
+	unordered_map<LexTag, function<shared_ptr<RegexToken>(int&, string&, string&)>> ActionMap;
 	//标签到规则的互相映射
-	unordered_map<LexTag, wstring> TagToRuleList;
-	unordered_map<wstring, LexTag> RuleToTagList;
+	unordered_map<LexTag, string> TagToRuleList;
+	unordered_map<string, LexTag> RuleToTagList;
 	//成对标签之间的互相映射
 	unordered_map<LexTag, LexTag> StartToEndList;
 	unordered_multimap<LexTag, LexTag> EndToStartList;
 	//字母表到索引的映射
 	//貌似暂时用不到
-	//unordered_map<wchar_t, int>CharMap;
+	//unordered_map<char, int>CharMap;
 
 	//字母表到字符范围的映射
 
 	
-	wstring Pattern;
+	string Pattern;
 	int Length;
 	//嵌套标签栈
 	//vector<LexTag>StackList;

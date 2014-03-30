@@ -49,8 +49,5 @@
     <None Include="RegexLexConfig">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="RegexParseConfig">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
 </Project>

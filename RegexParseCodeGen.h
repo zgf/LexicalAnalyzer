@@ -62,8 +62,33 @@ public:
 		ss >> Temp;
 		return std::move(Temp);
 	}
+	//指定元素在范围索引列表里面
+	template<typename T>
+	//这里是因为右值的原因,FindIter是unsigned int类型,强转int后生成临时变量,不能绑定左值引用,所以这里要用T&& 绑定右值,延长生命周期
+	int IsInTheRangeList(vector<pair<T,T>>& RangeList,T&& Target)
+	{
+		for(auto i = 0; i < RangeList.size();i++)
+		{
+			auto& Iter = RangeList[i];
+			if(Target > Iter.first&& Target < Iter.second)
+			{
+				return i;
+			}
+		}
+		return -1;
+	}
+
 	//按指定字符分割字符串,如果指定字符前有\\,则忽视该处字符,如果字符被"直接包裹" 忽略字符
 	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr);
+
+	//按指定字符分割字符串,如果指定字符前有\\,则忽视该处字符,如果字符被"直接包裹" 忽略字符,如果字符在jump区域内,忽略字符
+	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd);
+
+	//获取最长嵌套内容匹配
+	string GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex);
+
+	//获取最长嵌套内容匹配的最后一个字符索引
+	int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex);
 	//读取文件内容;
 	string ReadFileContent(string& FileName);
 	//删除区间含区间端点的内容.
@@ -118,6 +143,9 @@ public:
 
 	//创建TagMap的Str
 	string CreateTagMapStr(map<string,string>& TermToMap);
+
+	//创建语法列表索引到语义片段的绑定
+	string RegexParseCodeGen::CreatIndexToActionStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap);
 	//输出内容到文件
 	void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent);
 };

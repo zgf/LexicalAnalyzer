@@ -1,0 +1,96 @@
+<TokenDefine>
+  /*这里是写入非终结符号在词法解析时候的Tag表示*/
+  //禁止LexTag和非终结符号重名
+  //形式 "LexTag" : "终结符号" ;
+  "OtherChar " : "OtherChar";
+  "NumberChar" : "NumberChar";
+  "RealWordChar" : "RealWordChar";
+  "SimpleUnNamedCatch_Start" : "(";
+  "StringHead" : "^";
+  "StringTail" : "$";
+  "Mitipute_End" : ")";
+  "Closures_UnGreedy" : "*?";
+  "PositiveClosures_UnGreedy" : "+?";
+  "ChoseClosures_UnGreedy" : "??";
+  "Closures_Greedy" : "*";
+  "PositiveClosures_Greedy" : "+";
+  "ChoseClosures_Greedy" : "?";
+  "Repeat_Start" : "{";
+  "Repeat_And_BackRefer_End" : "}";
+  "Repeat_End_Greedy" : "}?";
+  "CharSet_Start" : "[";
+  "CharSet_End" : "]";
+  "CharSet_Back_Start" : "[^";
+  "ChoseSymbol" : "|";
+  "CharSetComponent" : "-";
+  "Comma" : ",";
+</TokenDefine>
+//开始产生式不是随便选择的,Express可以生成最多的产生式头部
+//第一个产生式是产生式开始.
+<FirstGrammar>
+  Start => Express;
+</FirstGrammar>
+//语义动作的函数签名是 void Func()
+<Grammar>
+  CompleteCharSet      => CharSet {语义动作1}
+                          | CharSet Repeat  {语义动作2}
+                          ;  
+  Factor               => "(" Express ")"  {语义动作3}
+                          | CompleteCharSet  {语义动作4}
+                          | NormalStringComplete
+                          ;
+  CompleteFactor       => Factor Repeat 
+                          | Factor
+                          ;
+  Term                 =>  CompleteFactor Term 
+                          | CompleteFactor
+                          ;
+  Express              =>Term  "|" Express  
+                          | Term
+                          ;
+  Repeat               => "{" RepeatRight RepeatEnd 
+                          | "*?"
+                          | "*" 
+                          | "+" 
+                          | "+?"
+                          | "?" 
+                          | "??"
+                          ;
+  RepeatRight          => "," SumNumber 
+                          | SumNumber "," 
+                          | SumNumber 
+                          | SumNumber "," SumNumber
+                          ;
+  RepeatEnd            => "}" 
+                          | "}?"
+                          ;
+  SumNumber            => NumberChar SumNumber
+                          ;
+  NormalStringComplete => NormalString Repeat 
+                          | NormalString
+                          ;
+  NormalString         => NormalChar NormalString  
+                          | NormalChar
+                          ;
+  NormalChar           => "NumberChar" 
+                           | "RealWordChar"
+                           | "OtherChar"
+                           ;
+  CharSet              => "[" CharSetString "]"
+                           | "[^" CharSetString "]"
+                           ;
+  CharSetString        => NormalString "-" CharSetString 
+                           | NormalString CharSetString  
+                           | NormalString
+                           ;
+</Grammar>
+//在ParseClass外部的全局区域放置的内容
+<Global>
+//这里可以是NFA 结构
+</Global>
+<DataMember>
+  //保存NFA的列表和映射表
+</DataMember>
+<UserDefineFunc>
+  
+</UserDefineFunc>

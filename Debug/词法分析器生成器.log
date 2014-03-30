@@ -1,7 +1,7 @@
-﻿生成启动时间为 3/30/2014 4:28:16 PM。
+﻿生成启动时间为 3/30/2014 5:55:33 PM。
      1>项目“F:\MyProjects\词法分析器生成器\词法分析器生成器\词法分析器生成器.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         E:\Program Files (x86)\Microsoft Visual C++ Compiler Nov 2013 CTP\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt RegexParseCodeGen.cpp main.cpp
+         E:\Program Files (x86)\Microsoft Visual C++ Compiler Nov 2013 CTP\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt RegexParseCodeGen.cpp
          RegexParseCodeGen.cpp
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(204): warning C4018: '<' : signed/unsigned mismatch
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(244): warning C4018: '<' : signed/unsigned mismatch
@@ -13,19 +13,13 @@
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(251): warning C4018: '<' : signed/unsigned mismatch
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(311): warning C4018: '<=' : signed/unsigned mismatch
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(359): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.h(70): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.h(80): warning C4018: '<' : signed/unsigned mismatch
                  f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(92) : see reference to function template instantiation 'int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)' being compiled
                  with
                  [
                      _Ty=std::pair<int,int>
          ,            T=int
                  ]
-         Generating Code...
-         Compiling...
-         main.cpp
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(204): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(244): warning C4018: '<' : signed/unsigned mismatch
-         Generating Code...
        Link:
          E:\Program Files (x86)\Microsoft Visual C++ Compiler Nov 2013 CTP\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.lib" /MACHINE:X86 Debug\CodeGenComplier.obj
          Debug\LexConfigTemplate.obj
@@ -36,4 +30,4 @@
 
 生成成功。
 
-已用时间 00:00:07.22
+已用时间 00:00:05.14

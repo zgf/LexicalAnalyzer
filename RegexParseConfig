@@ -25,18 +25,16 @@
   "CharSetComponent" : "-";
   "Comma" : ",";
 </TokenDefine>
-//开始产生式不是随便选择的,Express可以生成最多的产生式头部
 //第一个产生式是产生式开始.
 <FirstGrammar>
   Start => Express;
 </FirstGrammar>
-//语义动作的函数签名是 void Func()
 <Grammar>
-  CompleteCharSet      => CharSet {}
-                          | CharSet Repeat  {}
+  CompleteCharSet      => CharSet {语义动作1}
+                          | CharSet Repeat  {语义动作2}
                           ;  
-  Factor               => "(" Express ")"  {}
-                          | CompleteCharSet  {}
+  Factor               => "(" Express ")"  {语义动作3}
+                          | CompleteCharSet  {语义动作4}
                           | NormalStringComplete
                           ;
   CompleteFactor       => Factor Repeat 
@@ -84,23 +82,3 @@
                            | NormalString
                            ;
 </Grammar>
-//在ParseClass外部的全局区域放置的内容
-<Global>
-//这里可以是NFA 结构
-class ASTNode
-{
-  //int Index;
-  bool Nullable;
-  set<int> FirstPos;
-  set<int> LastPos;
-  set<int> FollowPos;
-};
-</Global>
-<DataMember>
-  //保存NFA的列表和映射表
-  vector<ASTNode> NodeList;
-
-</DataMember>
-<UserDefineFunc>
-
-</UserDefineFunc>

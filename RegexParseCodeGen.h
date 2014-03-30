@@ -29,6 +29,16 @@ public:
 		ParseConfig = DeleteNoteSign(ParseConfig, string("/*"), string("*/"));
 		ParseConfig = DeleteNoteSign(ParseConfig, string("//"), string("\n"));
 
+		//获得<Global>区域内容
+		//global插入模板
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<Global>"), GetNoteSignContent(ParseConfig, string("<Global>"), string("</Global>")) + "//<Global>");
+
+		// 获取DataMember区域内容插入模板
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<DataMember>"), GetNoteSignContent(ParseConfig, string("<DataMember>"), string("</DataMember>")) + "//<DataMember>");
+
+		// 获取用户定义的函数,插入模板
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<UserDefineFunc>"), GetNoteSignContent(ParseConfig, string("<UserDefineFunc>"), string("</UserDefineFunc>")) + "//<UserDefineFunc>");
+
 		//获得<Grammar>区域的文法映射
 		auto StatementMap = GetSpecStateMap(ParseConfig, string("<Grammar>"), string("</Grammar>"), string(";"));
 		//获得<FirstGrammar>区域开始产生式语句映射

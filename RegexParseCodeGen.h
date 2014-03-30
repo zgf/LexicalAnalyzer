@@ -42,14 +42,14 @@ public:
 		auto NameList = GetAllSymbolName(TermToTagMap, StartStatementMap, StatementMap);
 		auto NameEnumStr = CreatParseTagEnumStr(NameList);
 		//初始化ParseTag Enum类
-		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<ParseTag>"), NameEnumStr);
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<ParseTag>"), NameEnumStr + "//<ParseTag>");
 
 		//初始化TagMap
-		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<initTagMap>"), CreateTagMapStr(TermToTagMap));
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<initTagMap>"), CreateTagMapStr(TermToTagMap) + "//<initTagMap>");
 		//插入模板
-		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap));
-		
-			//创建文件
+		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap) + "//<initGrammarMap>");
+
+		//创建文件
 		CreateCppFile(string("Test.h"), Content);
 	}
 	//所有类型都转换为字符串
@@ -65,9 +65,9 @@ public:
 	//指定元素在范围索引列表里面
 	template<typename T>
 	//这里是因为右值的原因,FindIter是unsigned int类型,强转int后生成临时变量,不能绑定左值引用,所以这里要用T&& 绑定右值,延长生命周期
-	int IsInTheRangeList(vector<pair<T,T>>& RangeList,T&& Target)
+	int IsInTheRangeList(vector<pair<T, T>>& RangeList, T&& Target)
 	{
-		for(auto i = 0; i < RangeList.size();i++)
+		for(auto i = 0; i < RangeList.size(); i++)
 		{
 			auto& Iter = RangeList[i];
 			if(Target > Iter.first&& Target < Iter.second)
@@ -141,15 +141,21 @@ public:
 		}
 		return move(Result);
 	}
+	// 查找某个符号在串中出现最后一次的位置
+	int FindSignLastIndex(string& Target, string& Sign);
 
 	//用所有的符号名去定义生成文件中的ParseTag枚举类
 	string CreatParseTagEnumStr(vector<string>& NameList);
 
 	//创建TagMap的Str
-	string CreateTagMapStr(map<string,string>& TermToMap);
+	string CreateTagMapStr(map<string, string>& TermToMap);
 
 	//创建语法列表索引到语义片段的绑定
 	string RegexParseCodeGen::CreatIndexToActionStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap);
+
+	//查看目标串中存在不存在语义片段
+	int RegexParseCodeGen::HasSemanticAction(string& Target);
+
 	//输出内容到文件
 	void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent);
 };

@@ -41,6 +41,7 @@ enum class ParseTag
 	RepeatRight,
 	SumNumber,
 	Term,
+	//<ParseTag>
 };
 //语法分析符号
 
@@ -222,6 +223,7 @@ private:
 		TagMap.insert(make_pair(LexTag::ChoseSymbol, ParseTag::ChoseSymbol));
 		TagMap.insert(make_pair(LexTag::Repeat_And_BackRefer_End, ParseTag::Repeat_And_BackRefer_End));
 		TagMap.insert(make_pair(LexTag::Repeat_End_Greedy, ParseTag::Repeat_End_Greedy));
+		//<initTagMap>
 	}
 	void initGrammarList()
 	{
@@ -263,9 +265,7 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::NumberChar), Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor), Symbol(false, ParseTag::Term)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor)})));
-
-		//SemanticActionMap.insert(make_pair(1, bind(RegexParse::CheckLR1GOTO,this)
-		//));
+		//<initGrammarMap>
 	}
 	void initSemanticMap()
 	{
@@ -323,19 +323,17 @@ private:
 					{
 						ItemList.push_back({Iter->second, 0, TermSymbolSet});
 					}
-					else
+					else if(ItemList[ResultIndex].TagMap.empty())
+					{
+						TermSymbolSet.swap(ItemList[ResultIndex].TagMap);
+					}
+					else if(ItemList[ResultIndex].TagMap != TermSymbolSet)
 					{
 						//查看该产生式是否缺少还未加入的后缀
+
 						set<ParseTag> ResultSet;
-						if(ItemList[ResultIndex].TagMap.empty())
-						{
-							TermSymbolSet.swap(ItemList[ResultIndex].TagMap);
-						}
-						else if(ItemList[ResultIndex].TagMap != TermSymbolSet)
-						{
-							set_union(ItemList[ResultIndex].TagMap.begin(), ItemList[ResultIndex].TagMap.end(), TermSymbolSet.begin(), TermSymbolSet.end(), inserter(ResultSet, ResultSet.begin()));
-							ResultSet.swap(ItemList[ResultIndex].TagMap);
-						}
+						set_union(ItemList[ResultIndex].TagMap.begin(), ItemList[ResultIndex].TagMap.end(), TermSymbolSet.begin(), TermSymbolSet.end(), inserter(ResultSet, ResultSet.begin()));
+						ResultSet.swap(ItemList[ResultIndex].TagMap);
 					}
 				}
 			}
@@ -502,9 +500,9 @@ private:
 			}
 		}
 		/*	if(NextSet.find(ParseTag::ChoseSymbol) != NextSet.end())
-			{
-			int a = 0;
-			}*/
+		{
+		int a = 0;
+		}*/
 		//根据key分类,同key到同一个项集
 		for(auto KeyIter = NextSet.begin(); KeyIter != NextSet.end(); KeyIter = NextSet.upper_bound(KeyIter->first))
 		{
@@ -616,36 +614,34 @@ public:
 				}
 				else
 				{
-				
-						//需要弹出的状态数量
-						auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
+					//需要弹出的状态数量
+					auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
 
-						auto ProductHead = GrammarList[CurrentItermList[ResultIndex].first].Head;
-						StautsStack.erase(StautsStack.end() - PopNumber, StautsStack.end());
+					auto ProductHead = GrammarList[CurrentItermList[ResultIndex].first].Head;
+					StautsStack.erase(StautsStack.end() - PopNumber, StautsStack.end());
 
-						auto& FindIter = LR1ItemSet[StautsStack.back()].NextStauts.find(ProductHead.Tag);
-						if(ProductHead.Tag == ParseTag::Start)
+					auto& FindIter = LR1ItemSet[StautsStack.back()].NextStauts.find(ProductHead.Tag);
+					if(ProductHead.Tag == ParseTag::Start)
+					{
+						cout << "规约成功!";
+						return true;
+					}
+					else if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
+					{
+						cout << "Error! pop后移入tag进入新状态失败";
+						abort();
+					}
+					else
+					{
+						StautsStack.push_back(FindIter->second);
+						GetIndex = FindIter->second;
+						auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
+						if(FindAction != SemanticActionMap.end())
 						{
-							cout << "规约成功!";
-							return true;
+							FindAction->second();
 						}
-						if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
-						{
-							cout << "Error! pop后移入tag进入新状态失败";
-							abort();
-						}
-						else
-						{
-							StautsStack.push_back(FindIter->second);
-							GetIndex = FindIter->second;
-							auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
-							if(FindAction != SemanticActionMap.end())
-							{
-								FindAction->second();
-							}
-							//在这里执行语义片段
-						}
-					
+						//在这里执行语义片段
+					}
 				}
 				//可以规约
 			}

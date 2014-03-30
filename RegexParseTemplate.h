@@ -41,6 +41,7 @@ enum class ParseTag
 	RepeatRight,
 	SumNumber,
 	Term,
+	//<ParseTag>
 };
 //语法分析符号
 
@@ -222,6 +223,7 @@ private:
 		TagMap.insert(make_pair(LexTag::ChoseSymbol, ParseTag::ChoseSymbol));
 		TagMap.insert(make_pair(LexTag::Repeat_And_BackRefer_End, ParseTag::Repeat_And_BackRefer_End));
 		TagMap.insert(make_pair(LexTag::Repeat_End_Greedy, ParseTag::Repeat_End_Greedy));
+		//<initTagMap>
 	}
 	void initGrammarList()
 	{
@@ -263,9 +265,7 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::NumberChar), Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor), Symbol(false, ParseTag::Term)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor)})));
-
-		//SemanticActionMap.insert(make_pair(1, bind(RegexParse::CheckLR1GOTO,this)
-		//));
+		//<initGrammarMap>
 	}
 	void initSemanticMap()
 	{
@@ -304,10 +304,6 @@ private:
 				{
 					//有后缀就把后缀符号加入
 					TermSymbolSet = GetSymbolFirstSet(CurrentItem.first, CurrentItem.second + 1);
-					/*if(TermSymbolSet.find(ParseTag::ChoseSymbol) != TermSymbolSet.end())
-					{
-					int a = 0;
-					}*/
 				}
 
 				//在CouldExpand里面已经测试好了,肯定是非终结符号
@@ -444,18 +440,6 @@ private:
 		//auto Finish = CheckLR1GOTO();
 		//auto chose = CheckIndex();
 	}
-	//检测是不是index和数组index对应.
-	/*bool CheckIndex()
-	{
-	for(auto i = 0; i < LR1ItemSet.size();i++)
-	{
-	if (i != LR1ItemSet[i].Index)
-	{
-	return false;
-	}
-	}
-	return true;
-	}*/
 	//获取接受状态索引
 	int GetAcceptIndex(vector<LR1Stauts>& LR1ItemSet)
 	{
@@ -485,10 +469,6 @@ private:
 	{
 		//今日做
 		//存放当前LR1Stauts的后一个符号集合
-		/*if(TargetIndex == 11)
-		{
-		int a = 1;
-		}*/
 		unordered_multimap<ParseTag, Triple<int, int, set<ParseTag>>> NextSet;
 		auto& Target = LR1ItemSet[TargetIndex];
 		for(auto& Iter : Target.ItemList)
@@ -499,10 +479,7 @@ private:
 				NextSet.insert(make_pair(GetSymbolTag(Iter.first, Iter.second), Triple<int, int, set<ParseTag>>(Iter.first, Iter.second + 1, Iter.TagMap)));
 			}
 		}
-		/*	if(NextSet.find(ParseTag::ChoseSymbol) != NextSet.end())
-		{
-		int a = 0;
-		}*/
+
 		//根据key分类,同key到同一个项集
 		for(auto KeyIter = NextSet.begin(); KeyIter != NextSet.end(); KeyIter = NextSet.upper_bound(KeyIter->first))
 		{
@@ -564,10 +541,7 @@ private:
 		{
 			return false;
 		}
-		/*	if(Left.NextStauts != Right.NextStauts)
-		{
-		return false;
-		}*/
+
 		return true;
 	}
 	Symbol GetSymbol(int Index, int Position)
@@ -614,7 +588,6 @@ public:
 				}
 				else
 				{
-
 					//需要弹出的状态数量
 					auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
 
@@ -643,7 +616,6 @@ public:
 						}
 						//在这里执行语义片段
 					}
-
 				}
 				//可以规约
 			}

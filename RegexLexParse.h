@@ -192,7 +192,7 @@ public:
 		auto StartIndex = 0;
 		//首先对PatternStr预处理,去除注释之类的
 		PatternStr = DeleteNoteSign(PatternStr, StartNote, EndNote);
-		if (PatternStr.back() != '$')
+		if(PatternStr.back() != '$')
 		{
 			PatternStr.append("$");
 		}
@@ -645,7 +645,6 @@ private:
 
 	//字母表到字符范围的映射
 
-	
 	string Pattern;
 	int Length;
 	//嵌套标签栈

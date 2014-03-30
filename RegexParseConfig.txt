@@ -87,6 +87,10 @@
 //在ParseClass外部的全局区域放置的内容
 <Global>
 //这里可以是NFA 结构
+class ASTNode
+{
+  
+}
 </Global>
 <DataMember>
   //保存NFA的列表和映射表

@@ -8,7 +8,7 @@ int main()
 	//wstring Pattern(L"a(b|c)c*|b");
 	//LexParse Lex(Pattern);
 	//RegexParse Parse;
-	
+
 	//Parse.ParsingRegex(Lex.TokenStream);
 	return 0;
 }

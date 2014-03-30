@@ -54,7 +54,6 @@ vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string
 		if(FindStartIndex == SrcStr.npos)
 		{
 			break;
-
 		}
 		else if(FindStartIndex != 0 && IsStrLiteral(SrcStr, FindStartIndex))
 		{
@@ -133,9 +132,9 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 {
 	//TODO
 	//获取花括号的嵌套范围
-	
+
 	vector<string>Result;
-	
+
 	auto JumpList = GetNeedJumpList(SrcStr, DefineStr, JumpStart, JumpEnd);
 
 	auto SignList = GetNeedSignList(SrcStr, DefineStr, JumpList);
@@ -161,7 +160,7 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr)
 {
 	vector<string> Result;
-	
+
 	auto SignList = GetNeedSignList(SrcStr, DefineStr);
 	if(SignList.size() != 1)
 	{
@@ -330,51 +329,46 @@ vector<string> RegexParseCodeGen::GetSpaceCutToken(string Src)
 	}
 	return std::move(Result);
 }
-int HasSemanticAction(string& Target)
+int RegexParseCodeGen::FindSignLastIndex(string& Target, string& Sign)
 {
-	string Sign = "\"{\"";
-	for(auto i = 0; i < Target.size();i++)
+	auto FindIter = Target.find(Sign);
+	auto LastIndex = -1;
+	if(FindIter != Target.npos)
 	{
-		auto FindIter = Target.find(Sign);
-		if (FindIter != Target.npos)
+		while(FindIter != Target.npos)
 		{
-			//有"{"
-			auto LastIndex = 0;
-			while(FindIter != Target.npos)
+			FindIter = FindIter + Sign.size();
+			if(FindIter >= Target.size())
 			{
-				FindIter = FindIter + Sign.size();
-				if (FindIter >= Target.size())
-				{
-					break;
-				}
-				else
-				{
-					LastIndex = FindIter;
-					FindIter = Target.find(Sign, FindIter);
-				}
-			}
-			if(auto FindIndex = Target.find('{',LastIndex) != Target.npos)
-			{
-				return FindIndex;
+				break;
 			}
 			else
 			{
-				return -1;
+				LastIndex = FindIter;
+				FindIter = Target.find(Sign, FindIter);
 			}
 		}
-		
+	}
+
+	return LastIndex;
+}
+
+int RegexParseCodeGen::HasSemanticAction(string& Target)
+{
+	string Sign = "\"{\"";
+	for(auto i = 0; i < Target.size(); i++)
+	{
+		auto LastIndex = FindSignLastIndex(Target, Sign);
+		auto FindIndex = 0;
+		LastIndex = LastIndex != -1 ? LastIndex : 0;
+		FindIndex = Target.find('{', LastIndex);
+		if(FindIndex != Target.npos)
+		{
+			return FindIndex;
+		}
 		else
 		{
-			auto FindIndex = Target.find('{');
-			if(FindIndex != Target.npos)
-			{
-				return FindIndex;
-			}
-			else
-			{
-				 return -1;
-			}
-			
+			return -1;
 		}
 	}
 	return -1;
@@ -389,24 +383,23 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 	{
 		//StrIter 是每一个产生式体的字符串
 		auto HeadStr = Trim(Iter.first);
-		for(auto StrIter : Iter.second)
+		for(auto& StrIter : Iter.second)
 		{
 			//放vector<Symbol>字符串
-			
+
 			auto SemanticStartIndex = HasSemanticAction(StrIter);
 			string SemanticStr;
-			if (SemanticStartIndex != -1)
+			if(SemanticStartIndex != -1)
 			{
 				SemanticStr = GetLongestNestedContent(pair<char, char>('{', '}'), StrIter, SemanticStartIndex);
-				
-				StrIter = StrIter.erase(StrIter.find('{'+SemanticStr+'}'), SemanticStr.size()+2);
+
+				StrIter = StrIter.erase(StrIter.find('{' + SemanticStr + '}'), SemanticStr.size() + 2);
 			}
 
-
 			string TempSymbolStr = "GrammarList.push_back(Production( Symbol(false,ParseTag::" + HeadStr + "),vector<Symbol>({";
-			
+
 			Count++;
-			
+
 			auto ProductTokenList = GetSpaceCutToken(StrIter);
 			for(auto TokenIter : ProductTokenList)
 			{
@@ -431,10 +424,8 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			TempSymbolStr.erase(TempSymbolStr.size() - 1);
 			TempSymbolStr = TempSymbolStr + "})));\n";
 
-			
-
 			//将语义片段构造成函数放到指定位置
-			if (!SemanticStr.empty())
+			if(!SemanticStr.empty())
 			{
 				string CountStr = to_string(Count);
 				FuncStr = FuncStr + "void Production" + CountStr + "()\n{\n" + SemanticStr + "\n};\n";
@@ -442,7 +433,6 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 
 				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this)));\n ";
 			}
-		
 
 			TemplateStr = TemplateStr + TempSymbolStr;
 		}
@@ -485,7 +475,7 @@ void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent)
 
 map<string, vector<string>> RegexParseCodeGen::GetSpecStateMap(string Src, string StartNode, string EndNote, string StatementCutSign)
 {
-	auto StartStatement = CutByDefineCharacter(GetNoteSignContent(Src, StartNode, EndNote), StatementCutSign,'{','}');
+	auto StartStatement = CutByDefineCharacter(GetNoteSignContent(Src, StartNode, EndNote), StatementCutSign, '{', '}');
 	//最后一个分号不需要
 	StartStatement.pop_back();
 	return 	std::move(GetStatementMap(StartStatement));
@@ -522,7 +512,7 @@ string RegexParseCodeGen::CreatParseTagEnumStr(vector<string>& NameList)
 string RegexParseCodeGen::CreateTagMapStr(map<string, string>& TermToMap)
 {
 	string Content;
-	for (auto& Iter : TermToMap)
+	for(auto& Iter : TermToMap)
 	{
 		Content = Content + "TagMap.insert(make_pair(LexTag::" + Iter.second + ",ParseTag::" + Iter.second + "));\n";
 	}

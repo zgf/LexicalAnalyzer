@@ -578,7 +578,7 @@ private:
 	}
 
 	//查看该项集中是否存在到达产生式尾部的核心项,存在返回索引,不存在返回-1;
-	vector<int> HasCurrentProductTailIterm(vector<Triple<int, int, set<ParseTag>>>& LR1ItermList, ParseTag Tag)
+	int HasCurrentProductTailIterm(vector<Triple<int, int, set<ParseTag>>>& LR1ItermList, ParseTag Tag)
 	{
 		vector<int> Result;
 		for(auto j = 0; j < LR1ItermList.size(); j++)
@@ -586,10 +586,10 @@ private:
 			auto& CurrentIterm = LR1ItermList[j];
 			if(IsProductEnd(CurrentIterm.first, CurrentIterm.second) && CurrentIterm.TagMap.find(Tag) != CurrentIterm.TagMap.end())
 			{
-				Result.push_back(j);
+				return j;
 			}
 		}
-		return std::move(Result);
+		return -1;
 	}
 public:
 	bool ParsingRegex(vector<shared_ptr<RegexToken>>& TokenStream)
@@ -605,8 +605,8 @@ public:
 			{
 				//无法移入,需要规约后尝试
 				auto& CurrentItermList = LR1ItemSet[GetIndex].ItemList;
-				auto ResultIndexList = HasCurrentProductTailIterm(CurrentItermList, Tag);
-				if(ResultIndexList.empty())
+				auto ResultIndex = HasCurrentProductTailIterm(CurrentItermList, Tag);
+				if(ResultIndex == -1)
 				{
 					//出现错误字符
 					cout << "Error! Index:" << TokenStream[i]->GetIndex() << " Data:" << TokenStream[i]->GetData() << endl;
@@ -614,15 +614,9 @@ public:
 					//这里应该对错误进行处理
 					// TO DO
 				}
-				else if(ResultIndexList.size() != 1)
-				{
-					//回头这里修改掉,改成int的函数返回值,而不是vector
-					abort();
-				}
 				else
 				{
-					for(auto&ResultIndex : ResultIndexList)
-					{
+				
 						//需要弹出的状态数量
 						auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
 
@@ -644,10 +638,14 @@ public:
 						{
 							StautsStack.push_back(FindIter->second);
 							GetIndex = FindIter->second;
-
+							auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
+							if(FindAction != SemanticActionMap.end())
+							{
+								FindAction->second();
+							}
 							//在这里执行语义片段
 						}
-					}
+					
 				}
 				//可以规约
 			}

@@ -49,7 +49,7 @@ public:
 		//插入模板
 		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap));
 		
-		//创建文件
+			//创建文件
 		CreateCppFile(string("Test.h"), Content);
 	}
 	//所有类型都转换为字符串
@@ -110,7 +110,11 @@ public:
 	vector<string> GetSpaceCutToken(string Src);
 	//创建添入模板initGrammarMap的内容
 	string CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap, map<string, vector<string>>& StartStateMap);
-
+	//获取要跳过的符号对范围列表
+	vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd);
+	//获取Str中某个字串所有内容的列表
+	vector<int> GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList);
+	vector<int> GetNeedSignList(string& SrcStr, string& DefineStr);
 	//是空白字符?
 	bool IsWhiteSpaceChar(char i);
 

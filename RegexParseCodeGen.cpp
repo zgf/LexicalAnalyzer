@@ -43,14 +43,10 @@ string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, 
 	Symbol = Src.substr(SrcIndex, EndIndex - SrcIndex - 1);
 	return std::move(Symbol);
 }
-
-
-vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd)
+vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd)
 {
-	//TODO
-	//获取花括号的嵌套范围
-	 auto StartIndex = 0;
-	 auto FindStartIndex = 0;
+	auto StartIndex = 0;
+	auto FindStartIndex = 0;
 	vector<pair<int, int>> JumpList;
 	while(true)
 	{
@@ -58,7 +54,7 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 		if(FindStartIndex == SrcStr.npos)
 		{
 			break;
-			
+
 		}
 		else if(FindStartIndex != 0 && IsStrLiteral(SrcStr, FindStartIndex))
 		{
@@ -68,17 +64,18 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 		{
 			pair<int, int>Temp;
 			Temp.first = FindStartIndex;
-			auto FindEndIndex = GetLongestNestedEndIndex(pair<char,char>(JumpStart, JumpEnd), SrcStr, FindStartIndex);
+			auto FindEndIndex = GetLongestNestedEndIndex(pair<char, char>(JumpStart, JumpEnd), SrcStr, FindStartIndex);
 			Temp.second = FindEndIndex;
 			JumpList.push_back(Temp);
 			StartIndex = FindEndIndex;
 		}
 	}
-
-	StartIndex = 0;
-
-	vector<string> Result;
-	vector<int>SignList;
+	return std::move(JumpList);
+}
+vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList)
+{
+	auto StartIndex = 0;
+	vector<int> SignList;
 	SignList.push_back(0 - DefineStr.size());
 	while(true)
 	{
@@ -105,7 +102,43 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 			}
 		}
 	}
+	return move(SignList);
+}
+vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr)
+{
+	vector<int>SignList;
+	auto StartIndex = 0;
+	SignList.push_back(0 - DefineStr.size());
+	while(true)
+	{
+		auto FindIter = SrcStr.find(DefineStr, StartIndex);
+		if(FindIter == SrcStr.npos)
+		{
+			break;
+		}
+		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter))
+		{
+			StartIndex = FindIter + DefineStr.size();
+		}
+		else
+		{
+			SignList.push_back(FindIter);
+			StartIndex = FindIter + DefineStr.size();
+		}
+	}
+	return move(SignList);
+}
 
+vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd)
+{
+	//TODO
+	//获取花括号的嵌套范围
+	
+	vector<string>Result;
+	
+	auto JumpList = GetNeedJumpList(SrcStr, DefineStr, JumpStart, JumpEnd);
+
+	auto SignList = GetNeedSignList(SrcStr, DefineStr, JumpList);
 	if(SignList.size() != 1)
 	{
 		for(int i = 0; i < SignList.size() - 1; i++)
@@ -127,28 +160,9 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 
 vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr)
 {
-	auto StartIndex = 0;
 	vector<string> Result;
-	vector<int>SignList;
-	SignList.push_back(0 - DefineStr.size());
-	while(true)
-	{
-		auto FindIter = SrcStr.find(DefineStr, StartIndex);
-		if(FindIter == SrcStr.npos)
-		{
-			break;
-		}
-		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter))
-		{
-			StartIndex = FindIter + DefineStr.size();
-		}
-		else
-		{
-			SignList.push_back(FindIter);
-			StartIndex = FindIter + DefineStr.size();
-		}
-	}
-
+	
+	auto SignList = GetNeedSignList(SrcStr, DefineStr);
 	if(SignList.size() != 1)
 	{
 		for(int i = 0; i < SignList.size() - 1; i++)

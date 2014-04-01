@@ -1,14 +1,10 @@
-#include "RegexParseCodeGen.h"
-#include "Test.h"
+#include "RegexParse.h"
 
 int main()
 {
-	//RegexParseCodeGen ParseCodeGen(string("RegexParseConfig.cpp"), string("RegexParseTemplate.h"));
-//	ParseCodeGen.DealAll();
-	string Pattern("a(b|c)c*|b");
+	string Pattern("[a-znb]*|ab(c[a]|cb+?dd)");
 	LexParse Lex(Pattern);
 	RegexParse Parse;
-
 	Parse.ParsingRegex(Lex.TokenStream);
 	return 0;
 }

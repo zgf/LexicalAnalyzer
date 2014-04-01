@@ -3,7 +3,6 @@ CodeGen保留关键词 _Continue;
 _Continue意思是跳过当前捕获的字符(跳过空白等)
 */
 
-
 //<HeadFile>
 //这里会直接拷贝到LexParse文件中
 #include <unordered_map>
@@ -44,12 +43,10 @@ int Line;
 wstring SrcStr;
 //</ClassMember>
 
-
 //<RegularTypedef>
 //"模式别名" : "模式"
 
 //</RegularTypedef>
-
 
 //<Action>
 //"函数名": "模式" : {语义动作};

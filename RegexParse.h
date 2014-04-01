@@ -256,6 +256,7 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Back_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetUnit), Symbol(false, ParseTag::CharSetString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetUnit)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetUnit), vector<Symbol>({Symbol(false, ParseTag::NormalChar), Symbol(true, ParseTag::CharSetComponent), Symbol(false, ParseTag::NormalChar)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetUnit), vector<Symbol>({Symbol(false, ParseTag::NormalChar)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet)})));
@@ -292,6 +293,7 @@ private:
 	}
 	void initSemanticMap()
 	{
+		SemanticActionMap.insert(make_pair(1, bind(&RegexParse::Production1, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(2, bind(&RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(3, bind(&RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(4, bind(&RegexParse::Production4, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
@@ -722,7 +724,7 @@ private:
 private:
 
 	//CharSet "[" CharSetString "]"
-	void Production2(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production1(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
@@ -732,7 +734,7 @@ private:
 		NewNode->ChildNumber = 1;
 	};
 	//CharSet "[^" CharSetString "]"
-	void Production3(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production2(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
@@ -742,11 +744,17 @@ private:
 		NewNode->ChildNumber = 1;
 	};
 	//CharSetString CharSetUnit CharSetString
-	void Production4(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production3(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
 		TwoNodeSetup(ParseTag::CharSetString, CatchStack);
+	};
+	//CharSetString CharSetUnit
+	void Production4(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		NewNode = shared_ptr<Property>(new Property());
+		OneLeftNodeSetup(ParseTag::CharSetString, CatchStack);
 	};
 	//CharSetUnit NormalChar "-" NormalChar
 	void Production5(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
@@ -817,7 +825,7 @@ private:
 	void Production15(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
-		TwoNodeSetup(ParseTag::Factor, CatchStack);
+		OneLeftNodeSetup(ParseTag::Factor, CatchStack);
 	};
 	//NormalChar "NumberChar"
 	void Production16(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)

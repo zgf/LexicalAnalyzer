@@ -10,7 +10,7 @@ string RegexParseCodeGen::ReadFileContent(string& FileName)
 }
 
 // 查看指定位置字符是否被转义
-bool HasChangedMean(string& SrcStr, int FindIter)
+bool RegexParseCodeGen::HasChangedMean(string& SrcStr, int FindIter)
 {
 	if(FindIter == 0)
 	{
@@ -23,7 +23,7 @@ bool HasChangedMean(string& SrcStr, int FindIter)
 }
 
 //查找所有非字面值引号位置
-vector<int> FindAllSymbolPostion(string& SrcStr, char Sign = '"')
+vector<int> RegexParseCodeGen::FindAllSymbolPostion(string& SrcStr, char Sign )
 {
 	vector<int> Result;
 	for(auto i = 0; i < SrcStr.size(); i++)
@@ -39,28 +39,28 @@ vector<int> FindAllSymbolPostion(string& SrcStr, char Sign = '"')
 	return std::move(Result);
 }
 
-
-template<typename U>
-int BinarySearch(vector<U>& Container, U& Target,int Low,int Height)
-{
-	if(Low > Height)
-	{
-		return -1;
-	}
-	int Mid = Low + Height / 2;
-	if (Container[Mid] == Target)
-	{
-		return Mid;
-	}
-	else if(Container[Mid] < Target)
-	{
-		return BinarySearch(Container, Target, 0, Mid - 1);
-	}
-	else
-	{
-		return BinarySearch(Container, Target, Mid + 1, Height);
-	}
-}
+//
+//template<typename U>
+//int BinarySearch(vector<U>& Container, U& Target,int Low,int Height)
+//{
+//	if(Low > Height)
+//	{
+//		return -1;
+//	}
+//	int Mid = Low + Height / 2;
+//	if (Container[Mid] == Target)
+//	{
+//		return Mid;
+//	}
+//	else if(Container[Mid] < Target)
+//	{
+//		return BinarySearch(Container, Target, 0, Mid - 1);
+//	}
+//	else
+//	{
+//		return BinarySearch(Container, Target, Mid + 1, Height);
+//	}
+//}
 
 bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter,vector<int> SymbolList)
 {
@@ -595,10 +595,10 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			if(!SemanticStr.empty())
 			{
 				string CountStr = to_string(Count);
-				FuncStr = FuncStr + "void Production" + CountStr + "(int Index,int Postion,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream)\n{\n" + SemanticStr + "\n};\n";
+				FuncStr = FuncStr + "void Production" + CountStr + "(vector<shared_ptr<Property>>& CatchStack,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream)\n{\n" + SemanticStr + "\n};\n";
 				//添加语义内容的绑定
 
-				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4)));\n ";
+				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3)));\n ";
 			}
 
 			TemplateStr = TemplateStr + TempSymbolStr;

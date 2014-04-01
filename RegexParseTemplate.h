@@ -81,7 +81,14 @@ class Property
 {
 public:
 	string Val;
+	ParseTag Tag;
+	//在源码中出现的Index
+	int Index;
 	//<PropertyMember>
+	Property(string Value, ParseTag tTag,int tIndex) :Val(Value), Tag(tTag), Index(tIndex)
+	{
+
+	}
 };
 
 //
@@ -486,6 +493,8 @@ public:
 		for(auto i = 0; i < TokenStream.size();)
 		{
 			auto& Tag = TagMap[TokenStream[i]->GetTag()];
+			auto& Val = TokenStream[i]->GetData();
+			auto SrcIndex = TokenStream[i]->GetIndex();
 			auto& FindIter = LR1ItemSet[GetIndex].NextStauts.find(Tag);
 			if(FindIter == LR1ItemSet[GetIndex].NextStauts.end())
 			{
@@ -508,10 +517,8 @@ public:
 					auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
 					if(FindAction != SemanticActionMap.end())
 					{
-						FindAction->second(CurrentItermList[ResultIndex].first, CurrentItermList[ResultIndex].second, i, TokenStream);
+						FindAction->second(CatchStack ,i, TokenStream);
 					}
-
-
 					//需要弹出的状态数量
 					auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
 
@@ -541,7 +548,9 @@ public:
 			}
 			else
 			{
+				//执行移入.
 				StautsStack.push_back(FindIter->second);
+				CatchStack.push_back(shared_ptr<Property>(new Property(Val, Tag,SrcIndex)));
 				i++;
 				GetIndex = FindIter->second;
 			}
@@ -573,7 +582,7 @@ private:
 	unordered_map<LexTag, ParseTag> TagMap;
 
 	//文法列表索引到语义片段的索引
-	unordered_map<int, function<void(int,int,int,vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
+	unordered_map<int, function<void(vector<shared_ptr<Property>>&,int,vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
 
 	//<DataMember>
 };

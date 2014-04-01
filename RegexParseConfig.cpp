@@ -30,10 +30,10 @@
 <FirstGrammar>
   Start => Express;
 </FirstGrammar>
-//语义动作的函数签名是 void Func(int Index,int Postion,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream)
+//语义动作的函数签名是 void Func(vector<shared_ptr<Property>>& CatchStack,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream))
 <Grammar>
-  CompleteCharSet      => CharSet 								{OneLeftNodeSetup(ParseTag::CompleteCharSet);}
-                          | CharSet Repeat  					{TwoNodeSetup(ParseTag::CompleteCharSet);}
+  CompleteCharSet      => CharSet 								{OneLeftNodeSetup(ParseTag::CompleteCharSet,CatchStack);}
+                          | CharSet Repeat  					{TwoNodeSetup(ParseTag::CompleteCharSet,CatchStack);}
                           ;  
   Factor               => "(" Express ")" 						 {
   																	$$.Val = "";
@@ -41,18 +41,18 @@
 																	$$.LeftNode = $2;
 																	$$.ChildNumber = 1;
   																 }
-                          | CompleteCharSet  					{OneLeftNodeSetup(ParseTag::Factor);}
-                          | NormalStringComplete				{TwoNodeSetup(ParseTag::Factor);}
+                          | CompleteCharSet  					{OneLeftNodeSetup(ParseTag::Factor,CatchStack);}
+                          | NormalStringComplete				{TwoNodeSetup(ParseTag::Factor,CatchStack);}
                           ;
-  CompleteFactor       => Factor Repeat 						{TwoNodeSetup(ParseTag::CompleteFactor);}
-                          | Factor  							{OneLeftNodeSetup(ParseTag::CompleteFactor);}
+  CompleteFactor       => Factor Repeat 						{TwoNodeSetup(ParseTag::CompleteFactor,CatchStack);}
+                          | Factor  							{OneLeftNodeSetup(ParseTag::CompleteFactor,CatchStack);}
                           ;
-  Term                 =>  CompleteFactor Term					{TwoNodeSetup(ParseTag::Term);}
-                          | CompleteFactor						{OneLeftNodeSetup(ParseTag::Term);}
+  Term                 =>  CompleteFactor Term					{TwoNodeSetup(ParseTag::Term,CatchStack);}
+                          | CompleteFactor						{OneLeftNodeSetup(ParseTag::Term,CatchStack);}
                           ;
-  Express              =>Term  "|" Express						{TwoNodeSetup(ParseTag::ChoseSymbol);}
+  Express              =>Term  "|" Express						{TwoNodeSetup(ParseTag::ChoseSymbol,CatchStack);}
                           | Term								{
-																	OneLeftNodeSetup(ParseTag::Express);
+																	OneLeftNodeSetup(ParseTag::Express,CatchStack);
 																}
                           ;
   Repeat               => "{" RepeatRight RepeatEnd				{
@@ -98,7 +98,7 @@
 																	$$.ChildNumber = 0;
 																} 
                           ;
-  RepeatRight          => SumNumber								{OneLeftNodeSetup(ParseTag::RepeatRight);}
+  RepeatRight          => SumNumber								{OneLeftNodeSetup(ParseTag::RepeatRight,CatchStack);}
                           | SumNumber "," SumNumber				{
 																  $$.Val = "";
 																  $$.Tag = ParseTag::RepeatRight;
@@ -107,8 +107,8 @@
 																  $$.ChildNumber = 2;
 																}
                           ;
-  RepeatEnd			   => "}"									{GetValue(ParseTag::Repeat_And_BackRefer_End,"}" ); }
-						  | "}?"								{GetValue(ParseTag::Repeat_End_Greedy,"}?");}
+  RepeatEnd			   => "}"									{GetValue(ParseTag::Repeat_And_BackRefer_End,"}",CatchStack ); }
+						  | "}?"								{GetValue(ParseTag::Repeat_End_Greedy,"}?",CatchStack);}
                           ;
 						  //这里直接把子节点丢掉,只要一个SumNumber
   SumNumber			   => NumberChar SumNumber					{
@@ -118,27 +118,27 @@
 																 }
                           ;
   NormalStringComplete => NormalString Repeat					{
-																	TwoNodeSetup(ParseTag::NormalStringComplete);
+																	TwoNodeSetup(ParseTag::NormalStringComplete,CatchStack);
 																}
                           | NormalString						{
-																   OneLeftNodeSetup(ParseTag::NormalStringComplete);
+																   OneLeftNodeSetup(ParseTag::NormalStringComplete,CatchStack);
 																}
                           ;
   NormalString         => NormalChar NormalString				{
-																	TwoNodeSetup(ParseTag::NormalString);
+																	TwoNodeSetup(ParseTag::NormalString,CatchStack);
 																}
                           | NormalChar							{
-																	OneLeftNodeSetup(ParseTag::NormalString,$1.Val);
+																	OneLeftNodeSetup(ParseTag::NormalString,CatchStack,$1.Val);
 																}
                           ;
   NormalChar           => "NumberChar"							{
-																	GetValue(ParseTag::NormalChar,$1.Val);
+																	GetValue(ParseTag::NormalChar,CatchStack,$1.Val);
 																}
 					       | "RealWordChar"						{
-																	GetValue(ParseTag::NormalChar,$1.Val);
+																	GetValue(ParseTag::NormalChar,CatchStack,$1.Val);
 																}
 						   | "OtherChar"						{
-																	GetValue(ParseTag::NormalChar,$1.Val);
+																	GetValue(ParseTag::NormalChar,CatchStack,$1.Val);
 																 }				
 						   
                            ;
@@ -159,26 +159,13 @@
                            ;
 
   CharSetString		   => CharSetUnit CharSetString             {
-																	TwoNodeSetup(ParseTag::CharSetString);
+																	TwoNodeSetup(ParseTag::CharSetString,CatchStack);
 																}
 						   ;
-  CharSetUnit		   => NormalChar "-" NormalChar				{TwoNodeSetup(ParseTag::CharSetUnit);}
-						  | NormalChar							{GetValue(ParseTag::CharSetUnit,$1.Val);}
+  CharSetUnit		   => NormalChar "-" NormalChar				{TwoNodeSetup(ParseTag::CharSetUnit,CatchStack);}
+						  | NormalChar							{GetValue(ParseTag::CharSetUnit,CatchStack,$1.Val);}
 						  ;
- /* CharSetString        => NormalString "-" CharSetString		{
-																	$$.Val = "-";
-																	$$.Tag = ParseTag::CharSetString;
-																	$$.LeftNode = $3;
-																	$$.RightNode = $1;
-																	$$.ChildNumber = 2;
-																}
-                           | NormalString CharSetString			{
-																	TwoNodeSetup(ParseTag::CharSetString);
-																}
-                           | NormalString						{
-																	OneLeftNodeSetup(ParseTag::CharSetString);
-																}
-                           ;*/
+
 </Grammar>
 //在ParseClass外部的全局区域放置的内容
 <Global>
@@ -211,24 +198,21 @@
 
 </DataMember>
 <UserDefineFunc>
-void fun()
-{
 
-}
-void OneLeftNodeSetup(ParseTag Tag,string Value = "")
+void OneLeftNodeSetup(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value = "")
 {
 	$$.Val = Value;
 	$$.Tag = ParseTag::Tag;
 	$$.LeftNode = $1;
 	$$.ChildNumber = 1;
 }
-void GetValue(ParseTag Tag, string Value)
+void GetValue(ParseTag Tag, string Value, vector<shared_ptr<Property>>&CatchStack)
 {
 	$$.Val = Value;
 	$$.Tag = Tag;
 	$$.ChildNumber = 0;
 }
-void TwoNodeSetup(ParseTag Tag, string Value = "")
+void TwoNodeSetup(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value = "")
 {
 	$$.Val = Value;
 	$$.Tag = Tag;
@@ -245,7 +229,8 @@ void TwoNodeSetup(ParseTag Tag, string Value = "")
 // ParseTag Tag;
 
 //在CharSet中是否取反查看该位
-int a;
+
+
 bool Opps_Greedy;
 
 //通用属性

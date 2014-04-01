@@ -99,6 +99,12 @@ public:
 	//按指定字符分割字符串,如果指定字符前有\\,则忽视该处字符,如果字符被"直接包裹" 忽略字符,如果字符在jump区域内,忽略字符
 	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd);
 
+	// 查看指定位置字符是否被转义
+	bool RegexParseCodeGen::HasChangedMean(string& SrcStr, int FindIter);
+
+	//查找所有非字面值引号位置
+	vector<int> RegexParseCodeGen::FindAllSymbolPostion(string& SrcStr, char Sign = '"');
+
 	//获取最长嵌套内容匹配
 	string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex, vector<int>& SymbolList);
 	//获取最长嵌套内容匹配的最后一个字符索引

@@ -559,7 +559,7 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			{
 				auto ReferSymbolList = FindAllSymbolPostion(StrIter);
 				SemanticStr = GetLongestNestedContent(pair<char, char>('{', '}'), StrIter, SemanticStartIndex, ReferSymbolList);
-
+				
 				StrIter = StrIter.erase(StrIter.find('{' + SemanticStr + '}'), SemanticStr.size() + 2);
 			}
 
@@ -595,10 +595,14 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			if(!SemanticStr.empty())
 			{
 				string CountStr = to_string(Count);
-				FuncStr = FuncStr + "void Production" + CountStr + "(vector<shared_ptr<Property>>& CatchStack,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream)\n{\n" + SemanticStr + "\n};\n";
+				string FuncName = "Production" + CountStr ;
+				string FuncParam = "(vector<shared_ptr<Property>>& CatchStack,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream)";
+				string PreInsertContent = "NewNode= shared_ptr<Property> (new Property())._Get();\n";
+				string TailInsertContent = "";
+				FuncStr = FuncStr + "void " + FuncName + FuncParam + "\n{\n" + PreInsertContent + Repalce$$And$iStr(SemanticStr) + TailInsertContent + "\n};\n";
 				//添加语义内容的绑定
 
-				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3)));\n ";
+				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(&RegexParse::Production" + CountStr + ", this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3)));\n ";
 			}
 
 			TemplateStr = TemplateStr + TempSymbolStr;
@@ -625,8 +629,22 @@ string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, m
 }
 string RegexParseCodeGen::ReplaceDefinePostion(string& Template, string& TemplateSign, string& RePalceData)
 {
+
 	auto FindPos = Template.find(TemplateSign);
 	auto FindNum = TemplateSign.size();
+
+	/*if(TemplateSign == "//<PropertyMember>")
+	{
+		for(auto i = 1500; i < Template.size(); i++)
+		{
+			if(i == 2000)
+			{
+				break;
+			}
+			cout << Template[i];
+		}
+	}*/
+	
 	return std::move(Template.replace(FindPos, FindNum, RePalceData));
 }
 

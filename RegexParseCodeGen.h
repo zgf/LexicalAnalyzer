@@ -36,8 +36,15 @@ public:
 		// 获取DataMember区域内容插入模板
 		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<DataMember>"), GetNoteSignContent(ParseConfig, string("<DataMember>"), string("</DataMember>")) + "//<DataMember>");
 
+		// 获取PropertyMember区域内容插入模板
+		
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<PropertyMember>"), GetNoteSignContent(ParseConfig, string("<PropertyMember>"), string("</PropertyMember>")) + "//<PropertyMember>");
+	
 		// 获取用户定义的函数,插入模板
-		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<UserDefineFunc>"), GetNoteSignContent(ParseConfig, string("<UserDefineFunc>"), string("</UserDefineFunc>")) + "//<UserDefineFunc>");
+		auto UserDefineFuncStr = GetNoteSignContent(ParseConfig, string("<UserDefineFunc>"), string("</UserDefineFunc>"));
+		//替换掉UserDefineFuncStr中的$$和$i;
+		UserDefineFuncStr = Repalce$$And$iStr(UserDefineFuncStr);
+		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<UserDefineFunc>"), UserDefineFuncStr + "//<UserDefineFunc>");
 
 		//获得<Grammar>区域的文法映射
 		auto StatementMap = GetSpecStateMap(ParseConfig, string("<Grammar>"), string("</Grammar>"), string(";"));
@@ -178,6 +185,72 @@ public:
 	//查看目标串中存在不存在语义片段
 	int RegexParseCodeGen::HasSemanticAction(string& Target);
 
+	string&   replace_all_distinct(string&   str, const   string&   old_value, const   string&   new_value)
+	{
+		for(string::size_type pos(0); pos != string::npos; pos += new_value.length())
+		{
+			if(( pos = str.find(old_value, pos) ) != string::npos)
+				str.replace(pos, old_value.length(), new_value);
+			else   break;
+		}
+		return   move(str);
+	}
+
+	//替换掉指定字符串中的$$ 和$i
+	string Repalce$$And$iStr(string& Target)
+	{
+		Target = Replace$$(Target);
+		Target = Replace$i(Target);
+		
+		return std::move(Target);
+	}
+	string Replace$$(string& Target)
+	{
+		string Sym = "$$";
+		auto FindIter = Target.find(Sym);
+		if(FindIter != Target.npos)
+		{
+			string ReplaceData = "NewNode";
+			Target = replace_all_distinct(Target, Sym, ReplaceData);
+		}
+		Sym = "NewNode.";
+		FindIter = Target.find(Sym);
+		if(FindIter != Target.npos)
+		{
+			string ReplaceData = "NewNode->";
+			Target = replace_all_distinct(Target, Sym, ReplaceData);
+		}
+		return std::move(Target);
+	}
+	string Replace$i(string& Target)
+	{
+		//$i.X替换
+		for(auto i = 1;i<=10; i++)
+		{
+
+			auto Count = to_string(i);
+			auto Sym = "$" + Count;
+			auto FindIter = Target.find(Sym);
+			if(FindIter != Target.npos)
+			{
+				auto ReplaceData = "CatchStack[CatchStack.size()-" + Count + "]";
+				Target = replace_all_distinct(Target, Sym, ReplaceData);
+			}
+		}
+		for(auto i = 1;i<=10; i++)
+		{
+
+			auto Count = to_string(i);
+			auto Sym = "CatchStack[CatchStack.size()-" + Count + "].";
+			auto FindIter = Target.find(Sym);
+			if(FindIter != Target.npos)
+			{
+				auto ReplaceData = "CatchStack[CatchStack.size()-" + Count + "]->";
+				Target = replace_all_distinct(Target, Sym, ReplaceData);
+			}
+		}
+		return std::move(Target);
+	}
 	//输出内容到文件
 	void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent);
 };

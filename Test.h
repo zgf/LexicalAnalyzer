@@ -121,8 +121,17 @@ public:
 	ParseTag Tag;
 	//在源码中出现的Index
 	int Index;
+
+	bool Opps_Greedy;
+
+	shared_ptr<Property> RightNode;
+	shared_ptr<Property> LeftNode;
+	int ChildNumber;
 	//<PropertyMember>
 	Property(string Value, ParseTag tTag, int tIndex) :Val(Value), Tag(tTag), Index(tIndex)
+	{
+	}
+	Property()
 	{
 	}
 };
@@ -282,41 +291,41 @@ private:
 	}
 	void initSemanticMap()
 	{
-		SemanticActionMap.insert(make_pair(2, bind(RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(3, bind(RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(4, bind(RegexParse::Production4, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(5, bind(RegexParse::Production5, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(6, bind(RegexParse::Production6, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(7, bind(RegexParse::Production7, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(8, bind(RegexParse::Production8, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(9, bind(RegexParse::Production9, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(10, bind(RegexParse::Production10, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(11, bind(RegexParse::Production11, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(12, bind(RegexParse::Production12, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(13, bind(RegexParse::Production13, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(14, bind(RegexParse::Production14, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(15, bind(RegexParse::Production15, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(16, bind(RegexParse::Production16, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(17, bind(RegexParse::Production17, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(18, bind(RegexParse::Production18, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(19, bind(RegexParse::Production19, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(20, bind(RegexParse::Production20, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(21, bind(RegexParse::Production21, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(22, bind(RegexParse::Production22, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(23, bind(RegexParse::Production23, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(24, bind(RegexParse::Production24, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(25, bind(RegexParse::Production25, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(26, bind(RegexParse::Production26, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(27, bind(RegexParse::Production27, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(28, bind(RegexParse::Production28, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(29, bind(RegexParse::Production29, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(30, bind(RegexParse::Production30, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(31, bind(RegexParse::Production31, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(32, bind(RegexParse::Production32, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(33, bind(RegexParse::Production33, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(34, bind(RegexParse::Production34, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(35, bind(RegexParse::Production35, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(36, bind(RegexParse::Production36, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(2, bind(&RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(3, bind(&RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(4, bind(&RegexParse::Production4, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(5, bind(&RegexParse::Production5, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(6, bind(&RegexParse::Production6, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(7, bind(&RegexParse::Production7, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(8, bind(&RegexParse::Production8, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(9, bind(&RegexParse::Production9, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(10, bind(&RegexParse::Production10, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(11, bind(&RegexParse::Production11, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(12, bind(&RegexParse::Production12, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(13, bind(&RegexParse::Production13, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(14, bind(&RegexParse::Production14, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(15, bind(&RegexParse::Production15, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(16, bind(&RegexParse::Production16, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(17, bind(&RegexParse::Production17, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(18, bind(&RegexParse::Production18, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(19, bind(&RegexParse::Production19, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(20, bind(&RegexParse::Production20, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(21, bind(&RegexParse::Production21, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(22, bind(&RegexParse::Production22, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(23, bind(&RegexParse::Production23, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(24, bind(&RegexParse::Production24, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(25, bind(&RegexParse::Production25, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(26, bind(&RegexParse::Production26, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(27, bind(&RegexParse::Production27, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(28, bind(&RegexParse::Production28, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(29, bind(&RegexParse::Production29, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(30, bind(&RegexParse::Production30, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(31, bind(&RegexParse::Production31, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(32, bind(&RegexParse::Production32, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(33, bind(&RegexParse::Production33, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(34, bind(&RegexParse::Production34, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(35, bind(&RegexParse::Production35, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		SemanticActionMap.insert(make_pair(36, bind(&RegexParse::Production36, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 
 		//<initSemanticMap>
 	}
@@ -610,10 +619,10 @@ private:
 public:
 	bool ParsingRegex(vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		vector<int> StautsStack;
 		//这里是捕获的属性堆栈
 		//直接用Property构建AST
-		vector<shared_ptr<Property>>CatchStack;
+		/*vector<int> StautsStack;
+		vector<shared_ptr<Property>>CatchStack;*/
 		StautsStack.push_back(0);
 		auto GetIndex = StautsStack.back();
 		for(auto i = 0; i < TokenStream.size();)
@@ -665,6 +674,8 @@ public:
 					else
 					{
 						StautsStack.push_back(FindIter->second);
+						CatchStack.erase(CatchStack.end() - PopNumber, CatchStack.end());
+						CatchStack.push_back(shared_ptr<Property>(NewNode));
 						GetIndex = FindIter->second;
 					}
 				}
@@ -685,202 +696,258 @@ private:
 
 	void OneLeftNodeSetup(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value = "")
 	{
-		$$.Val = Value;
-		$$.Tag = ParseTag::Tag;
-		$$.LeftNode = $1;
-		$$.ChildNumber = 1;
+		NewNode->Val = Value;
+		NewNode->Tag = Tag;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 1];
+		NewNode->ChildNumber = 1;
 	}
-	void GetValue(ParseTag Tag, string Value, vector<shared_ptr<Property>>&CatchStack)
+	void GetValue(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value)
 	{
-		$$.Val = Value;
-		$$.Tag = Tag;
-		$$.ChildNumber = 0;
+		NewNode->Val = Value;
+		NewNode->Tag = Tag;
+		NewNode->ChildNumber = 0;
 	}
 	void TwoNodeSetup(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value = "")
 	{
-		$$.Val = Value;
-		$$.Tag = Tag;
-		$$.LeftNode = $2;
-		$$.RightNode = $1;
-		$$.ChildNumber = 2;
+		NewNode->Val = Value;
+		NewNode->Tag = Tag;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 2];
+		NewNode->RightNode = CatchStack[CatchStack.size() - 1];
+		NewNode->ChildNumber = 2;
 	}
 	//<UserDefineFunc>
 private:
 
 	void Production2(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = false;
-		$$.Tag = ParseTag::CharSet;
-		$$.LeftNode = $1;
-		$$.ChildNumber = 1;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = false;
+		NewNode->Tag = ParseTag::CharSet;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 1];
+		NewNode->ChildNumber = 1;
 	};
 	void Production3(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = true;
-		$$.Tag = ParseTag::CharSet;
-		$$.LeftNode = $1;
-		$$.ChildNumber = 1;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = true;
+		NewNode->Tag = ParseTag::CharSet;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 1];
+		NewNode->ChildNumber = 1;
 	};
 	void Production4(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
 		TwoNodeSetup(ParseTag::CharSetString, CatchStack);
 	};
 	void Production5(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		TwoNodeSetup(ParseTag::CharSetUnit, CatchStack);
 	};
 	void Production6(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		GetValue(ParseTag::CharSetUnit, CatchStack, $1.Val);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+		GetValue(ParseTag::CharSetUnit, CatchStack, CatchStack[CatchStack.size() - 1]->Val);
 	};
 	void Production7(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		OneLeftNodeSetup(ParseTag::CompleteCharSet, CatchStack);
 	};
 	void Production8(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		TwoNodeSetup(ParseTag::CompleteCharSet, CatchStack);
 	};
 	void Production9(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		TwoNodeSetup(ParseTag::CompleteFactor, CatchStack);
 	};
 	void Production10(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		OneLeftNodeSetup(ParseTag::CompleteFactor, CatchStack);
 	};
 	void Production11(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		TwoNodeSetup(ParseTag::ChoseSymbol, CatchStack);
 	};
 	void Production12(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
 		OneLeftNodeSetup(ParseTag::Express, CatchStack);
 	};
 	void Production13(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Val = "";
-		$$.Tag = ParseTag::Factor;
-		$$.LeftNode = $2;
-		$$.ChildNumber = 1;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Val = "";
+		NewNode->Tag = ParseTag::Factor;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 2];
+		NewNode->ChildNumber = 1;
 	};
 	void Production14(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		OneLeftNodeSetup(ParseTag::Factor, CatchStack);
 	};
 	void Production15(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		TwoNodeSetup(ParseTag::Factor, CatchStack);
 	};
 	void Production16(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		GetValue(ParseTag::NormalChar, CatchStack, $1.Val);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		GetValue(ParseTag::NormalChar, CatchStack, CatchStack[CatchStack.size() - 1]->Val);
 	};
 	void Production17(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		GetValue(ParseTag::NormalChar, CatchStack, $1.Val);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		GetValue(ParseTag::NormalChar, CatchStack, CatchStack[CatchStack.size() - 1]->Val);
 	};
 	void Production18(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		GetValue(ParseTag::NormalChar, CatchStack, $1.Val);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		GetValue(ParseTag::NormalChar, CatchStack, CatchStack[CatchStack.size() - 1]->Val);
 	};
 	void Production19(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
 		TwoNodeSetup(ParseTag::NormalString, CatchStack);
 	};
 	void Production20(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		OneLeftNodeSetup(ParseTag::NormalString, CatchStack, $1.Val);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		OneLeftNodeSetup(ParseTag::NormalString, CatchStack, CatchStack[CatchStack.size() - 1]->Val);
 	};
 	void Production21(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
 		TwoNodeSetup(ParseTag::NormalStringComplete, CatchStack);
 	};
 	void Production22(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
 		OneLeftNodeSetup(ParseTag::NormalStringComplete, CatchStack);
 	};
 	void Production23(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = $1.Opps_Greedy;
-		$$.Tag = ParseTag::Repeat;
-		$$.LeftNode = $2;
-		$$.ChildNumber = 1;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = CatchStack[CatchStack.size() - 1]->Opps_Greedy;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 2];
+		NewNode->ChildNumber = 1;
 	};
 	void Production24(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = true;
-		$$.Tag = ParseTag::Repeat;
-		$$.Val = "*";
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = true;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->Val = "*";
+		NewNode->ChildNumber = 0;
 	};
 	void Production25(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = false;
-		$$.Tag = ParseTag::Repeat;
-		$$.Val = "*";
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = false;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->Val = "*";
+		NewNode->ChildNumber = 0;
 	};
 	void Production26(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = false;
-		$$.Tag = ParseTag::Repeat;
-		$$.Val = "+";
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = false;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->Val = "+";
+		NewNode->ChildNumber = 0;
 	};
 	void Production27(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = true;
-		$$.Tag = ParseTag::Repeat;
-		$$.Val = "+";
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = true;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->Val = "+";
+		NewNode->ChildNumber = 0;
 	};
 	void Production28(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = false;
-		$$.Tag = ParseTag::Repeat;
-		$$.Val = "?";
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = false;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->Val = "?";
+		NewNode->ChildNumber = 0;
 	};
 	void Production29(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Opps_Greedy = true;
-		$$.Tag = ParseTag::Repeat;
-		$$.Val = "?";
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Opps_Greedy = true;
+		NewNode->Tag = ParseTag::Repeat;
+		NewNode->Val = "?";
+		NewNode->ChildNumber = 0;
 	};
 	void Production30(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		GetValue(ParseTag::Repeat_And_BackRefer_End, "}", CatchStack);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+		GetValue(ParseTag::Repeat_And_BackRefer_End, CatchStack, "}");
 	};
 	void Production31(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		GetValue(ParseTag::Repeat_End_Greedy, "}?", CatchStack);
+		NewNode = shared_ptr<Property>(new Property())._Get();
+		GetValue(ParseTag::Repeat_End_Greedy, CatchStack, "}?");
 	};
 	void Production32(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		OneLeftNodeSetup(ParseTag::RepeatRight, CatchStack);
 	};
 	void Production33(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Val = "";
-		$$.Tag = ParseTag::RepeatRight;
-		$$.LeftNode = $3;
-		$$.RightNode = $1;
-		$$.ChildNumber = 2;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Val = "";
+		NewNode->Tag = ParseTag::RepeatRight;
+		NewNode->LeftNode = CatchStack[CatchStack.size() - 3];
+		NewNode->RightNode = CatchStack[CatchStack.size() - 1];
+		NewNode->ChildNumber = 2;
 	};
 	void Production34(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
-		$$.Val = $2.Val + $1.Val;
-		$$.Tag = ParseTag::SumNumber;
-		$$.ChildNumber = 0;
+		NewNode = shared_ptr<Property>(new Property())._Get();
+
+		NewNode->Val = CatchStack[CatchStack.size() - 2]->Val + CatchStack[CatchStack.size() - 1]->Val;
+		NewNode->Tag = ParseTag::SumNumber;
+		NewNode->ChildNumber = 0;
 	};
 	void Production35(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		TwoNodeSetup(ParseTag::Term, CatchStack);
 	};
 	void Production36(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+		NewNode = shared_ptr<Property>(new Property())._Get();
 		OneLeftNodeSetup(ParseTag::Term, CatchStack);
 	};
 
@@ -905,8 +972,11 @@ private:
 
 	//文法列表索引到语义片段的索引
 	unordered_map<int, function<void(vector<shared_ptr<Property>>&, int, vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
-
-	vector<ASTNode> NodeList;
+	//捕获属性的状态栈和属性栈
+	vector<int> StautsStack;
+	vector<shared_ptr<Property>>CatchStack;
+	//每次执行语义动作时候构造的新节点挂载位置
+	Property* NewNode;
 
 	//<DataMember>
 };

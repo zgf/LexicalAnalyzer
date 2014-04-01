@@ -1,27 +1,45 @@
-﻿生成启动时间为 4/1/2014 1:51:20 AM。
+﻿生成启动时间为 4/1/2014 4:04:03 PM。
      1>项目“F:\MyProjects\词法分析器生成器\词法分析器生成器\词法分析器生成器.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt RegexParseCodeGen.cpp
+         E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt RegexParseCodeGen.cpp main.cpp
          RegexParseCodeGen.cpp
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(204): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(244): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(64): warning C4800: “int”: 将值强制为布尔值“true”或“false”(性能警告)
-     1>RegexParseCodeGen.cpp(110): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(252): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(280): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(315): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(332): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(345): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(364): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(424): warning C4018: “<=”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(472): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexParseCodeGen.h(81): warning C4018: “<”: 有符号/无符号不匹配
-                 RegexParseCodeGen.cpp(201): 参见对正在编译的函数 模板 实例化“int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)”的引用
+     1>RegexParseCodeGen.cpp(29): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(77): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(81): warning C4800: “int”: 将值强制为布尔值“true”或“false”(性能警告)
+     1>RegexParseCodeGen.cpp(115): warning C4800: “int”: 将值强制为布尔值“true”或“false”(性能警告)
+     1>RegexParseCodeGen.cpp(161): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(303): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(331): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(366): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(383): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(396): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(415): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(473): warning C4018: “<=”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(521): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexParseCodeGen.h(88): warning C4018: “<”: 有符号/无符号不匹配
+                 RegexParseCodeGen.cpp(252): 参见对正在编译的函数 模板 实例化“int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)”的引用
                  with
                  [
                      _Ty=std::pair<int,int>
          ,            T=int
                  ]
+         main.cpp
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(204): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(244): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(161): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(179): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(347): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(356): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(440): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(450): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(501): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(556): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(583): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(599): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(623): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\Test.h(644): warning C4018: “<”: 有符号/无符号不匹配
        Link:
          E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\MyProjects\词法分析器生成器\Release\词法分析器生成器.exe" /INCREMENTAL:NO /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\MyProjects\词法分析器生成器\Release\词法分析器生成器.pdb" /SUBSYSTEM:CONSOLE /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\MyProjects\词法分析器生成器\Release\词法分析器生成器.lib" /MACHINE:X86 /SAFESEH Release\CodeGenComplier.obj
          Release\LexConfigTemplate.obj
@@ -34,4 +52,4 @@
 
 生成成功。
 
-已用时间 00:00:03.54
+已用时间 00:00:11.08

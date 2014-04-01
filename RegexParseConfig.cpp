@@ -107,8 +107,8 @@
 																  $$.ChildNumber = 2;
 																}
                           ;
-  RepeatEnd			   => "}"									{GetValue(ParseTag::Repeat_And_BackRefer_End,"}",CatchStack ); }
-						  | "}?"								{GetValue(ParseTag::Repeat_End_Greedy,"}?",CatchStack);}
+  RepeatEnd			   => "}"									{GetValue(ParseTag::Repeat_And_BackRefer_End,CatchStack,"}" ); }
+						  | "}?"								{GetValue(ParseTag::Repeat_End_Greedy,CatchStack,"}?");}
                           ;
 						  //这里直接把子节点丢掉,只要一个SumNumber
   SumNumber			   => NumberChar SumNumber					{
@@ -194,19 +194,19 @@
 </Global>
 <DataMember>
   //保存NFA的列表和映射表
-  vector<ASTNode> NodeList;
 
 </DataMember>
+
 <UserDefineFunc>
 
 void OneLeftNodeSetup(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value = "")
 {
 	$$.Val = Value;
-	$$.Tag = ParseTag::Tag;
+	$$.Tag = Tag;
 	$$.LeftNode = $1;
 	$$.ChildNumber = 1;
 }
-void GetValue(ParseTag Tag, string Value, vector<shared_ptr<Property>>&CatchStack)
+void GetValue(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string Value)
 {
 	$$.Val = Value;
 	$$.Tag = Tag;
@@ -234,7 +234,7 @@ void TwoNodeSetup(ParseTag Tag, vector<shared_ptr<Property>>&CatchStack, string 
 bool Opps_Greedy;
 
 //通用属性
-int RightNode;
-int LeftNode;
+shared_ptr<Property> RightNode;
+shared_ptr<Property> LeftNode;
 int ChildNumber;
 </PropertyMember>

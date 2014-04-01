@@ -89,6 +89,10 @@ public:
 	{
 
 	}
+	Property()
+	{
+
+	}
 };
 
 //
@@ -484,10 +488,11 @@ public:
 	bool ParsingRegex(vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 
-		vector<int> StautsStack;
+		
 		//这里是捕获的属性堆栈
 		//直接用Property构建AST
-		vector<shared_ptr<Property>>CatchStack;
+		/*vector<int> StautsStack;
+		vector<shared_ptr<Property>>CatchStack;*/
 		StautsStack.push_back(0);
 		auto GetIndex = StautsStack.back();
 		for(auto i = 0; i < TokenStream.size();)
@@ -539,6 +544,10 @@ public:
 					else
 					{
 						StautsStack.push_back(FindIter->second);
+
+						//这里可能有问题0 0...CatchStack和StautsStack不一定是一一对应关系
+						CatchStack.erase(CatchStack.end() - PopNumber, CatchStack.end());
+						CatchStack.push_back(shared_ptr<Property>(NewNode)); 
 						GetIndex = FindIter->second;
 						
 						
@@ -583,6 +592,10 @@ private:
 
 	//文法列表索引到语义片段的索引
 	unordered_map<int, function<void(vector<shared_ptr<Property>>&,int,vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
-
+	//捕获属性的状态栈和属性栈
+	vector<int> StautsStack;
+	vector<shared_ptr<Property>>CatchStack;
+	//每次执行语义动作时候构造的新节点挂载位置
+	Property* NewNode;
 	//<DataMember>
 };

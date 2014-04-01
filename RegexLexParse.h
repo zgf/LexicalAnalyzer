@@ -650,6 +650,7 @@ private:
 	//Ƕ�ױ�ǩջ
 	//vector<LexTag>StackList;
 	vector<LexTag>StackList;
+
 public:
 	vector<shared_ptr<RegexToken>> TokenStream;
 };

@@ -61,7 +61,7 @@ public:
 		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap) + "//<initGrammarMap>");
 
 		//创建文件
-	//	CreateCppFile(string("Test.h"), Content);
+		CreateCppFile(string("Test.h"), Content);
 	}
 	//所有类型都转换为字符串
 	template<typename T>
@@ -90,20 +90,19 @@ public:
 	}
 	//字符串查找,跳过字面值
 
-	int RegexParseCodeGen::FindTrueCharIndex(string& SrcStr, char JumpSign, int StartIndex);
+	int RegexParseCodeGen::FindTrueCharIndex(string& SrcStr, char JumpSign, int StartIndex,vector<int>& SymbolList);
 
 
 	//按指定字符分割字符串,如果指定字符前有\\,则忽视该处字符,如果字符被"直接包裹" 忽略字符
-	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr);
+	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr,vector<int>& SymbolList);
 
 	//按指定字符分割字符串,如果指定字符前有\\,则忽视该处字符,如果字符被"直接包裹" 忽略字符,如果字符在jump区域内,忽略字符
 	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd);
 
 	//获取最长嵌套内容匹配
-	string GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex);
-
+	string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex, vector<int>& SymbolList);
 	//获取最长嵌套内容匹配的最后一个字符索引
-	int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex);
+	int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex, vector<int>& SymbolList);
 	//读取文件内容;
 	string ReadFileContent(string& FileName);
 	//删除区间含区间端点的内容.
@@ -126,10 +125,10 @@ public:
 	//创建添入模板initGrammarMap的内容
 	string CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap, map<string, vector<string>>& StartStateMap);
 	//获取要跳过的符号对范围列表
-	vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd);
+	vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd,vector<int>& SymbolList);
 	//获取Str中某个字串所有内容的列表
-	vector<int> GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList);
-	vector<int> GetNeedSignList(string& SrcStr, string& DefineStr);
+	vector<int> GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList,vector<int>& SymbolList);
+	vector<int> GetNeedSignList(string& SrcStr, string& DefineStr,vector<int>&SymbolList);
 	//是空白字符?
 	bool IsWhiteSpaceChar(char i);
 

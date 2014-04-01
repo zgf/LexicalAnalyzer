@@ -900,7 +900,7 @@ private:
 	//文法列表索引到语义片段的索引
 	unordered_map<int, function<void(int, int, int, vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
 
-	//vector<ASTNode> NodeList;
+	vector<ASTNode> NodeList;
 
 	//<DataMember>
 };

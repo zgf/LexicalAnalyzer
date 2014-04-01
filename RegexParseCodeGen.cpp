@@ -8,6 +8,20 @@ string RegexParseCodeGen::ReadFileContent(string& FileName)
 	Input.close();
 	return move(StrData);
 }
+
+// 查看指定位置字符是否被转义
+bool HasChangedMean(string& SrcStr, int FindIter)
+{
+	if(FindIter == 0)
+	{
+		return false;
+	}
+	else
+	{
+		return SrcStr[FindIter - 1] == '\\';
+	}
+}
+
 //查找所有非字面值引号位置
 vector<int> FindAllSymbolPostion(string& SrcStr, char Sign = '"')
 {
@@ -24,18 +38,7 @@ vector<int> FindAllSymbolPostion(string& SrcStr, char Sign = '"')
 	}
 	return std::move(Result);
 }
-// 查看指定位置字符是否被转义
-bool HasChangedMean(string& SrcStr, int FindIter)
-{
-	if(FindIter == 0)
-	{
-		return false;
-	}
-	else
-	{
-		return SrcStr[FindIter - 1] == '\\';
-	}
-}
+
 
 template<typename U>
 int BinarySearch(vector<U>& Container, U& Target,int Low,int Height)
@@ -61,7 +64,6 @@ int BinarySearch(vector<U>& Container, U& Target,int Low,int Height)
 
 bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter,vector<int> SymbolList)
 {
-	int Count = 0;
 	if(FindIter == 0)
 	{
 		return false;
@@ -72,9 +74,15 @@ bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter,vector<int> Sy
 	}
 	else
 	{
-		
+		for(auto i = 0; i < SymbolList.size();i++)
+		{
+			if (SymbolList[i] > FindIter)
+			{
+				return i %2;
+			}
+		}
+		return false;
 	}
-	return Count % 2;
 }
 
 
@@ -109,7 +117,7 @@ bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter)
 
 //查看该字符是不是字面值,字面值要跳过,字面值是指被""包围或者前面有\\的字符
 
-int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex)
+int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex,vector<int>& SymbolList)
 {
 	int StackList = 0;
 	StackList = 1;
@@ -120,7 +128,7 @@ int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, st
 		SrcIndex += 1;
 		Length += 1;
 
-		if (!IsStrLiteral(Src,SrcIndex))
+		if (!IsStrLiteral(Src,SrcIndex,SymbolList))
 		{
 			if(Src[SrcIndex] == NestedSign.first)
 			{
@@ -135,12 +143,12 @@ int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, st
 	}
 	return StartIndex + Length;
 }
-string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex)
+string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex,vector<int>& SymbolList)
 {
 	string Symbol;
 	auto StartIndex = Src.find(NestedSign.first,SrcIndex);
 	//这里的Index是超尾
-	auto EndIndex = GetLongestNestedEndIndex(NestedSign, Src, StartIndex);
+	auto EndIndex = GetLongestNestedEndIndex(NestedSign, Src, StartIndex,SymbolList);
 	StartIndex++;
 	Symbol = Src.substr(StartIndex, EndIndex - StartIndex - 1);
 	return std::move(Symbol);
@@ -148,13 +156,13 @@ string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, 
 
 //字符串查找,跳过字面值
 
-int RegexParseCodeGen::FindTrueCharIndex(string& SrcStr, char JumpSign, int StartIndex)
+int RegexParseCodeGen::FindTrueCharIndex(string& SrcStr, char JumpSign, int StartIndex,vector<int>& SymbolList)
 {
 	for(auto i = StartIndex; i < SrcStr.size();i++)
 	{
 		if (SrcStr[i] == JumpSign)
 		{
-			if(!IsStrLiteral(SrcStr,i))
+			if(!IsStrLiteral(SrcStr, i, SymbolList))
 			{
 				return i;
 			}
@@ -169,14 +177,14 @@ string RegexParseCodeGen::CreatIndexToActionStr(map<string, string>&TermToTagMap
 	return string();
 }
 
-vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd)
+vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd,vector<int>& SymbolList)
 {
 	auto StartIndex = 0;
 	auto FindStartIndex = 0;
 	vector<pair<int, int>> JumpList;
 	while(true)
 	{
-		FindStartIndex = FindTrueCharIndex(SrcStr,JumpStart, StartIndex);
+		FindStartIndex = FindTrueCharIndex(SrcStr, JumpStart, StartIndex, SymbolList);
 		
 		if(FindStartIndex == -1)
 		{
@@ -186,7 +194,7 @@ vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string
 		{
 			pair<int, int>Temp;
 			Temp.first = FindStartIndex;
-			auto FindEndIndex = GetLongestNestedEndIndex(pair<char, char>(JumpStart, JumpEnd), SrcStr, FindStartIndex);
+			auto FindEndIndex = GetLongestNestedEndIndex(pair<char, char>(JumpStart, JumpEnd), SrcStr, FindStartIndex,SymbolList);
 			Temp.second = FindEndIndex;
 			JumpList.push_back(Temp);
 			StartIndex = FindEndIndex;
@@ -223,7 +231,7 @@ vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string
 	//}
 	//return std::move(JumpList);
 }
-vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList)
+vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList,vector<int>& SymbolList)
 {
 	auto StartIndex = 0;
 	vector<int> SignList;
@@ -235,7 +243,7 @@ vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr
 		{
 			break;
 		}
-		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter))
+		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter, SymbolList))
 		{
 			StartIndex = FindIter + DefineStr.size();
 		}
@@ -255,7 +263,7 @@ vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr
 	}
 	return move(SignList);
 }
-vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr)
+vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr, vector<int>& SymbolList)
 {
 	vector<int>SignList;
 	auto StartIndex = 0;
@@ -267,7 +275,7 @@ vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr
 		{
 			break;
 		}
-		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter))
+		else if(FindIter != 0 && IsStrLiteral(SrcStr, FindIter, SymbolList))
 		{
 			StartIndex = FindIter + DefineStr.size();
 		}
@@ -287,9 +295,9 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 
 	vector<string>Result;
 	vector<int>ReferSymbolList = FindAllSymbolPostion(SrcStr);
-	auto JumpList = GetNeedJumpList(SrcStr, DefineStr, JumpStart, JumpEnd);
+	auto JumpList = GetNeedJumpList(SrcStr, DefineStr, JumpStart, JumpEnd, ReferSymbolList);
 
-	auto SignList = GetNeedSignList(SrcStr, DefineStr, JumpList);
+	auto SignList = GetNeedSignList(SrcStr, DefineStr, JumpList, ReferSymbolList);
 	if(SignList.size() != 1)
 	{
 		for(int i = 0; i < SignList.size() - 1; i++)
@@ -313,11 +321,11 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 	return std::move(Result);
 }
 
-vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr)
+vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& DefineStr, vector<int>&SymbolList)
 {
 	vector<string> Result;
 
-	auto SignList = GetNeedSignList(SrcStr, DefineStr);
+	auto SignList = GetNeedSignList(SrcStr, DefineStr,SymbolList);
 	if(SignList.size() != 1)
 	{
 		for(int i = 0; i < SignList.size() - 1; i++)
@@ -433,12 +441,10 @@ map<string, vector<string>> RegexParseCodeGen::GetStatementMap(vector<string>&St
 	int i = 0;
 	for(auto& Iter : Statement)
 	{
-		/*if (i == 5)
-		{
-		int a = 0;
-		}*/
-		auto StatementBlock = CutByDefineCharacter(Iter, string("=>"));
-		auto BodyList = CutByDefineCharacter(StatementBlock.back(), string("|"));
+		
+	
+		auto StatementBlock = CutByDefineCharacter(Iter, string("=>"), FindAllSymbolPostion(Iter));
+		auto BodyList = CutByDefineCharacter(StatementBlock.back(), string("|"), FindAllSymbolPostion(StatementBlock.back()));
 		StatementMap.insert(make_pair(Trim(StatementBlock.front()), BodyList));
 		i++;
 	}
@@ -447,13 +453,13 @@ map<string, vector<string>> RegexParseCodeGen::GetStatementMap(vector<string>&St
 map<string, string> RegexParseCodeGen::CreatTermToTagMap(string DefinePairStr)
 {
 	//获得语句
-	vector<string> PairStr = CutByDefineCharacter(DefinePairStr, string(";"));
+	vector<string> PairStr = CutByDefineCharacter(DefinePairStr, string(";"), FindAllSymbolPostion(DefinePairStr));
 	//语句都是;结尾
 	PairStr.pop_back();
 	map<string, string> Map;
 	for(auto& Iter : PairStr)
 	{
-		auto TempList = CutByDefineCharacter(Iter, string(":"));
+		auto TempList = CutByDefineCharacter(Iter, string(":"), FindAllSymbolPostion(Iter));
 		Map.insert(make_pair(Trim(GetNoteSignContent(TempList[1], string("\""), string("\""))), Trim(GetNoteSignContent(TempList[0], string("\""), string("\"")))));
 	}
 	return std::move(Map);
@@ -551,7 +557,8 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			string SemanticStr;
 			if(SemanticStartIndex != -1)
 			{
-				SemanticStr = GetLongestNestedContent(pair<char, char>('{', '}'), StrIter, SemanticStartIndex);
+				auto ReferSymbolList = FindAllSymbolPostion(StrIter);
+				SemanticStr = GetLongestNestedContent(pair<char, char>('{', '}'), StrIter, SemanticStartIndex, ReferSymbolList);
 
 				StrIter = StrIter.erase(StrIter.find('{' + SemanticStr + '}'), SemanticStr.size() + 2);
 			}

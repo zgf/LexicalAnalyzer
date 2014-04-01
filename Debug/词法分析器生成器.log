@@ -1,9 +1,30 @@
-﻿生成启动时间为 4/1/2014 4:12:06 PM。
+﻿生成启动时间为 4/1/2014 8:15:20 PM。
      1>项目“F:\MyProjects\词法分析器生成器\词法分析器生成器\词法分析器生成器.vcxproj”在节点 2 上(Build 个目标)。
-     1>Link:
+     1>ClCompile:
+         E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         main.cpp
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(204): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(244): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(155): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(173): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(335): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(344): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(427): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(437): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(488): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(543): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(570): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(586): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(610): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\test.h(629): warning C4018: “<”: 有符号/无符号不匹配
+       Link:
+         E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.lib" /MACHINE:X86 Debug\CodeGenComplier.obj
+         Debug\LexConfigTemplate.obj
+         Debug\main.obj
+         Debug\RegexParseCodeGen.obj
          词法分析器生成器.vcxproj -> F:\MyProjects\词法分析器生成器\Debug\词法分析器生成器.exe
      1>已完成生成项目“F:\MyProjects\词法分析器生成器\词法分析器生成器\词法分析器生成器.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:00.07
+已用时间 00:00:03.97

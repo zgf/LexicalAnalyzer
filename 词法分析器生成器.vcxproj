@@ -14,6 +14,7 @@
     <ProjectGuid>{DEBC8D4A-5E70-4F9E-A56C-BE3F7F847097}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>词法分析器生成器</RootNamespace>
+    <ProjectName>Lexical analyzer generator</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -81,20 +82,13 @@
     <ClCompile Include="CodeGenComplier.cpp" />
     <ClCompile Include="LexConfigTemplate.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="RegexParseCodeGen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CodeGenComplier.h" />
     <ClInclude Include="RegexLexParse.h" />
-    <ClInclude Include="RegexParseCodeGen.h" />
-    <ClInclude Include="RegexParseTemplate.h" />
-    <ClInclude Include="Test.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="RegexLexConfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <Text Include="RegexParseConfig.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

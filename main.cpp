@@ -3,7 +3,7 @@
 
 int main()
 {
-	RegexParseCodeGen ParseCodeGen(string("RegexParseConfig.txt"), string("RegexParseTemplate.h"));
+	RegexParseCodeGen ParseCodeGen(string("RegexParseConfig.cpp"), string("RegexParseTemplate.h"));
 	ParseCodeGen.DealAll();
 	//wstring Pattern(L"a(b|c)c*|b");
 	//LexParse Lex(Pattern);

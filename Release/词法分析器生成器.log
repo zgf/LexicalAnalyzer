@@ -1,20 +1,22 @@
-﻿生成启动时间为 3/30/2014 1:01:25 PM。
+﻿生成启动时间为 4/1/2014 1:51:20 AM。
      1>项目“F:\MyProjects\词法分析器生成器\词法分析器生成器\词法分析器生成器.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D WIN32 /D NDEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt RegexParseCodeGen.cpp
          RegexParseCodeGen.cpp
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(204): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(244): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexLexParse.h(334): warning C4244: “参数”: 从“wchar_t”转换到“char”，可能丢失数据
-     1>RegexParseCodeGen.cpp(104): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(147): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(203): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(220): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(233): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(64): warning C4800: “int”: 将值强制为布尔值“true”或“false”(性能警告)
+     1>RegexParseCodeGen.cpp(110): warning C4018: “<”: 有符号/无符号不匹配
      1>RegexParseCodeGen.cpp(252): warning C4018: “<”: 有符号/无符号不匹配
-     1>RegexParseCodeGen.cpp(312): warning C4018: “<=”: 有符号/无符号不匹配
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexParseCodeGen.h(70): warning C4018: “<”: 有符号/无符号不匹配
-                 RegexParseCodeGen.cpp(91): 参见对正在编译的函数 模板 实例化“int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)”的引用
+     1>RegexParseCodeGen.cpp(280): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(315): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(332): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(345): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(364): warning C4018: “<”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(424): warning C4018: “<=”: 有符号/无符号不匹配
+     1>RegexParseCodeGen.cpp(472): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\RegexParseCodeGen.h(81): warning C4018: “<”: 有符号/无符号不匹配
+                 RegexParseCodeGen.cpp(201): 参见对正在编译的函数 模板 实例化“int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)”的引用
                  with
                  [
                      _Ty=std::pair<int,int>
@@ -32,4 +34,4 @@
 
 生成成功。
 
-已用时间 00:00:04.46
+已用时间 00:00:03.54

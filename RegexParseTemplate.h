@@ -76,6 +76,14 @@ public:
 		}
 	}
 };
+//Token附加的属性
+class Property
+{
+public:
+	string Val;
+	//<PropertyMember>
+};
+
 //
 //状态集
 class LR1Stauts
@@ -468,7 +476,11 @@ private:
 public:
 	bool ParsingRegex(vector<shared_ptr<RegexToken>>& TokenStream)
 	{
+
 		vector<int> StautsStack;
+		//这里是捕获的属性堆栈
+		//直接用Property构建AST
+		vector<shared_ptr<Property>>CatchStack;
 		StautsStack.push_back(0);
 		auto GetIndex = StautsStack.back();
 		for(auto i = 0; i < TokenStream.size();)
@@ -490,6 +502,16 @@ public:
 				}
 				else
 				{
+					//在弹出前执行的语义片段
+					
+					//在这里执行语义片段
+					auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
+					if(FindAction != SemanticActionMap.end())
+					{
+						FindAction->second(CurrentItermList[ResultIndex].first, CurrentItermList[ResultIndex].second, i, TokenStream);
+					}
+
+
 					//需要弹出的状态数量
 					auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
 
@@ -511,12 +533,8 @@ public:
 					{
 						StautsStack.push_back(FindIter->second);
 						GetIndex = FindIter->second;
-						auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
-						if(FindAction != SemanticActionMap.end())
-						{
-							FindAction->second();
-						}
-						//在这里执行语义片段
+						
+						
 					}
 				}
 				//可以规约
@@ -555,7 +573,7 @@ private:
 	unordered_map<LexTag, ParseTag> TagMap;
 
 	//文法列表索引到语义片段的索引
-	unordered_map<int, function<void()>> SemanticActionMap;
+	unordered_map<int, function<void(int,int,int,vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
 
 	//<DataMember>
 };

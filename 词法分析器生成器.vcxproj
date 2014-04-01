@@ -94,7 +94,7 @@
     <None Include="RegexLexConfig" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="RegexParseConfig.txt" />
+    <Text Include="RegexParseConfig.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

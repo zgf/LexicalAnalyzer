@@ -52,6 +52,7 @@ public:
 		auto NameList = GetAllSymbolName(TermToTagMap, StartStatementMap, StatementMap);
 		auto NameEnumStr = CreatParseTagEnumStr(NameList);
 		//初始化ParseTag Enum类
+		
 		ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<ParseTag>"), NameEnumStr + "//<ParseTag>");
 
 		//初始化TagMap
@@ -60,7 +61,7 @@ public:
 		auto Content = ReplaceDefinePostion(ParseTemplate, string("//<initGrammarMap>"), CreatGrammarMapStr(TermToTagMap, StatementMap, StartStatementMap) + "//<initGrammarMap>");
 
 		//创建文件
-		CreateCppFile(string("Test.h"), Content);
+	//	CreateCppFile(string("Test.h"), Content);
 	}
 	//所有类型都转换为字符串
 	template<typename T>
@@ -87,6 +88,10 @@ public:
 		}
 		return -1;
 	}
+	//字符串查找,跳过字面值
+
+	int RegexParseCodeGen::FindTrueCharIndex(string& SrcStr, char JumpSign, int StartIndex);
+
 
 	//按指定字符分割字符串,如果指定字符前有\\,则忽视该处字符,如果字符被"直接包裹" 忽略字符
 	vector<string> CutByDefineCharacter(string& SrcStr, string& DefineStr);
@@ -130,6 +135,8 @@ public:
 
 	//是Config中特殊字符的字面值?
 	bool IsStrLiteral(string& SrcStr, int FindIter);
+	bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter, vector<int> SymbolList);
+
 	//替换Tempalte指定标记的位置的字符串.
 	string RegexParseCodeGen::ReplaceDefinePostion(string& Template, string& TemplateSign, string& RePalceData);
 

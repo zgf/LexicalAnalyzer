@@ -1,20 +1,22 @@
-﻿生成启动时间为 3/30/2014 5:55:33 PM。
+﻿生成启动时间为 4/1/2014 1:53:33 AM。
      1>项目“F:\MyProjects\词法分析器生成器\词法分析器生成器\词法分析器生成器.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          E:\Program Files (x86)\Microsoft Visual C++ Compiler Nov 2013 CTP\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt RegexParseCodeGen.cpp
          RegexParseCodeGen.cpp
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(204): warning C4018: '<' : signed/unsigned mismatch
      1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexlexparse.h(244): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(143): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(167): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(202): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(219): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(232): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(251): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(311): warning C4018: '<=' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(359): warning C4018: '<' : signed/unsigned mismatch
-     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.h(80): warning C4018: '<' : signed/unsigned mismatch
-                 f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(92) : see reference to function template instantiation 'int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)' being compiled
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(67): warning C4800: 'int' : forcing value to bool 'true' or 'false' (performance warning)
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(113): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(255): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(283): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(318): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(335): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(348): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(367): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(427): warning C4018: '<=' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(475): warning C4018: '<' : signed/unsigned mismatch
+     1>f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.h(81): warning C4018: '<' : signed/unsigned mismatch
+                 f:\myprojects\词法分析器生成器\词法分析器生成器\regexparsecodegen.cpp(204) : see reference to function template instantiation 'int RegexParseCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Ty>> &,T &&)' being compiled
                  with
                  [
                      _Ty=std::pair<int,int>
@@ -30,4 +32,4 @@
 
 生成成功。
 
-已用时间 00:00:05.14
+已用时间 00:00:04.26

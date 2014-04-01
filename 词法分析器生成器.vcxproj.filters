@@ -51,7 +51,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="RegexParseConfig.txt">
+    <Text Include="RegexParseConfig.cpp">
       <Filter>资源文件</Filter>
     </Text>
   </ItemGroup>

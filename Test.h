@@ -4,45 +4,45 @@ using std::unordered_multimap;
 // 文法符号enum类
 enum class ParseTag
 {
-
 	StringTail,
-SimpleUnNamedCatch_Start,
-Mitipute_End,
-Closures_Greedy,
-Closures_UnGreedy,
-PositiveClosures_Greedy,
-PositiveClosures_UnGreedy,
-Comma,
-CharSetComponent,
-ChoseClosures_Greedy,
-ChoseClosures_UnGreedy,
-NumberChar,
-OtherChar,
-RealWordChar,
-CharSet_Start,
-CharSet_Back_Start,
-CharSet_End,
-StringHead,
-Repeat_Start,
-ChoseSymbol,
-Repeat_And_BackRefer_End,
-Repeat_End_Greedy,
-Start,
-CharSet,
-CharSetString,
-CompleteCharSet,
-CompleteFactor,
-Express,
-Factor,
-NormalChar,
-NormalString,
-NormalStringComplete,
-Repeat,
-RepeatEnd,
-RepeatRight,
-SumNumber,
-Term,
-//<ParseTag>
+	SimpleUnNamedCatch_Start,
+	Mitipute_End,
+	Comma,
+	CharSetComponent,
+	ChoseClosures_Greedy,
+	ChoseClosures_UnGreedy,
+	Closures_Greedy,
+	Closures_UnGreedy,
+	NumberChar,
+	OtherChar,
+	PositiveClosures_Greedy,
+	PositiveClosures_UnGreedy,
+	RealWordChar,
+	CharSet_Start,
+	CharSet_Back_Start,
+	CharSet_End,
+	StringHead,
+	Repeat_Start,
+	ChoseSymbol,
+	Repeat_And_BackRefer_End,
+	Repeat_End_Greedy,
+	Start,
+	CharSet,
+	CharSetString,
+	CharSetUnit,
+	CompleteCharSet,
+	CompleteFactor,
+	Express,
+	Factor,
+	NormalChar,
+	NormalString,
+	NormalStringComplete,
+	Repeat,
+	RepeatEnd,
+	RepeatRight,
+	SumNumber,
+	Term,
+	//<ParseTag>
 };
 //语法分析符号
 
@@ -113,6 +113,14 @@ public:
 		}
 	}
 };
+//Token附加的属性
+class Property
+{
+public:
+	string Val;
+	//<PropertyMember>
+};
+
 //
 //状态集
 class LR1Stauts
@@ -188,14 +196,6 @@ public:
 	}
 };
 
-
-class ASTNode
-{
-    bool Nullable;
-  set<int> FirstPos;
-  set<int> LastPos;
-  set<int> FollowPos;
-};
 //<Global>
 class RegexParse
 {
@@ -210,82 +210,109 @@ public:
 private:
 	void initTagMap()
 	{
-
-		TagMap.insert(make_pair(LexTag::StringTail,ParseTag::StringTail));
-TagMap.insert(make_pair(LexTag::SimpleUnNamedCatch_Start,ParseTag::SimpleUnNamedCatch_Start));
-TagMap.insert(make_pair(LexTag::Mitipute_End,ParseTag::Mitipute_End));
-TagMap.insert(make_pair(LexTag::Closures_Greedy,ParseTag::Closures_Greedy));
-TagMap.insert(make_pair(LexTag::Closures_UnGreedy,ParseTag::Closures_UnGreedy));
-TagMap.insert(make_pair(LexTag::PositiveClosures_Greedy,ParseTag::PositiveClosures_Greedy));
-TagMap.insert(make_pair(LexTag::PositiveClosures_UnGreedy,ParseTag::PositiveClosures_UnGreedy));
-TagMap.insert(make_pair(LexTag::Comma,ParseTag::Comma));
-TagMap.insert(make_pair(LexTag::CharSetComponent,ParseTag::CharSetComponent));
-TagMap.insert(make_pair(LexTag::ChoseClosures_Greedy,ParseTag::ChoseClosures_Greedy));
-TagMap.insert(make_pair(LexTag::ChoseClosures_UnGreedy,ParseTag::ChoseClosures_UnGreedy));
-TagMap.insert(make_pair(LexTag::NumberChar,ParseTag::NumberChar));
-TagMap.insert(make_pair(LexTag::OtherChar,ParseTag::OtherChar));
-TagMap.insert(make_pair(LexTag::RealWordChar,ParseTag::RealWordChar));
-TagMap.insert(make_pair(LexTag::CharSet_Start,ParseTag::CharSet_Start));
-TagMap.insert(make_pair(LexTag::CharSet_Back_Start,ParseTag::CharSet_Back_Start));
-TagMap.insert(make_pair(LexTag::CharSet_End,ParseTag::CharSet_End));
-TagMap.insert(make_pair(LexTag::StringHead,ParseTag::StringHead));
-TagMap.insert(make_pair(LexTag::Repeat_Start,ParseTag::Repeat_Start));
-TagMap.insert(make_pair(LexTag::ChoseSymbol,ParseTag::ChoseSymbol));
-TagMap.insert(make_pair(LexTag::Repeat_And_BackRefer_End,ParseTag::Repeat_And_BackRefer_End));
-TagMap.insert(make_pair(LexTag::Repeat_End_Greedy,ParseTag::Repeat_End_Greedy));
-//<initTagMap>
+		TagMap.insert(make_pair(LexTag::StringTail, ParseTag::StringTail));
+		TagMap.insert(make_pair(LexTag::SimpleUnNamedCatch_Start, ParseTag::SimpleUnNamedCatch_Start));
+		TagMap.insert(make_pair(LexTag::Mitipute_End, ParseTag::Mitipute_End));
+		TagMap.insert(make_pair(LexTag::Comma, ParseTag::Comma));
+		TagMap.insert(make_pair(LexTag::CharSetComponent, ParseTag::CharSetComponent));
+		TagMap.insert(make_pair(LexTag::ChoseClosures_Greedy, ParseTag::ChoseClosures_Greedy));
+		TagMap.insert(make_pair(LexTag::ChoseClosures_UnGreedy, ParseTag::ChoseClosures_UnGreedy));
+		TagMap.insert(make_pair(LexTag::Closures_Greedy, ParseTag::Closures_Greedy));
+		TagMap.insert(make_pair(LexTag::Closures_UnGreedy, ParseTag::Closures_UnGreedy));
+		TagMap.insert(make_pair(LexTag::NumberChar, ParseTag::NumberChar));
+		TagMap.insert(make_pair(LexTag::OtherChar, ParseTag::OtherChar));
+		TagMap.insert(make_pair(LexTag::PositiveClosures_Greedy, ParseTag::PositiveClosures_Greedy));
+		TagMap.insert(make_pair(LexTag::PositiveClosures_UnGreedy, ParseTag::PositiveClosures_UnGreedy));
+		TagMap.insert(make_pair(LexTag::RealWordChar, ParseTag::RealWordChar));
+		TagMap.insert(make_pair(LexTag::CharSet_Start, ParseTag::CharSet_Start));
+		TagMap.insert(make_pair(LexTag::CharSet_Back_Start, ParseTag::CharSet_Back_Start));
+		TagMap.insert(make_pair(LexTag::CharSet_End, ParseTag::CharSet_End));
+		TagMap.insert(make_pair(LexTag::StringHead, ParseTag::StringHead));
+		TagMap.insert(make_pair(LexTag::Repeat_Start, ParseTag::Repeat_Start));
+		TagMap.insert(make_pair(LexTag::ChoseSymbol, ParseTag::ChoseSymbol));
+		TagMap.insert(make_pair(LexTag::Repeat_And_BackRefer_End, ParseTag::Repeat_And_BackRefer_End));
+		TagMap.insert(make_pair(LexTag::Repeat_End_Greedy, ParseTag::Repeat_End_Greedy));
+		//<initTagMap>
 	}
 	void initGrammarList()
 	{
-
-		GrammarList.push_back(Production( Symbol(false,ParseTag::Start),vector<Symbol>({Symbol(false,ParseTag::Express)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CharSet),vector<Symbol>({Symbol(true,ParseTag::CharSet_Start),Symbol(false,ParseTag::CharSetString),Symbol(true,ParseTag::CharSet_End)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CharSet),vector<Symbol>({Symbol(true,ParseTag::CharSet_Back_Start),Symbol(false,ParseTag::CharSetString),Symbol(true,ParseTag::CharSet_End)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CharSetString),vector<Symbol>({Symbol(false,ParseTag::NormalString),Symbol(true,ParseTag::CharSetComponent),Symbol(false,ParseTag::CharSetString)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CharSetString),vector<Symbol>({Symbol(false,ParseTag::NormalString),Symbol(false,ParseTag::CharSetString)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CharSetString),vector<Symbol>({Symbol(false,ParseTag::NormalString)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CompleteCharSet),vector<Symbol>({Symbol(false,ParseTag::CharSet)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CompleteCharSet),vector<Symbol>({Symbol(false,ParseTag::CharSet),Symbol(false,ParseTag::Repeat)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CompleteFactor),vector<Symbol>({Symbol(false,ParseTag::Factor),Symbol(false,ParseTag::Repeat)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::CompleteFactor),vector<Symbol>({Symbol(false,ParseTag::Factor)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Express),vector<Symbol>({Symbol(false,ParseTag::Term),Symbol(true,ParseTag::ChoseSymbol),Symbol(false,ParseTag::Express)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Express),vector<Symbol>({Symbol(false,ParseTag::Term)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Factor),vector<Symbol>({Symbol(true,ParseTag::SimpleUnNamedCatch_Start),Symbol(false,ParseTag::Express),Symbol(true,ParseTag::Mitipute_End)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Factor),vector<Symbol>({Symbol(false,ParseTag::CompleteCharSet)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Factor),vector<Symbol>({Symbol(false,ParseTag::NormalStringComplete)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalChar),vector<Symbol>({Symbol(true,ParseTag::NumberChar)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalChar),vector<Symbol>({Symbol(true,ParseTag::RealWordChar)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalChar),vector<Symbol>({Symbol(true,ParseTag::OtherChar)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalString),vector<Symbol>({Symbol(false,ParseTag::NormalChar),Symbol(false,ParseTag::NormalString)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalString),vector<Symbol>({Symbol(false,ParseTag::NormalChar)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalStringComplete),vector<Symbol>({Symbol(false,ParseTag::NormalString),Symbol(false,ParseTag::Repeat)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::NormalStringComplete),vector<Symbol>({Symbol(false,ParseTag::NormalString)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::Repeat_Start),Symbol(false,ParseTag::RepeatRight),Symbol(false,ParseTag::RepeatEnd)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::Closures_UnGreedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::Closures_Greedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::PositiveClosures_Greedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::PositiveClosures_UnGreedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::ChoseClosures_Greedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Repeat),vector<Symbol>({Symbol(true,ParseTag::ChoseClosures_UnGreedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::RepeatEnd),vector<Symbol>({Symbol(true,ParseTag::Repeat_And_BackRefer_End)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::RepeatEnd),vector<Symbol>({Symbol(true,ParseTag::Repeat_End_Greedy)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::RepeatRight),vector<Symbol>({Symbol(true,ParseTag::Comma),Symbol(false,ParseTag::SumNumber)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::RepeatRight),vector<Symbol>({Symbol(false,ParseTag::SumNumber),Symbol(true,ParseTag::Comma)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::RepeatRight),vector<Symbol>({Symbol(false,ParseTag::SumNumber)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::RepeatRight),vector<Symbol>({Symbol(false,ParseTag::SumNumber),Symbol(true,ParseTag::Comma),Symbol(false,ParseTag::SumNumber)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::SumNumber),vector<Symbol>({Symbol(false,ParseTag::NumberChar),Symbol(false,ParseTag::SumNumber)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Term),vector<Symbol>({Symbol(false,ParseTag::CompleteFactor),Symbol(false,ParseTag::Term)})));
-GrammarList.push_back(Production( Symbol(false,ParseTag::Term),vector<Symbol>({Symbol(false,ParseTag::CompleteFactor)})));
-//<initGrammarMap>
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Start), vector<Symbol>({Symbol(false, ParseTag::Express)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSet), vector<Symbol>({Symbol(true, ParseTag::CharSet_Back_Start), Symbol(false, ParseTag::CharSetString), Symbol(true, ParseTag::CharSet_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetString), vector<Symbol>({Symbol(false, ParseTag::CharSetUnit), Symbol(false, ParseTag::CharSetString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetUnit), vector<Symbol>({Symbol(false, ParseTag::NormalChar), Symbol(true, ParseTag::CharSetComponent), Symbol(false, ParseTag::NormalChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CharSetUnit), vector<Symbol>({Symbol(false, ParseTag::NormalChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteCharSet), vector<Symbol>({Symbol(false, ParseTag::CharSet), Symbol(false, ParseTag::Repeat)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteFactor), vector<Symbol>({Symbol(false, ParseTag::Factor), Symbol(false, ParseTag::Repeat)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::CompleteFactor), vector<Symbol>({Symbol(false, ParseTag::Factor)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Express), vector<Symbol>({Symbol(false, ParseTag::Term), Symbol(true, ParseTag::ChoseSymbol), Symbol(false, ParseTag::Express)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Express), vector<Symbol>({Symbol(false, ParseTag::Term)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Factor), vector<Symbol>({Symbol(true, ParseTag::SimpleUnNamedCatch_Start), Symbol(false, ParseTag::Express), Symbol(true, ParseTag::Mitipute_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Factor), vector<Symbol>({Symbol(false, ParseTag::CompleteCharSet)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Factor), vector<Symbol>({Symbol(false, ParseTag::NormalStringComplete)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::NumberChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::RealWordChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::OtherChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalChar), Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalString), vector<Symbol>({Symbol(false, ParseTag::NormalChar)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalStringComplete), vector<Symbol>({Symbol(false, ParseTag::NormalString), Symbol(false, ParseTag::Repeat)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalStringComplete), vector<Symbol>({Symbol(false, ParseTag::NormalString)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Repeat_Start), Symbol(false, ParseTag::RepeatRight), Symbol(false, ParseTag::RepeatEnd)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Closures_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Closures_UnGreedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::PositiveClosures_UnGreedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::PositiveClosures_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::ChoseClosures_UnGreedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::ChoseClosures_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatEnd), vector<Symbol>({Symbol(true, ParseTag::Repeat_And_BackRefer_End)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatEnd), vector<Symbol>({Symbol(true, ParseTag::Repeat_End_Greedy)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(true, ParseTag::Comma), Symbol(false, ParseTag::SumNumber)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::NumberChar), Symbol(false, ParseTag::SumNumber)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor), Symbol(false, ParseTag::Term)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Term), vector<Symbol>({Symbol(false, ParseTag::CompleteFactor)})));
+		//<initGrammarMap>
 	}
 	void initSemanticMap()
 	{
-		
-		
+		SemanticActionMap.insert(make_pair(2, bind(RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(3, bind(RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(4, bind(RegexParse::Production4, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(5, bind(RegexParse::Production5, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(6, bind(RegexParse::Production6, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(7, bind(RegexParse::Production7, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(8, bind(RegexParse::Production8, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(9, bind(RegexParse::Production9, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(10, bind(RegexParse::Production10, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(11, bind(RegexParse::Production11, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(12, bind(RegexParse::Production12, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(13, bind(RegexParse::Production13, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(14, bind(RegexParse::Production14, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(15, bind(RegexParse::Production15, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(16, bind(RegexParse::Production16, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(17, bind(RegexParse::Production17, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(18, bind(RegexParse::Production18, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(19, bind(RegexParse::Production19, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(20, bind(RegexParse::Production20, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(21, bind(RegexParse::Production21, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(22, bind(RegexParse::Production22, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(23, bind(RegexParse::Production23, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(24, bind(RegexParse::Production24, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(25, bind(RegexParse::Production25, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(26, bind(RegexParse::Production26, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(27, bind(RegexParse::Production27, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(28, bind(RegexParse::Production28, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(29, bind(RegexParse::Production29, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(30, bind(RegexParse::Production30, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(31, bind(RegexParse::Production31, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(32, bind(RegexParse::Production32, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(33, bind(RegexParse::Production33, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(34, bind(RegexParse::Production34, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(35, bind(RegexParse::Production35, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
+		SemanticActionMap.insert(make_pair(36, bind(RegexParse::Production36, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3, std::placeholders::_4)));
 
-//<initSemanticMap>
-
-
+		//<initSemanticMap>
 	}
 	void initGrammarMap()
 	{
@@ -578,6 +605,9 @@ public:
 	bool ParsingRegex(vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		vector<int> StautsStack;
+		//这里是捕获的属性堆栈
+		//直接用Property构建AST
+		vector<shared_ptr<Property>>CatchStack;
 		StautsStack.push_back(0);
 		auto GetIndex = StautsStack.back();
 		for(auto i = 0; i < TokenStream.size();)
@@ -599,6 +629,15 @@ public:
 				}
 				else
 				{
+					//在弹出前执行的语义片段
+
+					//在这里执行语义片段
+					auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
+					if(FindAction != SemanticActionMap.end())
+					{
+						FindAction->second(CurrentItermList[ResultIndex].first, CurrentItermList[ResultIndex].second, i, TokenStream);
+					}
+
 					//需要弹出的状态数量
 					auto PopNumber = GrammarList[CurrentItermList[ResultIndex].first].BodySize;
 
@@ -620,12 +659,6 @@ public:
 					{
 						StautsStack.push_back(FindIter->second);
 						GetIndex = FindIter->second;
-						auto FindAction = SemanticActionMap.find(CurrentItermList[ResultIndex].first);
-						if(FindAction != SemanticActionMap.end())
-						{
-							FindAction->second();
-						}
-						//在这里执行语义片段
 					}
 				}
 				//可以规约
@@ -640,20 +673,212 @@ public:
 		return false;
 	}
 private:
-	
-  void Func()
-  {
-	
-  }
-//<UserDefineFunc>
+
+	void fun()
+	{
+	}
+	void OneLeftNodeSetup(ParseTag Tag, string Value = "")
+	{
+		$$.Val = Value;
+		$$.Tag = ParseTag::Tag;
+		$$.LeftNode = $1;
+		$$.ChildNumber = 1;
+	}
+	void GetValue(ParseTag Tag, string Value)
+	{
+		$$.Val = Value;
+		$$.Tag = Tag;
+		$$.ChildNumber = 0;
+	}
+	void TwoNodeSetup(ParseTag Tag, string Value = "")
+	{
+		$$.Val = Value;
+		$$.Tag = Tag;
+		$$.LeftNode = $2;
+		$$.RightNode = $1;
+		$$.ChildNumber = 2;
+	}
+	//<UserDefineFunc>
 private:
 
-	
-	
+	void Production2(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = false;
+		$$.Tag = ParseTag::CharSet;
+		$$.LeftNode = $1;
+		$$.ChildNumber = 1;
+	};
+	void Production3(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = true;
+		$$.Tag = ParseTag::CharSet;
+		$$.LeftNode = $1;
+		$$.ChildNumber = 1;
+	};
+	void Production4(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::CharSetString);
+	};
+	void Production5(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::CharSetUnit);
+	};
+	void Production6(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		GetValue(ParseTag::CharSetUnit, $1.Val);
+	};
+	void Production7(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::CompleteCharSet);
+	};
+	void Production8(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::CompleteCharSet);
+	};
+	void Production9(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::CompleteFactor);
+	};
+	void Production10(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::CompleteFactor);
+	};
+	void Production11(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::ChoseSymbol);
+	};
+	void Production12(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::Express);
+	};
+	void Production13(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Val = "";
+		$$.Tag = ParseTag::Factor;
+		$$.LeftNode = $2;
+		$$.ChildNumber = 1;
+	};
+	void Production14(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::Factor);
+	};
+	void Production15(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::Factor);
+	};
+	void Production16(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		GetValue(ParseTag::NormalChar, $1.Val);
+	};
+	void Production17(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		GetValue(ParseTag::NormalChar, $1.Val);
+	};
+	void Production18(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		GetValue(ParseTag::NormalChar, $1.Val);
+	};
+	void Production19(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::NormalString);
+	};
+	void Production20(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::NormalString, $1.Val);
+	};
+	void Production21(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::NormalStringComplete);
+	};
+	void Production22(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::NormalStringComplete);
+	};
+	void Production23(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = $1.Opps_Greedy;
+		$$.Tag = ParseTag::Repeat;
+		$$.LeftNode = $2;
+		$$.ChildNumber = 1;
+	};
+	void Production24(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = true;
+		$$.Tag = ParseTag::Repeat;
+		$$.Val = "*";
+		$$.ChildNumber = 0;
+	};
+	void Production25(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = false;
+		$$.Tag = ParseTag::Repeat;
+		$$.Val = "*";
+		$$.ChildNumber = 0;
+	};
+	void Production26(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = false;
+		$$.Tag = ParseTag::Repeat;
+		$$.Val = "+";
+		$$.ChildNumber = 0;
+	};
+	void Production27(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = true;
+		$$.Tag = ParseTag::Repeat;
+		$$.Val = "+";
+		$$.ChildNumber = 0;
+	};
+	void Production28(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = false;
+		$$.Tag = ParseTag::Repeat;
+		$$.Val = "?";
+		$$.ChildNumber = 0;
+	};
+	void Production29(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Opps_Greedy = true;
+		$$.Tag = ParseTag::Repeat;
+		$$.Val = "?";
+		$$.ChildNumber = 0;
+	};
+	void Production30(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		GetValue(ParseTag::Repeat_And_BackRefer_End, "}");
+	};
+	void Production31(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		GetValue(ParseTag::Repeat_End_Greedy, "}?");
+	};
+	void Production32(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::RepeatRight);
+	};
+	void Production33(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Val = "";
+		$$.Tag = ParseTag::RepeatRight;
+		$$.LeftNode = $3;
+		$$.RightNode = $1;
+		$$.ChildNumber = 2;
+	};
+	void Production34(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		$$.Val = $2.Val + $1.Val;
+		$$.Tag = ParseTag::SumNumber;
+		$$.ChildNumber = 0;
+	};
+	void Production35(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		TwoNodeSetup(ParseTag::Term);
+	};
+	void Production36(int Index, int Postion, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		OneLeftNodeSetup(ParseTag::Term);
+	};
 
-//<SemanticFunc>
-
-
+	//<SemanticFunc>
 
 private:
 	//文法 0号是产生式头
@@ -673,10 +898,9 @@ private:
 	unordered_map<LexTag, ParseTag> TagMap;
 
 	//文法列表索引到语义片段的索引
-	unordered_map<int, function<void()>> SemanticActionMap;
+	unordered_map<int, function<void(int, int, int, vector<shared_ptr<RegexToken>>&)>> SemanticActionMap;
 
-	
-    vector<ASTNode> NodeList;
+	//vector<ASTNode> NodeList;
 
-//<DataMember>
+	//<DataMember>
 };

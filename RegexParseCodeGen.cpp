@@ -8,10 +8,107 @@ string RegexParseCodeGen::ReadFileContent(string& FileName)
 	Input.close();
 	return move(StrData);
 }
+//查找所有非字面值引号位置
+vector<int> FindAllSymbolPostion(string& SrcStr, char Sign = '"')
+{
+	vector<int> Result;
+	for(auto i = 0; i < SrcStr.size(); i++)
+	{
+		if(SrcStr[i] == '"')
+		{
+			if(!HasChangedMean(SrcStr, i))
+			{
+				Result.push_back(i);
+			}
+		}
+	}
+	return std::move(Result);
+}
+// 查看指定位置字符是否被转义
+bool HasChangedMean(string& SrcStr, int FindIter)
+{
+	if(FindIter == 0)
+	{
+		return false;
+	}
+	else
+	{
+		return SrcStr[FindIter - 1] == '\\';
+	}
+}
+
+template<typename U>
+int BinarySearch(vector<U>& Container, U& Target,int Low,int Height)
+{
+	if(Low > Height)
+	{
+		return -1;
+	}
+	int Mid = Low + Height / 2;
+	if (Container[Mid] == Target)
+	{
+		return Mid;
+	}
+	else if(Container[Mid] < Target)
+	{
+		return BinarySearch(Container, Target, 0, Mid - 1);
+	}
+	else
+	{
+		return BinarySearch(Container, Target, Mid + 1, Height);
+	}
+}
+
+bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter,vector<int> SymbolList)
+{
+	int Count = 0;
+	if(FindIter == 0)
+	{
+		return false;
+	}
+	else if(HasChangedMean(SrcStr, FindIter))
+	{
+		return true;
+	}
+	else
+	{
+		
+	}
+	return Count % 2;
+}
+
+
+//其实查找字面值应该是,找指定字符是否在""内或者前面有\\这样的.
 bool RegexParseCodeGen::IsStrLiteral(string& SrcStr, int FindIter)
 {
-	return SrcStr[FindIter - 1] == '\\' || ( SrcStr[FindIter - 1] == '"' && SrcStr[FindIter + 1] == '"' );
+	int Count = 0;
+	if (FindIter == 0)
+	{
+		return false;
+	}
+	else if(HasChangedMean(SrcStr, FindIter))
+	{
+		return true;
+	}
+	else
+	{
+		for(auto i = 0; i < FindIter;i++)
+		{
+			if (SrcStr[i] == '"')
+			{
+				if(!HasChangedMean(SrcStr, i))
+				{
+					Count++;
+				}
+			}
+			
+		}
+	}
+	return Count % 2;
 }
+
+//查看该字符是不是字面值,字面值要跳过,字面值是指被""包围或者前面有\\的字符
+
 int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, string& Src, int SrcIndex)
 {
 	int StackList = 0;
@@ -22,27 +119,56 @@ int RegexParseCodeGen::GetLongestNestedEndIndex(pair<char, char>& NestedSign, st
 	{
 		SrcIndex += 1;
 		Length += 1;
-		if(Src[SrcIndex] == NestedSign.first)
+
+		if (!IsStrLiteral(Src,SrcIndex))
 		{
-			StackList += 1;
+			if(Src[SrcIndex] == NestedSign.first)
+			{
+				StackList += 1;
+			}
+			else if(Src[SrcIndex] == NestedSign.second)
+			{
+				StackList -= 1;
+			}
 		}
-		else if(Src[SrcIndex] == NestedSign.second)
-		{
-			StackList -= 1;
-		}
+		
 	}
 	return StartIndex + Length;
 }
 string RegexParseCodeGen::GetLongestNestedContent(pair<char, char>& NestedSign, string& Src, int SrcIndex)
 {
 	string Symbol;
-	SrcIndex = Src.find(NestedSign.first);
+	auto StartIndex = Src.find(NestedSign.first,SrcIndex);
 	//这里的Index是超尾
-	auto EndIndex = GetLongestNestedEndIndex(NestedSign, Src, SrcIndex);
-	SrcIndex++;
-	Symbol = Src.substr(SrcIndex, EndIndex - SrcIndex - 1);
+	auto EndIndex = GetLongestNestedEndIndex(NestedSign, Src, StartIndex);
+	StartIndex++;
+	Symbol = Src.substr(StartIndex, EndIndex - StartIndex - 1);
 	return std::move(Symbol);
 }
+
+//字符串查找,跳过字面值
+
+int RegexParseCodeGen::FindTrueCharIndex(string& SrcStr, char JumpSign, int StartIndex)
+{
+	for(auto i = StartIndex; i < SrcStr.size();i++)
+	{
+		if (SrcStr[i] == JumpSign)
+		{
+			if(!IsStrLiteral(SrcStr,i))
+			{
+				return i;
+			}
+		}
+		
+	}
+	return -1;
+}
+
+string RegexParseCodeGen::CreatIndexToActionStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap)
+{
+	return string();
+}
+
 vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string& DefineStr, char JumpStart, char JumpEnd)
 {
 	auto StartIndex = 0;
@@ -50,14 +176,11 @@ vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string
 	vector<pair<int, int>> JumpList;
 	while(true)
 	{
-		FindStartIndex = SrcStr.find(JumpStart, StartIndex);
-		if(FindStartIndex == SrcStr.npos)
+		FindStartIndex = FindTrueCharIndex(SrcStr,JumpStart, StartIndex);
+		
+		if(FindStartIndex == -1)
 		{
 			break;
-		}
-		else if(FindStartIndex != 0 && IsStrLiteral(SrcStr, FindStartIndex))
-		{
-			StartIndex = StartIndex + 1;
 		}
 		else
 		{
@@ -70,6 +193,35 @@ vector<pair<int, int>> RegexParseCodeGen::GetNeedJumpList(string& SrcStr, string
 		}
 	}
 	return std::move(JumpList);
+
+
+
+	//auto StartIndex = 0;
+	//auto FindStartIndex = 0;
+	//vector<pair<int, int>> JumpList;
+	//while(true)
+	//{
+	//	FindStartIndex = SrcStr.find(JumpStart, StartIndex);
+
+	//	if(FindStartIndex == SrcStr.npos)
+	//	{
+	//		break;
+	//	}
+	//	else if(FindStartIndex != 0 && IsStrLiteral(SrcStr, FindStartIndex))
+	//	{
+	//		StartIndex = StartIndex + 1;
+	//	}
+	//	else
+	//	{
+	//		pair<int, int>Temp;
+	//		Temp.first = FindStartIndex;
+	//		auto FindEndIndex = GetLongestNestedEndIndex(pair<char, char>(JumpStart, JumpEnd), SrcStr, FindStartIndex);
+	//		Temp.second = FindEndIndex;
+	//		JumpList.push_back(Temp);
+	//		StartIndex = FindEndIndex;
+	//	}
+	//}
+	//return std::move(JumpList);
 }
 vector<int> RegexParseCodeGen::GetNeedSignList(string& SrcStr, string& DefineStr, vector<pair<int, int>>& JumpList)
 {
@@ -134,7 +286,7 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 	//获取花括号的嵌套范围
 
 	vector<string>Result;
-
+	vector<int>ReferSymbolList = FindAllSymbolPostion(SrcStr);
 	auto JumpList = GetNeedJumpList(SrcStr, DefineStr, JumpStart, JumpEnd);
 
 	auto SignList = GetNeedSignList(SrcStr, DefineStr, JumpList);
@@ -142,6 +294,10 @@ vector<string> RegexParseCodeGen::CutByDefineCharacter(string& SrcStr, string& D
 	{
 		for(int i = 0; i < SignList.size() - 1; i++)
 		{
+			if (i== 7)
+			{
+				int a = 0;
+			}
 			auto Catch = SrcStr.substr(SignList[i] + DefineStr.size(), SignList[i + 1] - ( SignList[i] + DefineStr.size() ));
 			if(!Catch.empty())
 			{
@@ -381,6 +537,10 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 	string BindStr = "";
 	for(auto& Iter : StatementMap)
 	{
+		if (Iter.first =="Repeat")
+		{
+			int a = 0;
+		}
 		//StrIter 是每一个产生式体的字符串
 		auto HeadStr = Trim(Iter.first);
 		for(auto& StrIter : Iter.second)
@@ -413,7 +573,7 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 					//需要替换的终结符号
 					/*auto re = GetNoteSignContent(TokenIter, string("\""), string("\""));*/
 					auto& test = TermToTagMap.find(GetNoteSignContent(TokenIter, string("\""), string("\"")));
-					TempSymbolStr = TempSymbolStr + "Symbol(true,ParseTag::" + test->second + "),";
+						TempSymbolStr = TempSymbolStr + "Symbol(true,ParseTag::" + test->second + "),";
 				}
 				else
 				{
@@ -428,10 +588,10 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 			if(!SemanticStr.empty())
 			{
 				string CountStr = to_string(Count);
-				FuncStr = FuncStr + "void Production" + CountStr + "()\n{\n" + SemanticStr + "\n};\n";
+				FuncStr = FuncStr + "void Production" + CountStr + "(int Index,int Postion,int StreamIndex,vector<shared_ptr<RegexToken>>& TokenStream)\n{\n" + SemanticStr + "\n};\n";
 				//添加语义内容的绑定
 
-				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this)));\n ";
+				BindStr = BindStr + "SemanticActionMap.insert(make_pair(" + CountStr + ", bind(RegexParse::Production" + CountStr + ", this,std::placeholders::_1,std::placeholders::_2,std::placeholders::_3,std::placeholders::_4)));\n ";
 			}
 
 			TemplateStr = TemplateStr + TempSymbolStr;
@@ -447,10 +607,6 @@ string RegexParseCodeGen::CreatGrammarListContentStr(map<string, string>&TermToT
 	ParseTemplate = ReplaceDefinePostion(ParseTemplate, string("//<initSemanticMap>"), BindStr);
 
 	return std::move(TemplateStr);
-}
-string RegexParseCodeGen::CreatIndexToActionStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap)
-{
-	return string();
 }
 
 string RegexParseCodeGen::CreatGrammarMapStr(map<string, string>&TermToTagMap, map<string, vector<string>>& StatementMap, map<string, vector<string>>& StartStateMap)
@@ -475,7 +631,12 @@ void RegexParseCodeGen::CreateCppFile(string& FilePatch, string& TextContent)
 
 map<string, vector<string>> RegexParseCodeGen::GetSpecStateMap(string Src, string StartNode, string EndNote, string StatementCutSign)
 {
-	auto StartStatement = CutByDefineCharacter(GetNoteSignContent(Src, StartNode, EndNote), StatementCutSign, '{', '}');
+	if (StartNode == "<Grammar>")
+	{
+		int a = 0;
+	}
+	auto Content = GetNoteSignContent(Src, StartNode, EndNote);
+	auto StartStatement = CutByDefineCharacter(Content, StatementCutSign, '{', '}');
 	//最后一个分号不需要
 	StartStatement.pop_back();
 	return 	std::move(GetStatementMap(StartStatement));

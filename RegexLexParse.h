@@ -522,12 +522,12 @@ private:
 		TagToRuleList.insert(make_pair(LexTag::StringHead, "^"));
 		TagToRuleList.insert(make_pair(LexTag::StringTail, "$"));
 		TagToRuleList.insert(make_pair(LexTag::Mitipute_End, ")"));
-		TagToRuleList.insert(make_pair(LexTag::Closures_UnGreedy, "*"));
-		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_UnGreedy, "+"));
-		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_UnGreedy, "?"));
-		TagToRuleList.insert(make_pair(LexTag::Closures_Greedy, "*?"));
-		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_Greedy, "+?"));
-		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_Greedy, "??"));
+		TagToRuleList.insert(make_pair(LexTag::Closures_Greedy, "*"));
+		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_Greedy, "+"));
+		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_Greedy, "?"));
+		TagToRuleList.insert(make_pair(LexTag::Closures_UnGreedy, "*?"));
+		TagToRuleList.insert(make_pair(LexTag::PositiveClosures_UnGreedy, "+?"));
+		TagToRuleList.insert(make_pair(LexTag::ChoseClosures_UnGreedy, "??"));
 		TagToRuleList.insert(make_pair(LexTag::Repeat_Start, "{"));
 		TagToRuleList.insert(make_pair(LexTag::Repeat_And_BackRefer_End, "}"));
 		TagToRuleList.insert(make_pair(LexTag::Repeat_End_Greedy, "}?"));
@@ -552,12 +552,12 @@ private:
 		RuleToTagList.insert(make_pair("^", LexTag::StringHead));
 		RuleToTagList.insert(make_pair("$", LexTag::StringTail));
 		RuleToTagList.insert(make_pair(")", LexTag::Mitipute_End));
-		RuleToTagList.insert(make_pair("*", LexTag::Closures_UnGreedy));
-		RuleToTagList.insert(make_pair("+", LexTag::PositiveClosures_UnGreedy));
-		RuleToTagList.insert(make_pair("?", LexTag::ChoseClosures_UnGreedy));
-		RuleToTagList.insert(make_pair("*?", LexTag::Closures_Greedy));
-		RuleToTagList.insert(make_pair("+?", LexTag::PositiveClosures_Greedy));
-		RuleToTagList.insert(make_pair("??", LexTag::ChoseClosures_Greedy));
+		RuleToTagList.insert(make_pair("*", LexTag::Closures_Greedy));
+		RuleToTagList.insert(make_pair("+", LexTag::PositiveClosures_Greedy));
+		RuleToTagList.insert(make_pair("?", LexTag::ChoseClosures_Greedy));
+		RuleToTagList.insert(make_pair("*?", LexTag::Closures_UnGreedy));
+		RuleToTagList.insert(make_pair("+?", LexTag::PositiveClosures_UnGreedy));
+		RuleToTagList.insert(make_pair("??", LexTag::ChoseClosures_UnGreedy));
 		RuleToTagList.insert(make_pair("{", LexTag::Repeat_Start));
 		RuleToTagList.insert(make_pair("}", LexTag::Repeat_And_BackRefer_End));
 		RuleToTagList.insert(make_pair("}?", LexTag::Repeat_End_Greedy));
@@ -644,7 +644,7 @@ private:
 	//unordered_map<char, int>CharMap;
 
 	//×ÖÄ¸±íµ½×Ö·û·¶Î§µÄÓ³Éä
-
+	
 	string Pattern;
 	int Length;
 	//Ç¶Ì×±êÇ©Õ»

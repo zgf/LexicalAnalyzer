@@ -2,7 +2,8 @@
 
 int main()
 {
-	string Pattern("[a-znb]*|ab(c[a]|cb+?dd)");
+	//[a-znb]*|ab(c[a\\b]|cb+?dd)
+	string Pattern("[a-znb]*|ab(c[a\\b]|cb+?dd)");
 	LexParse Lex(Pattern);
 	RegexParse Parse;
 	Parse.ParsingRegex(Lex.TokenStream);

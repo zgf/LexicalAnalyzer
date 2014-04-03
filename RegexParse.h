@@ -753,7 +753,7 @@ public:
 					if(ProductHead.Tag == ParseTag::Start)
 					{
 						cout << "规约成功!";
-						AstRootNode = CatchStack.back();
+						//AstRootNode = CatchStack.back();
 						return true;
 					}
 					else if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
@@ -764,7 +764,6 @@ public:
 					else
 					{
 						StautsStack.push_back(FindIter->second);
-
 						//这里可能有问题0 0...CatchStack和StautsStack不一定是一一对应关系
 						CatchStack.erase(CatchStack.end() - PopNumber, CatchStack.end());
 						CatchStack.push_back(shared_ptr<Property>(NewNode));
@@ -785,10 +784,10 @@ public:
 		return false;
 	}
 public:
-	shared_ptr<Property>& GetAst()
+	/*shared_ptr<Property>& GetAst()
 	{
-		return AstRootNode;
-	}
+	return AstRootNode;
+	}*/
 private:
 
 	bool NeedChangeIndex(char Index)
@@ -1135,5 +1134,5 @@ private:
 	//<DataMember>
 
 	//AST根节点
-	shared_ptr<Property> AstRootNode;
+	//	shared_ptr<Property> AstRootNode;
 };

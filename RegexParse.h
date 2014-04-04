@@ -795,6 +795,7 @@ public:
 					{
 						cout << "规约成功!";
 						//AstRootNode = CatchStack.back();
+					//	stringTail没有被push进去
 						AstStack;
 						AstNodeList;
 						return true;

@@ -24,6 +24,9 @@
     <ClInclude Include="RegexParse.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="RegexDFA.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeGenComplier.cpp">

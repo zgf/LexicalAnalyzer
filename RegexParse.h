@@ -205,6 +205,9 @@ public:
 	}
 };
 
+int a = 0;
+class DFA;
+
 enum class AstTag
 {
 	Link,
@@ -214,6 +217,7 @@ enum class AstTag
 	Factor,
 	NormalChar,
 	CharSetUnit,
+	StringTail,
 };
 class AstNode
 {
@@ -232,6 +236,8 @@ public:
 		:Tag(tTag), LeftNodeIndex(tLeftNodeIndex), RightNodeIndex(tRightNodeIndex), ChildNumber(tChildNumber)
 	{
 	}
+public:
+	virtual void Accept(DFA& Dfa, int CurrentIndex) = 0;
 };
 class NormalChar :public AstNode
 {
@@ -247,6 +253,7 @@ public:
 	~NormalChar()
 	{
 	}
+	void Accept(DFA& Dfa, int CurrentIndex);
 };
 enum class OppsType
 {
@@ -270,6 +277,7 @@ public:
 	~CharSet()
 	{
 	}
+	void Accept(DFA& Dfa, int CurrentIndex);
 };
 enum  class GreedyType
 {
@@ -292,6 +300,7 @@ public:
 	~Repeat()
 	{
 	}
+	void Accept(DFA& Dfa, int CurrentIndex);
 };
 
 class ChoseSymbol :public AstNode
@@ -307,8 +316,38 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
 	{
 	}
+	void Accept(DFA& Dfa, int CurrentIndex);
 };
-
+class StringTail : public AstNode
+{
+public:
+	~StringTail()
+	{
+	}
+	StringTail()
+	{
+	}
+	StringTail(AstTag tTag, int tLeftNodeIndex, int tRightNodeIndex, int tChildNumber)
+		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
+	{
+	}
+	void Accept(DFA& Dfa, int CurrentIndex);
+};
+class Link :public AstNode
+{
+public:
+	~Link()
+	{
+	}
+	Link()
+	{
+	}
+	Link(AstTag tTag, int tLeftNodeIndex, int tRightNodeIndex, int tChildNumber)
+		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
+	{
+	}
+	void Accept(DFA& Dfa, int CurrentIndex);
+};
 //<Global>
 class RegexParse
 {
@@ -389,6 +428,8 @@ private:
 	}
 	void initSemanticMap()
 	{
+		SemanticActionMap.insert(make_pair(0, bind(&RegexParse::Production0, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+
 		SemanticActionMap.insert(make_pair(1, bind(&RegexParse::Production1, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(2, bind(&RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(3, bind(&RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
@@ -754,6 +795,8 @@ public:
 					{
 						cout << "规约成功!";
 						//AstRootNode = CatchStack.back();
+						AstStack;
+						AstNodeList;
 						return true;
 					}
 					else if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
@@ -790,6 +833,7 @@ public:
 	}*/
 private:
 
+private:
 	bool NeedChangeIndex(char Index)
 	{
 		return ( CharMap[Index] == 0 ) || ( CharMap[Index + 1] == CharMap[Index] ) || ( CharMap[Index - 1] == CharMap[Index] );
@@ -804,7 +848,7 @@ private:
 	void CreatRepeatNode(pair<int, int>&CharSetRange, GreedyType IsGreedy = GreedyType::Unkown)
 	{
 		int Index = AstNodeList.size();
-		AstNodeList.push_back(new Repeat(AstTag::Repeat, 0, 0, 0, GreedyType::Unkown, CharSetRange));
+		AstNodeList.push_back(new Repeat(AstTag::Repeat, -1, -1, 0, IsGreedy, CharSetRange));
 		AstStack.push_back(Index);
 	}
 	void CreatCompleteNode()
@@ -828,11 +872,45 @@ private:
 	void CreatNormalCharNode(shared_ptr<Property> Root)
 	{
 		AstStack.push_back(AstNodeList.size());
-		AstNodeList.push_back(new NormalChar(AstTag::NormalChar, 0, 0, 0, Root->Val[0]));
+		AstNodeList.push_back(new NormalChar(AstTag::NormalChar, -1, -1, 0, Root->Val[0]));
 	}
 
+public:
+	AstNode* GetAst()
+	{
+		return AstNodeList[AstStack.back()];
+	}
+	void DeleteAst()
+	{
+		for(auto i = 0; i < AstNodeList.size(); i++)
+		{
+			delete AstNodeList[i];
+		}
+	}
+	vector<int> GetCharMap()
+	{
+		return CharMap;
+	}
+	int GetAstRootIndex()
+	{
+		return AstStack.back();
+	}
+	vector<AstNode*> GetAstNodeList()
+	{
+		return AstNodeList;
+	}
 	//<UserDefineFunc>
 private:
+
+	//Start Express
+	void Production0(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	{
+		NewNode = shared_ptr<Property>(new Property());
+
+		AstStack.push_back(AstNodeList.size());
+		AstNodeList.push_back(new StringTail(AstTag::StringTail, -1, -1, 0));
+		SetupTwoChild(new Link(AstTag::Link, -1, -1, 0));
+	};
 
 	//CharSet "[" CharSetString "]"
 	void Production1(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
@@ -866,7 +944,7 @@ private:
 		set<pair<int, int>>NewSet;
 		set_union(LeftSetPointer->CharSetRange.begin(), LeftSetPointer->CharSetRange.end(), RightSetPointer->CharSetRange.begin(), RightSetPointer->CharSetRange.end(), inserter(NewSet, NewSet.begin()));
 		auto Index = AstNodeList.size();
-		AstNodeList.push_back(new CharSet(AstTag::CharSetUnit, 0, 0, 0, NewSet, OppsType::Unkown));
+		AstNodeList.push_back(new CharSet(AstTag::CharSetUnit, -1, -1, 0, NewSet, OppsType::Unkown));
 		AstStack.push_back(Index);
 	};
 	//CharSetUnit NormalChar "-" NormalChar
@@ -885,7 +963,7 @@ private:
 		set<pair<int, int>>CharSetRange;
 		CharSetRange.insert(pair<int, int>(CatchStack[CatchStack.size() - 3]->Val[0], CatchStack[CatchStack.size() - 1]->Val[0]));
 		auto Index = AstNodeList.size();
-		AstNodeList.push_back(new CharSet(AstTag::CharSetUnit, 0, 0, 0, CharSetRange, OppsType::Unkown));
+		AstNodeList.push_back(new CharSet(AstTag::CharSetUnit, -1, -1, 0, CharSetRange, OppsType::Unkown));
 		AstStack.pop_back();
 		AstStack.pop_back();
 		AstStack.push_back(Index);
@@ -914,7 +992,7 @@ private:
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
-		SetupTwoChild(new ChoseSymbol(AstTag::ChoseSymbol, 0, 0, 0));
+		SetupTwoChild(new ChoseSymbol(AstTag::ChoseSymbol, -1, -1, 0));
 	};
 	//ExpressComplete "(" Express ")" Repeat
 	void Production12(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
@@ -1091,7 +1169,7 @@ private:
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
-		SetupTwoChild(new ChoseSymbol(AstTag::Link, 0, 0, 0));
+		SetupTwoChild(new Link(AstTag::Link, -1, -1, 0));
 	};
 	//Term Factor
 	void Production34(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
@@ -1126,7 +1204,6 @@ private:
 	//每次执行语义动作时候构造的新节点挂载位置
 	shared_ptr<Property> NewNode;
 
-	int a = 0;
 	vector<int>CharMap;
 	int IncreaseIndex = 1;
 	vector<AstNode*>AstNodeList;

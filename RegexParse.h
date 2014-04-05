@@ -8,13 +8,10 @@ enum class ParseTag
 	SimpleUnNamedCatch_Start,
 	Mitipute_End,
 	Closures_Greedy,
-	Closures_UnGreedy,
 	PositiveClosures_Greedy,
-	PositiveClosures_UnGreedy,
 	Comma,
 	CharSetComponent,
 	ChoseClosures_Greedy,
-	ChoseClosures_UnGreedy,
 	NumberChar,
 	OtherChar,
 	RealWordChar,
@@ -25,7 +22,6 @@ enum class ParseTag
 	Repeat_Start,
 	ChoseSymbol,
 	Repeat_And_BackRefer_End,
-	Repeat_End_Greedy,
 	Start,
 	CharSet,
 	CharSetString,
@@ -37,7 +33,6 @@ enum class ParseTag
 	NormalChar,
 	NormalCharComplete,
 	Repeat,
-	RepeatEnd,
 	RepeatRight,
 	SumNumber,
 	Term,
@@ -206,6 +201,7 @@ public:
 };
 
 class FA;
+class RegexParse;
 
 enum class AstTag
 {
@@ -213,10 +209,10 @@ enum class AstTag
 	ChoseSymbol,
 	CharSet,
 	Repeat,
-	Factor,
 	NormalChar,
 	CharSetUnit,
 	StringTail,
+	Nullable,
 };
 class AstNode
 {
@@ -237,6 +233,7 @@ public:
 	}
 public:
 	virtual void Accept(FA& Dfa, int CurrentIndex) = 0;
+	virtual void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack) = 0;
 };
 class NormalChar :public AstNode
 {
@@ -253,6 +250,28 @@ public:
 	{
 	}
 	void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
+};
+class Nullable : public AstNode
+{
+public:
+	AstTag Tag;
+	int LeftNodeIndex;
+	int RightNodeIndex;
+	int ChildNumber;
+	Nullable()
+	{
+	}
+	virtual ~Nullable()
+	{
+	}
+	Nullable(AstTag tTag, int tLeftNodeIndex, int tRightNodeIndex, int tChildNumber)
+		:Tag(tTag), LeftNodeIndex(tLeftNodeIndex), RightNodeIndex(tRightNodeIndex), ChildNumber(tChildNumber)
+	{
+	}
+public:
+	virtual void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 enum class OppsType
 {
@@ -277,6 +296,7 @@ public:
 	{
 	}
 	void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 enum  class GreedyType
 {
@@ -300,6 +320,7 @@ public:
 	{
 	}
 	void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 
 class ChoseSymbol :public AstNode
@@ -316,6 +337,7 @@ public:
 	{
 	}
 	void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 class StringTail : public AstNode
 {
@@ -331,6 +353,10 @@ public:
 	{
 	}
 	void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		abort();
+	}
 };
 class Link :public AstNode
 {
@@ -346,7 +372,9 @@ public:
 	{
 	}
 	void Accept(FA& Dfa, int CurrentIndex);
+	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
+
 //<Global>
 class RegexParse
 {
@@ -366,13 +394,10 @@ private:
 		TagMap.insert(make_pair(LexTag::SimpleUnNamedCatch_Start, ParseTag::SimpleUnNamedCatch_Start));
 		TagMap.insert(make_pair(LexTag::Mitipute_End, ParseTag::Mitipute_End));
 		TagMap.insert(make_pair(LexTag::Closures_Greedy, ParseTag::Closures_Greedy));
-		TagMap.insert(make_pair(LexTag::Closures_UnGreedy, ParseTag::Closures_UnGreedy));
 		TagMap.insert(make_pair(LexTag::PositiveClosures_Greedy, ParseTag::PositiveClosures_Greedy));
-		TagMap.insert(make_pair(LexTag::PositiveClosures_UnGreedy, ParseTag::PositiveClosures_UnGreedy));
 		TagMap.insert(make_pair(LexTag::Comma, ParseTag::Comma));
 		TagMap.insert(make_pair(LexTag::CharSetComponent, ParseTag::CharSetComponent));
 		TagMap.insert(make_pair(LexTag::ChoseClosures_Greedy, ParseTag::ChoseClosures_Greedy));
-		TagMap.insert(make_pair(LexTag::ChoseClosures_UnGreedy, ParseTag::ChoseClosures_UnGreedy));
 		TagMap.insert(make_pair(LexTag::NumberChar, ParseTag::NumberChar));
 		TagMap.insert(make_pair(LexTag::OtherChar, ParseTag::OtherChar));
 		TagMap.insert(make_pair(LexTag::RealWordChar, ParseTag::RealWordChar));
@@ -383,7 +408,6 @@ private:
 		TagMap.insert(make_pair(LexTag::Repeat_Start, ParseTag::Repeat_Start));
 		TagMap.insert(make_pair(LexTag::ChoseSymbol, ParseTag::ChoseSymbol));
 		TagMap.insert(make_pair(LexTag::Repeat_And_BackRefer_End, ParseTag::Repeat_And_BackRefer_End));
-		TagMap.insert(make_pair(LexTag::Repeat_End_Greedy, ParseTag::Repeat_End_Greedy));
 		//<initTagMap>
 	}
 	void initGrammarList()
@@ -409,15 +433,10 @@ private:
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalChar), vector<Symbol>({Symbol(true, ParseTag::OtherChar)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalCharComplete), vector<Symbol>({Symbol(false, ParseTag::NormalChar), Symbol(false, ParseTag::Repeat)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::NormalCharComplete), vector<Symbol>({Symbol(false, ParseTag::NormalChar)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Repeat_Start), Symbol(false, ParseTag::RepeatRight), Symbol(false, ParseTag::RepeatEnd)})));
+		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Repeat_Start), Symbol(false, ParseTag::RepeatRight), Symbol(true, ParseTag::Repeat_And_BackRefer_End)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Closures_Greedy)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::Closures_UnGreedy)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::PositiveClosures_UnGreedy)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::PositiveClosures_Greedy)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::ChoseClosures_UnGreedy)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::Repeat), vector<Symbol>({Symbol(true, ParseTag::ChoseClosures_Greedy)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatEnd), vector<Symbol>({Symbol(true, ParseTag::Repeat_And_BackRefer_End)})));
-		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatEnd), vector<Symbol>({Symbol(true, ParseTag::Repeat_End_Greedy)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::RepeatRight), vector<Symbol>({Symbol(false, ParseTag::SumNumber), Symbol(true, ParseTag::Comma), Symbol(false, ParseTag::SumNumber)})));
 		GrammarList.push_back(Production(Symbol(false, ParseTag::SumNumber), vector<Symbol>({Symbol(false, ParseTag::NumberChar), Symbol(false, ParseTag::SumNumber)})));
@@ -428,6 +447,7 @@ private:
 	void initSemanticMap()
 	{
 		SemanticActionMap.insert(make_pair(0, bind(&RegexParse::Production0, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+
 		SemanticActionMap.insert(make_pair(1, bind(&RegexParse::Production1, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(2, bind(&RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(3, bind(&RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
@@ -449,11 +469,6 @@ private:
 		SemanticActionMap.insert(make_pair(27, bind(&RegexParse::Production27, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(28, bind(&RegexParse::Production28, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(29, bind(&RegexParse::Production29, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(30, bind(&RegexParse::Production30, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(31, bind(&RegexParse::Production31, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(32, bind(&RegexParse::Production32, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(33, bind(&RegexParse::Production33, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-		SemanticActionMap.insert(make_pair(34, bind(&RegexParse::Production34, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 
 		//<initSemanticMap>
 	}
@@ -836,9 +851,6 @@ private:
 	{
 		return ( CharMap[Index] == 0 ) || ( CharMap[Index + 1] == CharMap[Index] ) || ( CharMap[Index - 1] == CharMap[Index] );
 	}
-	void CreatCharSetNode(shared_ptr<Property>& Root)
-	{
-	}
 	int TraversalAstSumNumber(shared_ptr<Property> Root)
 	{
 		return atoi(Root->Val.c_str());
@@ -851,11 +863,166 @@ private:
 	}
 	void CreatCompleteNode()
 	{
-		int EndIndex = AstStack.size() - 1;
-		AstNodeList[AstStack[EndIndex]]->ChildNumber = 1;
-		AstNodeList[AstStack[EndIndex]]->LeftNodeIndex = AstStack[EndIndex - 1];
-		AstStack[EndIndex - 1] = AstStack[EndIndex];
-		AstStack.pop_back();
+		auto RepeatNodeIndex = AstStack.back();
+		auto ReaptNodePtr = dynamic_cast<Repeat*>( AstNodeList[RepeatNodeIndex] );
+		int StartNumber = ReaptNodePtr->RepeatNumber.first;
+		int EndNumber = ReaptNodePtr->RepeatNumber.second;
+
+		if(StartNumber > EndNumber || StartNumber == INT_MAX || EndNumber == 0)
+		{
+			abort();
+		}
+
+		if(EndNumber == INT_MAX)
+		{
+			if(StartNumber == 0)
+			{
+				int EndIndex = AstStack.size() - 1;
+				AstNodeList[AstStack[EndIndex]]->ChildNumber = 1;
+				AstNodeList[AstStack[EndIndex]]->LeftNodeIndex = AstStack[EndIndex - 1];
+				AstStack[EndIndex - 1] = AstStack[EndIndex];
+				AstStack.pop_back();
+			}
+			else
+			{
+				int EndIndex = AstStack.size() - 1;
+				AstNodeList[AstStack[EndIndex]]->ChildNumber = 1;
+				AstNodeList[AstStack[EndIndex]]->LeftNodeIndex = AstStack[EndIndex - 1];
+				AstStack[EndIndex - 1] = AstStack[EndIndex];
+				AstStack.pop_back();
+				auto RepeatIndex = AstStack.back();
+				auto RootNodeIndex = AstNodeList[RepeatIndex]->LeftNodeIndex;
+				vector<int> NeedCatList;
+				for(auto i = 0; i < StartNumber; i++)
+				{
+					NeedCatList.push_back(CreatIsomorphismTree(RootNodeIndex));
+				}
+				AstStack.push_back(LinkVector(NeedCatList));
+				SetupTwoChild(new Link(AstTag::Link, -1, -1, 0));
+			}
+		}
+		else
+		{
+			AstStack.pop_back();
+			auto RootNodeIndex = AstStack.back();
+			AstStack.pop_back();
+			AstStack.push_back(ReaptLimitedNumber(RootNodeIndex, StartNumber, EndNumber));
+		}
+	}
+	int ReaptLimitedNumber(int RootNodeIndex, int StartNumber, int EndNumber)
+	{
+		vector<int> NeedChoseList;
+		for(auto j = StartNumber; j <= EndNumber; j++)
+		{
+			vector<int> NeedCatList;
+			if(j == 0)
+			{
+				NeedCatList.push_back(CreatOneNode(AstTag::Nullable));
+			}
+			else
+			{
+				for(auto i = 0; i < j; i++)
+				{
+					NeedCatList.push_back(CreatIsomorphismTree(RootNodeIndex));
+				}
+			}
+			NeedChoseList.push_back(LinkVector(NeedCatList));
+		}
+		return ChoseCatVector(NeedChoseList);
+	}
+
+	int ChoseCatVector(vector<int>&NodeList)
+	{
+		if(NodeList.size() != 1)
+		{
+			for(auto i = 0; i < NodeList.size() - 1; i++)
+			{
+				auto NewNodeIndex = CreatOneNode(AstTag::ChoseSymbol);
+				AstNodeList[NewNodeIndex]->ChildNumber = 2;
+				AstNodeList[NewNodeIndex]->LeftNodeIndex = NodeList[i];
+				AstNodeList[NewNodeIndex]->RightNodeIndex = NodeList[i + 1];
+				NodeList[i + 1] = NewNodeIndex;
+			}
+		}
+
+		return NodeList.back();
+	}
+	int LinkVector(vector<int>&NodeList)
+	{
+		if(NodeList.size() != 1)
+		{
+			for(auto i = 0; i < NodeList.size() - 1; i++)
+			{
+				auto NewNodeIndex = CreatOneNode(AstTag::Link);
+				AstNodeList[NewNodeIndex]->ChildNumber = 2;
+				AstNodeList[NewNodeIndex]->LeftNodeIndex = NodeList[i];
+				AstNodeList[NewNodeIndex]->RightNodeIndex = NodeList[i + 1];
+				NodeList[i + 1] = NewNodeIndex;
+			}
+		}
+
+		return NodeList.back();
+	}
+	int CreatIsomorphismTree(int RootIndex)
+	{
+		map<int, int> NodeMap;
+		list<int> Stack;
+		Stack.push_back(RootIndex);
+		NodeMap.insert(make_pair(RootIndex, CreatOneNode(AstNodeList[RootIndex]->Tag)));
+		while(!Stack.empty())
+		{
+			auto CurrentIndex = Stack.front();
+			GetAstNodePtr(CurrentIndex)->AdjustAst(*this, CurrentIndex, NodeMap, Stack);
+			Stack.pop_front();
+		}
+		return NodeMap[RootIndex];
+	}
+	AstNode* GetAstNodePtr(int Index)
+	{
+		return AstNodeList[Index];
+	}
+	int CreatOneNode(AstTag Tag)
+	{
+		int Index = AstNodeList.size();
+		if(Tag == AstTag::CharSet)
+		{
+			AstNodeList.push_back(new CharSet);
+			AstNodeList.back()->Tag = AstTag::CharSet;
+		}
+		else if(Tag == AstTag::ChoseSymbol)
+		{
+			AstNodeList.push_back(new ChoseSymbol);
+			AstNodeList.back()->Tag = AstTag::ChoseSymbol;
+		}
+		else if(Tag == AstTag::Link)
+		{
+			AstNodeList.push_back(new Link);
+			AstNodeList.back()->Tag = AstTag::Link;
+		}
+		else if(Tag == AstTag::NormalChar)
+		{
+			AstNodeList.push_back(new NormalChar);
+			AstNodeList.back()->Tag = AstTag::NormalChar;
+		}
+		else if(Tag == AstTag::Nullable)
+		{
+			AstNodeList.push_back(new Nullable);
+			AstNodeList.back()->Tag = AstTag::Nullable;
+		}
+		else if(Tag == AstTag::Repeat)
+		{
+			AstNodeList.push_back(new Repeat);
+			AstNodeList.back()->Tag = AstTag::Repeat;
+		}
+		else
+		{
+			abort();
+		}
+		AstNodeList.back()->LeftNodeIndex = -1;
+		AstNodeList.back()->RightNodeIndex = -1;
+		AstNodeList.back()->ChildNumber = 0;
+
+		return Index;
 	}
 	void SetupTwoChild(AstNode* Father)
 	{
@@ -874,6 +1041,59 @@ private:
 	}
 
 public:
+	void AdjustAst(Link* NodePtr, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		auto NewNodePtr = (Link*)AstNodeList[NodeMap[CurrentIndex]];
+		*NewNodePtr = *NodePtr;
+		CopyNodeChild(AstNodeList[NodePtr->LeftNodeIndex], NodePtr->LeftNodeIndex, NodeMap, Stack);
+		CopyNodeChild(AstNodeList[NodePtr->RightNodeIndex], NodePtr->RightNodeIndex, NodeMap, Stack);
+	}
+	void AdjustAst(ChoseSymbol* NodePtr, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		auto NewNodePtr = (ChoseSymbol*)AstNodeList[NodeMap[CurrentIndex]];
+		*NewNodePtr = *NodePtr;
+		CopyNodeChild(AstNodeList[NodePtr->LeftNodeIndex], NodePtr->LeftNodeIndex, NodeMap, Stack);
+		CopyNodeChild(AstNodeList[NodePtr->RightNodeIndex], NodePtr->RightNodeIndex, NodeMap, Stack);
+	}
+	void AdjustAst(CharSet* NodePtr, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		auto NewNodePtr = (CharSet*)AstNodeList[NodeMap[CurrentIndex]];
+		*NewNodePtr = *NodePtr;
+	}
+	void AdjustAst(NormalChar* NodePtr, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		auto NewNodePtr = (NormalChar*)AstNodeList[NodeMap[CurrentIndex]];
+		*NewNodePtr = *NodePtr;
+
+	}
+	void AdjustAst(Nullable* NodePtr, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		auto NewNodePtr = (Nullable*)AstNodeList[NodeMap[CurrentIndex]];
+		*NewNodePtr = *NodePtr;
+	
+	}
+	void AdjustAst(Repeat* NodePtr, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		auto NewNodePtr = (Repeat*)AstNodeList[NodeMap[CurrentIndex]];
+		*NewNodePtr = *NodePtr;
+	}
+	void CopyNodeChild(AstNode* NewNodePtr, int LeftNodeIndex, map<int, int>&NodeMap, list<int>& Stack)
+	{
+		if(NewNodePtr->LeftNodeIndex != -1)
+		{
+			auto& FindLeft = NodeMap.find(NewNodePtr->LeftNodeIndex);
+			if(FindLeft == NodeMap.end())
+			{
+				auto LeftNewNodeIndex = CreatOneNode(AstNodeList[NewNodePtr->LeftNodeIndex]->Tag);
+				NodeMap.insert(make_pair(NewNodePtr->LeftNodeIndex, LeftNewNodeIndex));
+				Stack.push_back(NewNodePtr->LeftNodeIndex);
+			}
+			else
+			{
+				NewNodePtr->LeftNodeIndex = NodeMap[NewNodePtr->RightNodeIndex];
+			}
+		}
+	}
 	AstNode* GetAst()
 	{
 		return AstNodeList[AstStack.back()];
@@ -1046,7 +1266,7 @@ private:
 
 		CreatCompleteNode();
 	};
-	//Repeat "{" RepeatRight RepeatEnd
+	//Repeat "{" RepeatRight "}"
 	void Production21(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
@@ -1065,6 +1285,7 @@ private:
 		}
 	};
 	//Repeat "*"
+
 	void Production22(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
@@ -1074,70 +1295,29 @@ private:
 		CharSetRange.second = INT_MAX;
 		CreatRepeatNode(CharSetRange, GreedyType::Greedy);
 	};
-	//Repeat "*?"
+	//Repeat "+"
+
 	void Production23(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
 		pair<int, int>CharSetRange;
-		CharSetRange.first = 0;
+		CharSetRange.first = 1;
 		CharSetRange.second = INT_MAX;
-		CreatRepeatNode(CharSetRange, GreedyType::UnGreedy);
+		CreatRepeatNode(CharSetRange, GreedyType::Greedy);
 	};
-	//Repeat "+?"
+	//Repeat "?"
 	void Production24(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
 		pair<int, int>CharSetRange;
-		CharSetRange.first = 1;
-		CharSetRange.second = INT_MAX;
-		CreatRepeatNode(CharSetRange, GreedyType::UnGreedy);
-	};
-	//Repeat "+"
-	void Production25(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
-	{
-		NewNode = shared_ptr<Property>(new Property());
-
-		pair<int, int>CharSetRange;
-		CharSetRange.first = 1;
-		CharSetRange.second = INT_MAX;
-		CreatRepeatNode(CharSetRange, GreedyType::Greedy);
-	};
-	//Repeat "??"
-	void Production26(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
-	{
-		NewNode = shared_ptr<Property>(new Property());
-
-		pair<int, int>CharSetRange;
-		CharSetRange.first = 0;
-		CharSetRange.second = 1;
-		CreatRepeatNode(CharSetRange, GreedyType::UnGreedy);
-	};
-	//Repeat "?"
-	void Production27(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
-	{
-		NewNode = shared_ptr<Property>(new Property());
-
-		pair<int, int>CharSetRange;
 		CharSetRange.first = 0;
 		CharSetRange.second = 1;
 		CreatRepeatNode(CharSetRange, GreedyType::Greedy);
-	};
-	//RepeatEnd "}"
-	void Production28(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
-	{
-		NewNode = shared_ptr<Property>(new Property());
-		NewNode->Val = "}";
-	};
-	//RepeatEnd "}?"
-	void Production29(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
-	{
-		NewNode = shared_ptr<Property>(new Property());
-		NewNode->Val = "}?";
 	};
 	//RepeatRight SumNumber
-	void Production30(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production25(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
@@ -1146,7 +1326,7 @@ private:
 		CreatRepeatNode(CharSetRange);
 	};
 	//RepeatRight SumNumber "," SumNumber
-	void Production31(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production26(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
@@ -1156,21 +1336,21 @@ private:
 		CreatRepeatNode(CharSetRange);
 	};
 	//SumNumber NumberChar SumNumber
-	void Production32(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production27(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
 		NewNode->Val = CatchStack[CatchStack.size() - 2]->Val + CatchStack[CatchStack.size() - 1]->Val;
 	};
 	//Term  Factor Term
-	void Production33(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production28(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 
 		SetupTwoChild(new Link(AstTag::Link, -1, -1, 0));
 	};
 	//Term Factor
-	void Production34(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
+	void Production29(vector<shared_ptr<Property>>& CatchStack, int StreamIndex, vector<shared_ptr<RegexToken>>& TokenStream)
 	{
 		NewNode = shared_ptr<Property>(new Property());
 	};
@@ -1206,8 +1386,33 @@ private:
 	int IncreaseIndex = 1;
 	vector<AstNode*>AstNodeList;
 	vector<int>AstStack;
+
 	//<DataMember>
 
 	//AST¸ù½Úµã
 	//	shared_ptr<Property> AstRootNode;
 };
+void Link::AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+{
+	Parse.AdjustAst(this, CurrentIndex, NodeMap, Stack);
+}
+void ChoseSymbol::AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+{
+	Parse.AdjustAst(this, CurrentIndex, NodeMap, Stack);
+}
+void Repeat::AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+{
+	Parse.AdjustAst(this, CurrentIndex, NodeMap, Stack);
+}
+void CharSet::AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+{
+	Parse.AdjustAst(this, CurrentIndex, NodeMap, Stack);
+}
+void Nullable::AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+{
+	Parse.AdjustAst(this, CurrentIndex, NodeMap, Stack);
+}
+void NormalChar::AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
+{
+	Parse.AdjustAst(this, CurrentIndex, NodeMap, Stack);
+}

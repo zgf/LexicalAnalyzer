@@ -19,9 +19,10 @@ public:
 	virtual void VisitSpecNode(ChoseSymbol* NodePtr, int CurrentIndex) = 0;
 	virtual void VisitSpecNode(CharSet* NodePtr, int CurrentIndex) = 0;
 	virtual void VisitSpecNode(StringTail* NodePtr, int CurrentIndex) = 0;
+	virtual void VisitSpecNode(Nullable* NodePtr, int CurrentIndex) = 0;
+
 	virtual  ~FA()
 	{
-
 	}
 };
 
@@ -38,7 +39,7 @@ private:
 	AstNode* AstRoot;
 	int AstRootIndex;
 	vector<AstNode*>AstNodeList;
-	
+
 	//nfa接受状态的index.
 	int AcceptStautsIndex;
 	//nfa 开始状态的index
@@ -55,6 +56,7 @@ public:
 	~NFA()
 	{
 	}
+
 private:
 	void initNFAStuats()
 	{
@@ -83,19 +85,17 @@ private:
 	}
 	void CreatNFA(Repeat* NodePtr, int CurrentIndex)
 	{
-
 		auto StartIndex = CreatOneNode();
 		auto EndIndex = CreatOneNode();
 		//获取重复次数
 		auto& StartNumber = NodePtr->RepeatNumber.first;
 		auto& EndNumber = NodePtr->RepeatNumber.second;
 		//获得是不是贪婪匹配
-		GreedyType IsGreedy = NodePtr->Greedy;
-
+		//GreedyType IsGreedy = NodePtr->Greedy;
 		auto ChildStauts = NfaNodeMap[NodePtr->LeftNodeIndex];
 		vector<pair<int, int>>NewStautsList;
 		NewStautsList.push_back(ChildStauts);
-		if (EndNumber == INT_MAX)
+		if(EndNumber == INT_MAX)
 		{
 			for(size_t i = 1; i <= StartNumber; i++)
 			{
@@ -106,7 +106,6 @@ private:
 		else if(EndNumber == 0)
 		{
 			abort();
-
 		}
 		else
 		{
@@ -127,7 +126,6 @@ private:
 			{
 				for(auto Index = StartNumber - 1; Index <= EndNumber - 1; Index++)
 				{
-
 					auto CurrentNodePtr = GetNfaNodePtr(NewStautsList[Index].second);
 					CurrentNodePtr->NullNextMap.insert(EndIndex);
 				}
@@ -138,7 +136,6 @@ private:
 			GetNfaNodePtr(NewStautsList[i].second)->NullNextMap.insert(NewStautsList[i + 1].first);
 		}
 		GetNfaNodePtr(StartIndex)->NullNextMap.insert(NewStautsList.front().first);
-		
 	}
 	void CreatNFA(NormalChar* NodePtr, int CurrentIndex)
 	{
@@ -166,24 +163,27 @@ private:
 		GetNfaNodePtr(RightIndexPair.second)->NullNextMap.insert(EndIndex);
 		this->NfaNodeMap.insert(make_pair(CurrentIndex, pair<int, int>(StartIndex, EndIndex)));
 	}
+	void CreatNFA(Nullable* NodePtr, int CurrentIndex)
+	{
+	}
 	void CreatNFA(CharSet* NodePtr, int CurrentIndex)
 	{
 		auto StartIndex = CreatOneNode();
 		auto EndIndex = CreatOneNode();
 		auto StartNodePtr = GetNfaNodePtr(StartIndex);
-		for(auto Iter = NodePtr->CharSetRange.begin(); Iter != NodePtr->CharSetRange.end();Iter++)
+		for(auto Iter = NodePtr->CharSetRange.begin(); Iter != NodePtr->CharSetRange.end(); Iter++)
 		{
-			if (Iter->first == Iter->second)
+			if(Iter->first == Iter->second)
 			{
 				//说明是单个字符
 				StartNodePtr->NextMap.insert(make_pair(CharMap[Iter->first], EndIndex));
 			}
 			else
 			{
-				for(int i = Iter->first; i <= Iter->second;i++)
+				for(int i = Iter->first; i <= Iter->second; i++)
 				{
 					auto FindIter = StartNodePtr->NextMap.find(CharMap[i]);
-					if (FindIter == StartNodePtr->NextMap.end())
+					if(FindIter == StartNodePtr->NextMap.end())
 					{
 						StartNodePtr->NextMap.insert(make_pair(CharMap[i], EndIndex));
 					}
@@ -228,7 +228,7 @@ private:
 		return AstNodeList[CurrentIndex]->RightNodeIndex != -1;
 	}
 	//拷贝一个NFA状态图子图的结构
-	pair<int,int> CreatIsomorphismGraph(pair<int,int>StautsSet)
+	pair<int, int> CreatIsomorphismGraph(pair<int, int>StautsSet)
 	{
 		//老新节点映射
 		map<int, int> StautsMap;
@@ -307,7 +307,10 @@ public:
 	{
 		CreatNFA(NodePtr, CurrentIndex);
 	}
-
+	void VisitSpecNode(Nullable* NodePtr, int CurrentIndex)
+	{
+		CreatNFA(NodePtr, CurrentIndex);
+	}
 };
 class DFA :public FA
 {
@@ -323,6 +326,7 @@ public:
 	DFA(vector<int>& tCharMap, AstNode* tAstRoot, int Index, vector<AstNode*>& tAstNodeList) :CharMap(tCharMap), AstRoot(tAstRoot), AstRootIndex(Index), AstNodeList(tAstNodeList)
 	{
 		initFigureMap(AstRootIndex);
+
 	}
 	DFA() = delete;
 	~DFA()
@@ -331,6 +335,7 @@ public:
 
 	void CreatDFA(Repeat* NodePtr, int CurrentIndex)
 	{
+		cout << "CreatDFA(Repeat* NodePtr, int CurrentIndex)" << endl;
 		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
 		FigureNode Figure;
 		auto CurrentNodePtr = dynamic_cast<Repeat*>( AstNodeList[CurrentIndex] );
@@ -344,8 +349,6 @@ public:
 		auto& EndNumber = NodePtr->RepeatNumber.second;
 		//获得是不是贪婪匹配
 		GreedyType IsGreedy = NodePtr->Greedy;
-
-
 
 		if(LeftNodeIter != FirgueMap.end())
 		{
@@ -373,18 +376,57 @@ public:
 	}
 	void CreatDFA(NormalChar* NodePtr, int CurrentIndex)
 	{
-		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
-
+		cout << "CreatDFA(NormalChar* NodePtr, int CurrentIndex)" << endl;
+		FigureNode Figure;
+		Figure.Nullable = false;
+		Figure.FirstPos.insert(CurrentIndex);
+		Figure.LastPos.insert(CurrentIndex);
+		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
 	void CreatDFA(Link* NodePtr, int CurrentIndex)
 	{
-		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
+		cout << " CreatDFA(Link* NodePtr, int CurrentIndex)" << endl;
+		FigureNode Figure;
 		auto LeftIndex = AstNodeList[CurrentIndex]->LeftNodeIndex;
 		auto RightIndex = AstNodeList[CurrentIndex]->RightNodeIndex;
+		auto& FindLeftIter = FirgueMap.find(LeftIndex);
+		auto& FindRightIter = FirgueMap.find(RightIndex);
+		if(FindLeftIter != FirgueMap.end() && FindRightIter != FirgueMap.end())
+		{
+			auto& LeftFigure = FindLeftIter->second;
+			auto& RightFigure = FindRightIter->second;
+			Figure.Nullable = LeftFigure.Nullable && RightFigure.Nullable;
+			if(LeftFigure.Nullable)
+			{
+				set_union(LeftFigure.FirstPos.begin(), LeftFigure.FirstPos.end(), RightFigure.FirstPos.begin(), RightFigure.FirstPos.end(), inserter(Figure.FirstPos, Figure.FirstPos.begin()));
+			}
+			else
+			{
+				Figure.FirstPos = LeftFigure.FirstPos;
+			}
+			if(RightFigure.Nullable)
+			{
+				set_union(LeftFigure.LastPos.begin(), LeftFigure.LastPos.end(), RightFigure.LastPos.begin(), RightFigure.LastPos.end(), inserter(Figure.LastPos, Figure.LastPos.begin()));
+			}
+			else
+			{
+				Figure.LastPos = RightFigure.LastPos;
+			}
+			for(auto Iter = LeftFigure.LastPos.begin(); Iter != LeftFigure.LastPos.end(); Iter++)
+			{
+				FirgueMap[*Iter].FollowPos.insert(RightFigure.FirstPos.begin(), RightFigure.FirstPos.end());
+			}
+		}
+		else
+		{
+			abort();
+		}
+
+		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
 	void CreatDFA(ChoseSymbol* NodePtr, int CurrentIndex)
 	{
-		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
+		cout << " CreatDFA(ChoseSymbol* NodePtr, int CurrentIndex)"<<endl;
 		FigureNode Figure;
 		auto LeftIndex = AstNodeList[CurrentIndex]->LeftNodeIndex;
 		auto RightIndex = AstNodeList[CurrentIndex]->RightNodeIndex;
@@ -408,7 +450,8 @@ public:
 	}
 	void CreatDFA(CharSet* NodePtr, int CurrentIndex)
 	{
-		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
+		cout << " CreatDFA(CharSet* NodePtr, int CurrentIndex)" << endl;
+
 		FigureNode Figure;
 		Figure.Nullable = false;
 		Figure.FirstPos.insert(CurrentIndex);
@@ -417,60 +460,58 @@ public:
 	}
 	void CreatDFA(StringTail* NodePtr, int CurrentIndex)
 	{
+		cout << "CreatDFA(StringTail* NodePtr, int CurrentIndex)" << endl;
+
 		FigureNode Figure;
 		AcceptIndex = CurrentIndex;
-		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
 		Figure.Nullable = false;
 		Figure.FirstPos.insert(CurrentIndex);
 		Figure.LastPos.insert(CurrentIndex);
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-
-
-
+	void CreatDFA(Nullable* NodePtr, int CurrentIndex)
+	{
+		cout << "CreatDFA(Nullable* NodePtr, int CurrentIndex)" << endl;
+		FigureNode Figure;
+		Figure.Nullable = true;
+		FirgueMap.insert(make_pair(CurrentIndex, Figure));
+	}
 
 	void VisitSpecNode(Repeat* NodePtr, int CurrentIndex)
 	{
-
+		//先调整子树结构
+		// Old节点到新节点的映射
+		/*map<int, int> NodeMap;
+		vector<int>Stack;
+		Stack.push_back(NodePtr->LeftNodeIndex);*/
+		CreatDFA(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(NormalChar* NodePtr, int CurrentIndex)
 	{
+		CreatDFA(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(Link* NodePtr, int CurrentIndex)
 	{
+		CreatDFA(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(ChoseSymbol* NodePtr, int CurrentIndex)
 	{
+		CreatDFA(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(CharSet* NodePtr, int CurrentIndex)
 	{
+		CreatDFA(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(StringTail* NodePtr, int CurrentIndex)
 	{
+		CreatDFA(NodePtr, CurrentIndex);
 	}
-
+	void VisitSpecNode(Nullable* NodePtr, int CurrentIndex)
+	{
+		CreatDFA(NodePtr, CurrentIndex);
+	}
 
 private:
-
-	/*void TraversalAst(int CurrentIndex,map<int,FigureNode>&FirgueMap,function<void()>& Functor)
-	{
-	int CurrentIndex = AstRootIndex;
-	if(CurrentIndex == -1)
-	{
-	return;
-	}
-
-	if(HasLeftNode(CurrentIndex))
-	{
-	TraversalAst(AstNodeList[CurrentIndex]->LeftNodeIndex, FirgueMap,Functor);
-	}
-	if(HasRightNode(CurrentIndex))
-	{
-	TraversalAst(AstNodeList[CurrentIndex]->RightNodeIndex, FirgueMap,Functor);
-	}
-	Functor();
-	}*/
-
 
 	void initFigureMap(int CurrentIndex)
 	{
@@ -510,6 +551,10 @@ void AstNode::Accept(FA& Dfa, int CurrentIndex)
 	abort();
 }
 void Repeat::Accept(FA& Dfa, int CurrentIndex)
+{
+	Dfa.VisitSpecNode(this, CurrentIndex);
+}
+void Nullable::Accept(FA& Dfa, int CurrentIndex)
 {
 	Dfa.VisitSpecNode(this, CurrentIndex);
 }

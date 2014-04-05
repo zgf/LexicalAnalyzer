@@ -205,8 +205,7 @@ public:
 	}
 };
 
-int a = 0;
-class DFA;
+class FA;
 
 enum class AstTag
 {
@@ -237,7 +236,7 @@ public:
 	{
 	}
 public:
-	virtual void Accept(DFA& Dfa, int CurrentIndex) = 0;
+	virtual void Accept(FA& Dfa, int CurrentIndex) = 0;
 };
 class NormalChar :public AstNode
 {
@@ -253,7 +252,7 @@ public:
 	~NormalChar()
 	{
 	}
-	void Accept(DFA& Dfa, int CurrentIndex);
+	void Accept(FA& Dfa, int CurrentIndex);
 };
 enum class OppsType
 {
@@ -277,7 +276,7 @@ public:
 	~CharSet()
 	{
 	}
-	void Accept(DFA& Dfa, int CurrentIndex);
+	void Accept(FA& Dfa, int CurrentIndex);
 };
 enum  class GreedyType
 {
@@ -300,7 +299,7 @@ public:
 	~Repeat()
 	{
 	}
-	void Accept(DFA& Dfa, int CurrentIndex);
+	void Accept(FA& Dfa, int CurrentIndex);
 };
 
 class ChoseSymbol :public AstNode
@@ -316,7 +315,7 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
 	{
 	}
-	void Accept(DFA& Dfa, int CurrentIndex);
+	void Accept(FA& Dfa, int CurrentIndex);
 };
 class StringTail : public AstNode
 {
@@ -331,7 +330,7 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
 	{
 	}
-	void Accept(DFA& Dfa, int CurrentIndex);
+	void Accept(FA& Dfa, int CurrentIndex);
 };
 class Link :public AstNode
 {
@@ -346,7 +345,7 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
 	{
 	}
-	void Accept(DFA& Dfa, int CurrentIndex);
+	void Accept(FA& Dfa, int CurrentIndex);
 };
 //<Global>
 class RegexParse
@@ -429,7 +428,6 @@ private:
 	void initSemanticMap()
 	{
 		SemanticActionMap.insert(make_pair(0, bind(&RegexParse::Production0, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
-
 		SemanticActionMap.insert(make_pair(1, bind(&RegexParse::Production1, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(2, bind(&RegexParse::Production2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
 		SemanticActionMap.insert(make_pair(3, bind(&RegexParse::Production3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
@@ -795,7 +793,6 @@ public:
 					{
 						cout << "规约成功!";
 						//AstRootNode = CatchStack.back();
-					//	stringTail没有被push进去
 						AstStack;
 						AstNodeList;
 						return true;

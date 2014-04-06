@@ -322,20 +322,72 @@ private:
 	vector<AstNode*>AstNodeList;
 	//接受状态的index.
 	int AcceptIndex;
+
+	unordered_map<string, unordered_map<int, string>>DfaMap;
+	string DfaStart;
+	set<string> DfaEnd;
 public:
+
+	//打印 DfaMap;
+	void PrintDfaMap()
+	{
+		cout << "DfaMap:" << endl;
+		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end();Iter++)
+		{
+			cout << "Stauts: \""<<Iter->first<<"\""<<endl;
+			cout << "Jump:";
+			for(auto JumpIter = Iter->second.begin(); JumpIter != Iter->second.end();JumpIter++)
+			{
+				cout << JumpIter->first << " \"" << JumpIter->second<<"\""<<endl;
+			}
+		}
+	}
+
 	DFA(vector<int>& tCharMap, AstNode* tAstRoot, int Index, vector<AstNode*>& tAstNodeList) :CharMap(tCharMap), AstRoot(tAstRoot), AstRootIndex(Index), AstNodeList(tAstNodeList)
 	{
 		initFigureMap(AstRootIndex);
-
+		CreatDFA();
+		PrintDfaMap();
+		/*auto AcceptStr = to_string(AcceptIndex);
+		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end();Iter = DfaMap.upper_bound(Iter->first))
+		{
+		if(Iter->first.find(AcceptStr) != Iter->first.npos)
+		{
+		DfaEnd.insert(Iter->first);
+		}
+		}*/
 	}
 	DFA() = delete;
 	~DFA()
 	{
 	}
-
-	void CreatDFA(Repeat* NodePtr, int CurrentIndex)
+	bool RunDfa(string& Text)
 	{
-		cout << "CreatDFA(Repeat* NodePtr, int CurrentIndex)" << endl;
+		string End = to_string(AcceptIndex);
+		auto CurrentStauts = DfaStart;
+		for(auto j = 0; j < Text.size(); j++)
+		{
+			for(auto i = j; i < Text.size(); i++)
+			{
+				if(DfaMap[CurrentStauts].find(CharMap[Text[i]]) == DfaMap[CurrentStauts].end())
+				{
+					i = Text.size();
+				}
+				else
+				{
+					CurrentStauts = DfaMap[CurrentStauts][CharMap[Text[i]]];
+				}
+				if(CurrentStauts.find(End) != CurrentStauts.npos)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	void FigureNodeProperty(Repeat* NodePtr, int CurrentIndex)
+	{
+		cout << "FigureNodeProperty(Repeat* NodePtr, int CurrentIndex)" << endl;
 		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
 		FigureNode Figure;
 		auto CurrentNodePtr = dynamic_cast<Repeat*>( AstNodeList[CurrentIndex] );
@@ -374,18 +426,18 @@ public:
 		}
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-	void CreatDFA(NormalChar* NodePtr, int CurrentIndex)
+	void FigureNodeProperty(NormalChar* NodePtr, int CurrentIndex)
 	{
-		cout << "CreatDFA(NormalChar* NodePtr, int CurrentIndex)" << endl;
+		cout << "FigureNodeProperty(NormalChar* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		Figure.Nullable = false;
 		Figure.FirstPos.insert(CurrentIndex);
 		Figure.LastPos.insert(CurrentIndex);
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-	void CreatDFA(Link* NodePtr, int CurrentIndex)
+	void FigureNodeProperty(Link* NodePtr, int CurrentIndex)
 	{
-		cout << " CreatDFA(Link* NodePtr, int CurrentIndex)" << endl;
+		cout << " FigureNodeProperty(Link* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		auto LeftIndex = AstNodeList[CurrentIndex]->LeftNodeIndex;
 		auto RightIndex = AstNodeList[CurrentIndex]->RightNodeIndex;
@@ -424,9 +476,9 @@ public:
 
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-	void CreatDFA(ChoseSymbol* NodePtr, int CurrentIndex)
+	void FigureNodeProperty(ChoseSymbol* NodePtr, int CurrentIndex)
 	{
-		cout << " CreatDFA(ChoseSymbol* NodePtr, int CurrentIndex)"<<endl;
+		cout << " FigureNodeProperty(ChoseSymbol* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		auto LeftIndex = AstNodeList[CurrentIndex]->LeftNodeIndex;
 		auto RightIndex = AstNodeList[CurrentIndex]->RightNodeIndex;
@@ -448,9 +500,9 @@ public:
 		}
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-	void CreatDFA(CharSet* NodePtr, int CurrentIndex)
+	void FigureNodeProperty(CharSet* NodePtr, int CurrentIndex)
 	{
-		cout << " CreatDFA(CharSet* NodePtr, int CurrentIndex)" << endl;
+		cout << " FigureNodeProperty(CharSet* NodePtr, int CurrentIndex)" << endl;
 
 		FigureNode Figure;
 		Figure.Nullable = false;
@@ -458,9 +510,9 @@ public:
 		Figure.LastPos.insert(CurrentIndex);
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-	void CreatDFA(StringTail* NodePtr, int CurrentIndex)
+	void FigureNodeProperty(StringTail* NodePtr, int CurrentIndex)
 	{
-		cout << "CreatDFA(StringTail* NodePtr, int CurrentIndex)" << endl;
+		cout << "FigureNodeProperty(StringTail* NodePtr, int CurrentIndex)" << endl;
 
 		FigureNode Figure;
 		AcceptIndex = CurrentIndex;
@@ -469,9 +521,9 @@ public:
 		Figure.LastPos.insert(CurrentIndex);
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
 	}
-	void CreatDFA(Nullable* NodePtr, int CurrentIndex)
+	void FigureNodeProperty(Nullable* NodePtr, int CurrentIndex)
 	{
-		cout << "CreatDFA(Nullable* NodePtr, int CurrentIndex)" << endl;
+		cout << "FigureNodeProperty(Nullable* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		Figure.Nullable = true;
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));
@@ -484,35 +536,154 @@ public:
 		/*map<int, int> NodeMap;
 		vector<int>Stack;
 		Stack.push_back(NodePtr->LeftNodeIndex);*/
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(NormalChar* NodePtr, int CurrentIndex)
 	{
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(Link* NodePtr, int CurrentIndex)
 	{
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(ChoseSymbol* NodePtr, int CurrentIndex)
 	{
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(CharSet* NodePtr, int CurrentIndex)
 	{
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(StringTail* NodePtr, int CurrentIndex)
 	{
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
 	void VisitSpecNode(Nullable* NodePtr, int CurrentIndex)
 	{
-		CreatDFA(NodePtr, CurrentIndex);
+		FigureNodeProperty(NodePtr, CurrentIndex);
+	}
+	//根据figuremap内容,创建DFA
+	void CreatDFA()
+	{
+		//获取开始状态集合
+		// DtranList里面都是未标记的集合.即不再DfaMap里面
+		//unordered_map<string, unordered_map<int, int>>DfaMap;
+		list<pair<string, set<int>>> DtranList;
+		string NewDfaNodeName;
+		set<int> initSet;
+
+		for(auto& Iter = FirgueMap[AstRootIndex].FirstPos.begin(); Iter != FirgueMap[AstRootIndex].FirstPos.end(); Iter++)
+		{
+			NewDfaNodeName += to_string(*Iter);
+			initSet.insert(*Iter);
+		}
+		DtranList.push_back(pair<string, set<int>>(NewDfaNodeName, initSet));
+		DfaStart = NewDfaNodeName;
+		while(!DtranList.empty())
+		{
+			auto& CrrentDfaStauts = DtranList.front();
+			unordered_multimap<int, int> SymbolJumpList;
+			for(auto& Iter = CrrentDfaStauts.second.begin(); Iter != CrrentDfaStauts.second.end(); Iter++)
+			{
+				auto CurrentIndex = *Iter;
+				if(AstNodeList[CurrentIndex]->Tag == AstTag::CharSet)
+				{
+					CharSet* CurrentAstNode = (CharSet*)AstNodeList[*Iter];
+					GetCharSetSymbolJumpList(SymbolJumpList, CurrentAstNode, CurrentIndex);
+				}
+				else if(AstNodeList[CurrentIndex]->Tag == AstTag::NormalChar)
+				{
+					NormalChar* CurrentAstNode = (NormalChar*)AstNodeList[CurrentIndex];
+					//该键值对是否存在
+					if(!HasThisPair(SymbolJumpList, CharMap[CurrentAstNode->Val], CurrentIndex))
+					{
+						SymbolJumpList.insert(make_pair(CharMap[CurrentAstNode->Val], CurrentIndex));
+					}
+				}
+				else if(AstNodeList[CurrentIndex]->Tag == AstTag::StringTail)
+				{
+					StringTail* CurrentAstNode = (StringTail*)AstNodeList[CurrentIndex];
+					//该键值对是否存在
+					if(!HasThisPair(SymbolJumpList, CharMap[CurrentAstNode->Val], CurrentIndex))
+					{
+						SymbolJumpList.insert(make_pair(CharMap[CurrentAstNode->Val], CurrentIndex));
+					}
+				}
+			}
+			for(auto& SymbolIter = SymbolJumpList.begin(); SymbolIter != SymbolJumpList.end();)
+			{
+				auto KeyCount = SymbolJumpList.count(SymbolIter->first);
+				auto Key = SymbolIter->first;
+				set<int> FollowSet;
+				string FollowSetName;
+				for(auto i = 0; i < KeyCount; i++, SymbolIter++)
+				{
+					FollowSet.insert(FirgueMap[SymbolIter->second].FollowPos.begin(), FirgueMap[SymbolIter->second].FollowPos.end());
+				}
+				for(auto& FollowIter : FollowSet)
+				{
+					FollowSetName += to_string(FollowIter);
+				}
+
+				auto Find = DfaMap.find(CrrentDfaStauts.first);
+				if(Find == DfaMap.end())
+				{
+					unordered_map<int, string>TempMap;
+					TempMap.insert(make_pair(Key, FollowSetName));
+					DfaMap.insert(make_pair(CrrentDfaStauts.first, TempMap));
+				}
+				else
+				{
+					DfaMap[CrrentDfaStauts.first].insert(make_pair(Key, FollowSetName));
+				}
+
+				auto& FindIter = DfaMap.find(FollowSetName);
+				if(FindIter == DfaMap.end())
+				{
+					DtranList.push_back(pair<string, set<int>>(FollowSetName, FollowSet));
+				}
+			}
+			DtranList.pop_front();
+		}
 	}
 
 private:
 
+	bool HasThisPair(unordered_multimap<int, int>& SymbolJumpList, int Key, int Value)
+	{
+		auto& Range = SymbolJumpList.equal_range(Key);
+		for(; Range.first != Range.second; Range.first++)
+		{
+			if(Range.first->second == Value)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	void GetCharSetSymbolJumpList(unordered_multimap<int, int>& SymbolJumpList, CharSet* CurrentAstNode, int CurrentIndex)
+	{
+		for(auto& RangeIter = CurrentAstNode->CharSetRange.begin(); RangeIter != CurrentAstNode->CharSetRange.end(); RangeIter++)
+		{
+			if(RangeIter->first == RangeIter->second)
+			{
+				if(!HasThisPair(SymbolJumpList, CharMap[RangeIter->first], CurrentIndex))
+				{
+					SymbolJumpList.insert(make_pair(CharMap[RangeIter->first], CurrentIndex));
+				}
+			}
+			else
+			{
+				for(auto i = RangeIter->first; i <= RangeIter->second; i++)
+				{
+					if(!HasThisPair(SymbolJumpList, CharMap[i], CurrentIndex))
+					{
+						SymbolJumpList.insert(make_pair(CharMap[i], CurrentIndex));
+					}
+				}
+			}
+		}
+	}
 	void initFigureMap(int CurrentIndex)
 	{
 		if(CurrentIndex == -1)

@@ -1,0 +1,6 @@
+DfaMap:
+Stauts: "5"
+Jump:0 "6"
+5 "6"
+Stauts: "6"
+Jump:5 ""

@@ -24,19 +24,19 @@ int main()
 	// 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+?dd)", "dsnbs");
 	//
 	auto start = clock();
-	/*TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
+	TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
 	TestRegex("[a-znb]*|1", "1");
 
 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "abca");
-	TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "abcbbdd");
+	
 	TestRegex("a*", "aaaa");
 	TestRegex("ba*", "b");
 	TestRegex("a+", "a");
-	TestRegex("a+", "aaaa");*/
-	//TestRegex("[^a-zA]", "C");
+	TestRegex("a+", "aaaa");
+	
 	TestRegex("[^a-z]", "b");
-
-	/*TestRegex("a?", "aa");
+	TestRegex("[a-zAB]{4,5}|ab(c[a\\b]|cb+dd)", "abcbbdd");
+	TestRegex("a?", "aa");
 	TestRegex("ba?", "b");
 	TestRegex("b|a", "b");
 	TestRegex("[a-zA]", "A");
@@ -50,7 +50,8 @@ int main()
 	TestRegex("[a-z]", "b");
 	TestRegex("[ABVD]", "D");
 	TestRegex("(c|b)|a", "ba");
-	TestRegex("(c|b)|a", "ca");*/
+	TestRegex("(c|b)|a", "ca");
+	TestRegex("[^a-zA]", "C");
 	auto end = clock();
 	cout << (double)start - end;
 	int a = 0;

@@ -1,5 +1,7 @@
 #pragma once
 #include "RegexParse.h"
+#include <fstream>
+using std::ofstream;
 class FigureNode
 {
 public:
@@ -332,14 +334,15 @@ public:
 	//打印 DfaMap;
 	void PrintDfaMap()
 	{
-		//cout << "DfaMap:" << endl;
+		ofstream OutPut("info.txt");
+		OutPut << "DfaMap:" << std::endl;
 		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end();Iter++)
 		{
-			//cout << "Stauts: \""<<Iter->first<<"\""<<endl;
-			//cout << "Jump:";
+			OutPut << "Stauts: \"" << Iter->first << "\"" << std::endl;
+			OutPut << "Jump:";
 			for(auto JumpIter = Iter->second.begin(); JumpIter != Iter->second.end();JumpIter++)
 			{
-				//cout << JumpIter->first << " \"" << JumpIter->second<<"\""<<endl;
+				OutPut << JumpIter->first << " \"" << JumpIter->second << "\"" << std::endl;
 			}
 		}
 	}
@@ -348,6 +351,7 @@ public:
 	{
 		initFigureMap(AstRootIndex);
 		CreatDFA();
+		PrintDfaMap();
 	}
 	DFA() = delete;
 	~DFA()
@@ -554,27 +558,42 @@ public:
 	{
 		FigureNodeProperty(NodePtr, CurrentIndex);
 	}
+	
+	unordered_map<int,string> initToStringMap()
+	{
+		unordered_map<int, string> IndexToString;
+		//创建figureMap的key名到string的映射
+		for(auto& Iter = FirgueMap.begin(); Iter != FirgueMap.end(); Iter = FirgueMap.upper_bound(Iter->first))
+		{
+			IndexToString.insert(make_pair(Iter->first,to_string(Iter->first)));
+		}
+		return std::move(IndexToString);
+	}
 	//根据figuremap内容,创建DFA
 	void CreatDFA()
 	{
 		//获取开始状态集合
 		// DtranList里面都是未标记的集合.即不再DfaMap里面
 		//unordered_map<string, unordered_map<int, int>>DfaMap;
+		auto IndexToString = initToStringMap();
 		list<pair<string, set<int>>> DtranList;
 		string NewDfaNodeName;
 		set<int> initSet;
 
 		for(auto& Iter = FirgueMap[AstRootIndex].FirstPos.begin(); Iter != FirgueMap[AstRootIndex].FirstPos.end(); Iter++)
 		{
-			NewDfaNodeName += to_string(*Iter);
+			NewDfaNodeName += IndexToString[*Iter];
 			initSet.insert(*Iter);
 		}
 		DtranList.push_back(pair<string, set<int>>(NewDfaNodeName, initSet));
 		DfaStart = NewDfaNodeName;
+		unordered_multimap<int, int> SymbolJumpList;
+		//标记数组
+		set<string> SignSet;
+		SignSet.insert(NewDfaNodeName);
 		while(!DtranList.empty())
 		{
 			auto& CrrentDfaStauts = DtranList.front();
-			unordered_multimap<int, int> SymbolJumpList;
 			for(auto& Iter = CrrentDfaStauts.second.begin(); Iter != CrrentDfaStauts.second.end(); Iter++)
 			{
 				auto CurrentIndex = *Iter;
@@ -615,7 +634,7 @@ public:
 				}
 				for(auto& FollowIter : FollowSet)
 				{
-					FollowSetName += to_string(FollowIter);
+					FollowSetName += IndexToString[FollowIter];
 				}
 
 				auto Find = DfaMap.find(CrrentDfaStauts.first);
@@ -631,15 +650,23 @@ public:
 				}
 
 				auto& FindIter = DfaMap.find(FollowSetName);
-				if(FindIter == DfaMap.end())
+				auto& FindSet = SignSet.find(FollowSetName);
+				if(FindIter == DfaMap.end() && FindSet == SignSet.end())
 				{
-					DtranList.push_back(pair<string, set<int>>(FollowSetName, FollowSet));
+					DtranList.emplace_back(pair<string, set<int>>(FollowSetName, FollowSet));
+					SignSet.insert(FollowSetName);
 				}
+				
 			}
 			DtranList.pop_front();
+			SymbolJumpList.clear();
 		}
 	}
+	//最小化DFA
+	void MinningDfa()
+	{
 
+	}
 private:
 	//是否已经存在了这个pair
 	bool HasThisPair(unordered_multimap<int, int>& SymbolJumpList, int Key, int Value)

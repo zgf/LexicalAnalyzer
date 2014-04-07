@@ -734,7 +734,7 @@ private:
 			if(result == -1)
 			{
 				LR1ItemSet[TargetIndex].NextStauts.insert(make_pair(KeyIter->first, LR1ItemSet.size()));
-				LR1ItemSet.push_back(CurrentStauts);
+				LR1ItemSet.emplace_back(move(CurrentStauts));
 			}
 			else
 			{

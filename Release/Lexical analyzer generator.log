@@ -1,4 +1,4 @@
-﻿生成启动时间为 4/7/2014 5:08:02 PM。
+﻿生成启动时间为 4/7/2014 9:24:46 PM。
      1>项目“F:\MyProjects\编译器工具集\Lexical analyzer generator\Lexical analyzer generator\Lexical analyzer generator.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /Zi /nologo /W3 /WX- /sdl /O2 /Oi /Oy- /GL /D _MBCS /Gm- /EHsc /MD /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Release\\" /Fd"Release\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
@@ -15,16 +15,16 @@
      1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(749): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(765): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(789): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(808): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(979): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(995): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(1142): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(100): warning C4018: “<=”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(112): warning C4018: “<=”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(134): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(360): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(362): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(612): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(809): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(982): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(998): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexParse.h(1145): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(102): warning C4018: “<=”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(114): warning C4018: “<=”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(136): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(364): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(366): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\RegexDFA.h(628): warning C4018: “<”: 有符号/无符号不匹配
        Link:
          E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\MyProjects\编译器工具集\Lexical analyzer generator\Release\Lexical analyzer generator.exe" /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\MyProjects\编译器工具集\Lexical analyzer generator\Release\Lexical analyzer generator.pdb" /OPT:REF /OPT:ICF /LTCG /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\MyProjects\编译器工具集\Lexical analyzer generator\Release\Lexical analyzer generator.lib" /MACHINE:X86 /SAFESEH Release\CodeGenComplier.obj
          Release\LexConfigTemplate.obj
@@ -36,4 +36,4 @@
 
 生成成功。
 
-已用时间 00:00:09.22
+已用时间 00:00:11.73

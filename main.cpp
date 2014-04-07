@@ -6,15 +6,15 @@ void TestRegex(const char* tPattern,const char* tText)
 	LexParse Lex(Pattern);
 	RegexParse Parse;
 	Parse.ParsingRegex(Lex.TokenStream);
-	DFA DfaMachine(Parse.GetCharMap(), Parse.GetAst(), Parse.GetAstRootIndex(), Parse.GetAstNodeList());
+	DFA DfaMachine(Parse.GetCharMap(), Parse.GetAst(), Parse.GetAstRootIndex(), Parse.GetAstNodeList(),Parse.GetCharEndIndex());
 	string Text(tText);
 	if(DfaMachine.RunDfa(Text) == true)
 	{
-	//	cout << Pattern << "测试通过" << endl;
+		cout << Pattern << "测试通过" << endl;
 	}
 	else
 	{
-	//	cout << Pattern << "测试不通过" << endl;
+		cout << Pattern << "测试不通过" << endl;
 	}
 }
 
@@ -24,7 +24,7 @@ int main()
 	// 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+?dd)", "dsnbs");
 	//
 	auto start = clock();
-	TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
+	/*TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
 	TestRegex("[a-znb]*|1", "1");
 
 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+dd)", "abca");
@@ -32,7 +32,10 @@ int main()
 	TestRegex("a*", "aaaa");
 	TestRegex("ba*", "b");
 	TestRegex("a+", "a");
-	TestRegex("a+", "aaaa");
+	TestRegex("a+", "aaaa");*/
+	//TestRegex("[^a-zA]", "C");
+	TestRegex("[^a-z]", "b");
+
 	/*TestRegex("a?", "aa");
 	TestRegex("ba?", "b");
 	TestRegex("b|a", "b");

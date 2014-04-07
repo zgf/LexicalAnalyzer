@@ -271,14 +271,14 @@ private:
 	{
 		ReStartIndex += 1;
 
-		if(StackList.back() == RuleToTagList[string("[")])
-		{
+		/*if(StackList.back() == RuleToTagList[string("[")])
+		{*/
 			return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::CharSetComponent, CatchContent, ReStartIndex - 1)));
-		}
-		else
+		//}
+	/*	else
 		{
 			return std::move(shared_ptr<RegexToken>(new RegexToken(LexTag::OtherChar, CatchContent, ReStartIndex - 1)));
-		}
+		}*/
 	}
 	bool CheckStringHead(int ReStartIndex)
 	{

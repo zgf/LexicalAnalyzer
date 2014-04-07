@@ -1,6 +1,6 @@
 #pragma once
 #include "RegexDFA.h"
-/*要支持取反字符集*/
+/*要支持取反字符集*/ //FINISH
 /*DFA状态最小化*/
 /*错误处理*/
 /*要做cpp 和h文件分离*/

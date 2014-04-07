@@ -323,9 +323,10 @@ private:
 	//接受状态的index.
 	int AcceptIndex;
 
+	//CharMap的最后一个索引
+	int CharEndIndex;
 	unordered_map<string, unordered_map<int, string>>DfaMap;
 	string DfaStart;
-	set<string> DfaEnd;
 public:
 
 	//打印 DfaMap;
@@ -343,7 +344,7 @@ public:
 		}
 	}
 
-	DFA(vector<int>& tCharMap, AstNode* tAstRoot, int Index, vector<AstNode*>& tAstNodeList) :CharMap(tCharMap), AstRoot(tAstRoot), AstRootIndex(Index), AstNodeList(tAstNodeList)
+	DFA(vector<int>& tCharMap, AstNode* tAstRoot, int Index, vector<AstNode*>& tAstNodeList, int tCharEndIndex) :CharMap(tCharMap), AstRoot(tAstRoot), AstRootIndex(Index), AstNodeList(tAstNodeList), CharEndIndex(tCharEndIndex)
 	{
 		initFigureMap(AstRootIndex);
 		CreatDFA();
@@ -581,6 +582,7 @@ public:
 				{
 					CharSet* CurrentAstNode = (CharSet*)AstNodeList[*Iter];
 					GetCharSetSymbolJumpList(SymbolJumpList, CurrentAstNode, CurrentIndex);
+					
 				}
 				else if(AstNodeList[CurrentIndex]->Tag == AstTag::NormalChar)
 				{
@@ -639,7 +641,7 @@ public:
 	}
 
 private:
-
+	//是否已经存在了这个pair
 	bool HasThisPair(unordered_multimap<int, int>& SymbolJumpList, int Key, int Value)
 	{
 		auto& Range = SymbolJumpList.equal_range(Key);
@@ -654,23 +656,64 @@ private:
 	}
 	void GetCharSetSymbolJumpList(unordered_multimap<int, int>& SymbolJumpList, CharSet* CurrentAstNode, int CurrentIndex)
 	{
-		for(auto& RangeIter = CurrentAstNode->CharSetRange.begin(); RangeIter != CurrentAstNode->CharSetRange.end(); RangeIter++)
+		if(CurrentAstNode->Opps == OppsType::False)
 		{
-			if(RangeIter->first == RangeIter->second)
+			for(auto& RangeIter = CurrentAstNode->CharSetRange.begin(); RangeIter != CurrentAstNode->CharSetRange.end(); RangeIter++)
 			{
-				if(!HasThisPair(SymbolJumpList, CharMap[RangeIter->first], CurrentIndex))
+				if(RangeIter->first == RangeIter->second)
 				{
-					SymbolJumpList.insert(make_pair(CharMap[RangeIter->first], CurrentIndex));
+					if(!HasThisPair(SymbolJumpList, CharMap[RangeIter->first], CurrentIndex))
+					{
+						SymbolJumpList.insert(make_pair(CharMap[RangeIter->first], CurrentIndex));
+					}
+				}
+				else
+				{
+					for(auto i = RangeIter->first; i <= RangeIter->second; i++)
+					{
+						if(!HasThisPair(SymbolJumpList, CharMap[i], CurrentIndex))
+						{
+							SymbolJumpList.insert(make_pair(CharMap[i], CurrentIndex));
+						}
+					}
 				}
 			}
-			else
+			
+		}
+		else if(CurrentAstNode->Opps == OppsType::True)
+		{
+			set<int> Temp;
+			for(auto& RangeIter = CurrentAstNode->CharSetRange.begin(); RangeIter != CurrentAstNode->CharSetRange.end(); RangeIter++)
 			{
-				for(auto i = RangeIter->first; i <= RangeIter->second; i++)
+				if(RangeIter->first == RangeIter->second)
 				{
-					if(!HasThisPair(SymbolJumpList, CharMap[i], CurrentIndex))
+					Temp.insert(CharMap[RangeIter->first]);
+				}
+				else
+				{
+					for(auto i = RangeIter->first; i <= RangeIter->second; i++)
 					{
-						SymbolJumpList.insert(make_pair(CharMap[i], CurrentIndex));
+						if (Temp.find(CharMap[i])== Temp.end())
+						{
+							Temp.insert(CharMap[i]);
+						}
 					}
+				}
+			}
+			set<int> Result;
+			for(auto i = 0; i <= CharEndIndex;i++)
+			{
+				Result.insert(i);
+			}
+			for(auto& Iter = Temp.begin(); Iter != Temp.end();Iter++)
+			{
+				Result.erase(*Iter);
+			}
+			for(auto Iter = Result.begin(); Iter != Result.end();Iter++)
+			{
+				if(!HasThisPair(SymbolJumpList, *Iter, CurrentIndex))
+				{
+					SymbolJumpList.insert(make_pair(*Iter, CurrentIndex));
 				}
 			}
 		}

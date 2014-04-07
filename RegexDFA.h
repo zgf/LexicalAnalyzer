@@ -327,6 +327,7 @@ private:
 
 	//CharMap的最后一个索引
 	int CharEndIndex;
+
 	unordered_map<string, unordered_map<int, string>>DfaMap;
 	string DfaStart;
 public:
@@ -351,7 +352,7 @@ public:
 	{
 		initFigureMap(AstRootIndex);
 		CreatDFA();
-		PrintDfaMap();
+		//PrintDfaMap();
 	}
 	DFA() = delete;
 	~DFA()
@@ -665,7 +666,7 @@ public:
 	//最小化DFA
 	void MinningDfa()
 	{
-
+		
 	}
 private:
 	//是否已经存在了这个pair

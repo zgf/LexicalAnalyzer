@@ -331,14 +331,14 @@ public:
 	//¥Ú”° DfaMap;
 	void PrintDfaMap()
 	{
-		cout << "DfaMap:" << endl;
+		//cout << "DfaMap:" << endl;
 		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end();Iter++)
 		{
-			cout << "Stauts: \""<<Iter->first<<"\""<<endl;
-			cout << "Jump:";
+			//cout << "Stauts: \""<<Iter->first<<"\""<<endl;
+			//cout << "Jump:";
 			for(auto JumpIter = Iter->second.begin(); JumpIter != Iter->second.end();JumpIter++)
 			{
-				cout << JumpIter->first << " \"" << JumpIter->second<<"\""<<endl;
+				//cout << JumpIter->first << " \"" << JumpIter->second<<"\""<<endl;
 			}
 		}
 	}
@@ -347,15 +347,6 @@ public:
 	{
 		initFigureMap(AstRootIndex);
 		CreatDFA();
-		PrintDfaMap();
-		/*auto AcceptStr = to_string(AcceptIndex);
-		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end();Iter = DfaMap.upper_bound(Iter->first))
-		{
-		if(Iter->first.find(AcceptStr) != Iter->first.npos)
-		{
-		DfaEnd.insert(Iter->first);
-		}
-		}*/
 	}
 	DFA() = delete;
 	~DFA()
@@ -387,7 +378,7 @@ public:
 	}
 	void FigureNodeProperty(Repeat* NodePtr, int CurrentIndex)
 	{
-		cout << "FigureNodeProperty(Repeat* NodePtr, int CurrentIndex)" << endl;
+		//cout << "FigureNodeProperty(Repeat* NodePtr, int CurrentIndex)" << endl;
 		auto CurrentTag = AstNodeList[CurrentIndex]->Tag;
 		FigureNode Figure;
 		auto CurrentNodePtr = dynamic_cast<Repeat*>( AstNodeList[CurrentIndex] );
@@ -428,7 +419,7 @@ public:
 	}
 	void FigureNodeProperty(NormalChar* NodePtr, int CurrentIndex)
 	{
-		cout << "FigureNodeProperty(NormalChar* NodePtr, int CurrentIndex)" << endl;
+		//cout << "FigureNodeProperty(NormalChar* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		Figure.Nullable = false;
 		Figure.FirstPos.insert(CurrentIndex);
@@ -437,7 +428,7 @@ public:
 	}
 	void FigureNodeProperty(Link* NodePtr, int CurrentIndex)
 	{
-		cout << " FigureNodeProperty(Link* NodePtr, int CurrentIndex)" << endl;
+		//cout << " FigureNodeProperty(Link* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		auto LeftIndex = AstNodeList[CurrentIndex]->LeftNodeIndex;
 		auto RightIndex = AstNodeList[CurrentIndex]->RightNodeIndex;
@@ -478,7 +469,7 @@ public:
 	}
 	void FigureNodeProperty(ChoseSymbol* NodePtr, int CurrentIndex)
 	{
-		cout << " FigureNodeProperty(ChoseSymbol* NodePtr, int CurrentIndex)" << endl;
+		//cout << " FigureNodeProperty(ChoseSymbol* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		auto LeftIndex = AstNodeList[CurrentIndex]->LeftNodeIndex;
 		auto RightIndex = AstNodeList[CurrentIndex]->RightNodeIndex;
@@ -502,7 +493,7 @@ public:
 	}
 	void FigureNodeProperty(CharSet* NodePtr, int CurrentIndex)
 	{
-		cout << " FigureNodeProperty(CharSet* NodePtr, int CurrentIndex)" << endl;
+		//cout << " FigureNodeProperty(CharSet* NodePtr, int CurrentIndex)" << endl;
 
 		FigureNode Figure;
 		Figure.Nullable = false;
@@ -512,7 +503,7 @@ public:
 	}
 	void FigureNodeProperty(StringTail* NodePtr, int CurrentIndex)
 	{
-		cout << "FigureNodeProperty(StringTail* NodePtr, int CurrentIndex)" << endl;
+		//cout << "FigureNodeProperty(StringTail* NodePtr, int CurrentIndex)" << endl;
 
 		FigureNode Figure;
 		AcceptIndex = CurrentIndex;
@@ -523,7 +514,7 @@ public:
 	}
 	void FigureNodeProperty(Nullable* NodePtr, int CurrentIndex)
 	{
-		cout << "FigureNodeProperty(Nullable* NodePtr, int CurrentIndex)" << endl;
+		//cout << "FigureNodeProperty(Nullable* NodePtr, int CurrentIndex)" << endl;
 		FigureNode Figure;
 		Figure.Nullable = true;
 		FirgueMap.insert(make_pair(CurrentIndex, Figure));

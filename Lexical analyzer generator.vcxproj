@@ -68,6 +68,7 @@
     <ClInclude Include="RegexDFA.h" />
     <ClInclude Include="RegexLexParse.h" />
     <ClInclude Include="RegexParse.h" />
+    <ClInclude Include="Test.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeGenComplier.cpp" />

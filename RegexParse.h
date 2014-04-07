@@ -486,7 +486,7 @@ private:
 	}
 private:
 	//计算项集的闭包并加入项集
-	void CreatItemClourse(vector<Triple<int, int, set<ParseTag>>>& ItemList)
+	void CreatItemClourse(vector<Triple<int, int, set<ParseTag>>>& ItemList, unordered_map<int, unordered_map<int, set<ParseTag>>>& SymbolMap)
 	{
 		for(int i = 0; i < ItemList.size(); i++)
 		{
@@ -504,7 +504,7 @@ private:
 				else
 				{
 					//有后缀就把后缀符号加入
-					TermSymbolSet = GetSymbolFirstSet(CurrentItem.first, CurrentItem.second + 1);
+					TermSymbolSet = GetSymbolFirstSet(CurrentItem.first, CurrentItem.second + 1, SymbolMap);
 				}
 
 				//在CouldExpand里面已经测试好了,肯定是非终结符号
@@ -518,7 +518,7 @@ private:
 					auto ResultIndex = HasAddThisProduct(ItemList, Iter->second, 0);
 					if(-1 == ResultIndex)
 					{
-						ItemList.push_back({Iter->second, 0, TermSymbolSet});
+						ItemList.push_back(Triple<int, int, set<ParseTag>>(Iter->second, 0, TermSymbolSet));
 					}
 					else if(ItemList[ResultIndex].TagMap.empty())
 					{
@@ -528,16 +528,17 @@ private:
 					{
 						//查看该产生式是否缺少还未加入的后缀
 
-						set<ParseTag> ResultSet;
-						set_union(ItemList[ResultIndex].TagMap.begin(), ItemList[ResultIndex].TagMap.end(), TermSymbolSet.begin(), TermSymbolSet.end(), inserter(ResultSet, ResultSet.begin()));
-						ResultSet.swap(ItemList[ResultIndex].TagMap);
+						//	set<ParseTag> ResultSet;
+						ItemList[ResultIndex].TagMap.insert(TermSymbolSet.begin(), TermSymbolSet.end());
+						//	set_union(ItemList[ResultIndex].TagMap.begin(), ItemList[ResultIndex].TagMap.end(), TermSymbolSet.begin(), TermSymbolSet.end(), inserter(ResultSet, ResultSet.begin()));
+						//ResultSet.swap(ItemList[ResultIndex].TagMap);
 					}
 				}
 			}
 		}
 		//排序后对于是否存在该项集就容易很多了;
 
-		sort(ItemList.begin(), ItemList.end());
+		//sort(ItemList.begin(), ItemList.end());
 	}
 
 	bool IsProductEnd(int Index, int Position)
@@ -546,35 +547,66 @@ private:
 	}
 
 	//获取Symbol的First集合
-	set<ParseTag> GetSymbolFirstSet(int Index, int Position)
+	set<ParseTag>& GetSymbolFirstSet(int Index, int Position, unordered_map<int, unordered_map<int, set<ParseTag>>>& SymbolMap)
 	{
-		set<ParseTag> Result;
-		auto Sym = GetSymbol(Index, Position);
-		if(Sym.IsTerminal == true)
+		if(FindSymbolMap(Index, Position, SymbolMap))
 		{
-			//终结符号
-			Result.insert(Sym.Tag);
+			//已经存在
+			return SymbolMap[Index][Position];
 		}
 		else
 		{
-			//非终结符号
-			for(auto& Iter : GetProductBodyNumber(Sym.Tag))
+			set<ParseTag> Result;
+			auto& Sym = GetSymbol(Index, Position);
+			if(Sym.IsTerminal == true)
 			{
-				auto& Find = GetSymbolFirstSet(Iter, 0);
-				Result.insert(Find.begin(), Find.end());
+				//终结符号
+				Result.insert(Sym.Tag);
 			}
-		}
-		return std::move(Result);
-	}
+			else
+			{
+				//非终结符号
+				for(auto& Iter : GetProductBodyNumber(Sym.Tag))
+				{
+					auto& Find = GetSymbolFirstSet(Iter, 0, SymbolMap);
+					Result.insert(Find.begin(), Find.end());
+				}
+			}
+			SymbolMap[Index].insert(make_pair(Position, std::move(Result)));
 
+			return SymbolMap[Index][Position];
+		}
+	}
+	bool FindSymbolMap(int Index, int Position, unordered_map<int, unordered_map<int, set<ParseTag>>>& SymbolMap)
+	{
+		auto & FindIndexIter = SymbolMap.find(Index);
+		if(FindIndexIter == SymbolMap.end())
+		{
+			return false;
+		}
+		else if(FindIndexIter->second.find(Position) == FindIndexIter->second.end())
+		{
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
 	vector<int> GetProductBodyNumber(ParseTag NonTerminal)
 	{
+		//auto FindIter = GrammarMap.find(NonTerminal);
+		auto& EqualPair = GrammarMap.equal_range(NonTerminal);
+
 		vector<int> Result;
-		auto FindIter = GrammarMap.find(NonTerminal);
-		for(auto i = 0; i < GrammarMap.count(NonTerminal); i++, FindIter++)
+		for(auto& Iter = EqualPair.first; Iter != EqualPair.second; Iter++)
 		{
-			Result.push_back(FindIter->second);
+			Result.push_back(Iter->second);
 		}
+		/*for(auto i = 0; i < GrammarMap.count(NonTerminal); i++, FindIter++)
+		{
+		Result.push_back(FindIter->second);
+		}*/
 		return std::move(Result);
 	}
 
@@ -627,14 +659,15 @@ private:
 		TagList.insert(ParseTag::StringTail);
 		StartSet.ItemList.push_back(Triple<int, int, set<ParseTag>>({0, 0, TagList}));
 		StartSet.CoreItermNumber = 1;
+		unordered_map<int, unordered_map<int, set<ParseTag>>> SymbolMap;
 		//第一个项集的闭包计算
-		CreatItemClourse(StartSet.ItemList);
+		CreatItemClourse(StartSet.ItemList, SymbolMap);
 
 		//第一个项集压栈
 		LR1ItemSet.push_back(StartSet);
 		for(int i = 0; i < LR1ItemSet.size(); i++)
 		{
-			LR1GOTO(LR1ItemSet, i);
+			LR1GOTO(LR1ItemSet, i, SymbolMap);
 		}
 		AcceptIndex = GetAcceptIndex(LR1ItemSet);
 
@@ -666,9 +699,8 @@ private:
 		return LR1ItemSet.size() == Length;
 	}
 
-	void LR1GOTO(vector<LR1Stauts>& LR1ItemSet, int TargetIndex)
+	void LR1GOTO(vector<LR1Stauts>& LR1ItemSet, int TargetIndex, unordered_map<int, unordered_map<int, set<ParseTag>>>& SymbolMap)
 	{
-		//今日做
 		//存放当前LR1Stauts的后一个符号集合
 		unordered_multimap<ParseTag, Triple<int, int, set<ParseTag>>> NextSet;
 		auto& Target = LR1ItemSet[TargetIndex];
@@ -696,7 +728,7 @@ private:
 			{
 				int a = 0;
 			}
-			CreatItemClourse(CurrentStauts.ItemList);
+			CreatItemClourse(CurrentStauts.ItemList, SymbolMap);
 			//判断是否新状态在项集集合中;
 			auto result = HasThisItemSet(CurrentStauts);
 			if(result == -1)
@@ -813,8 +845,8 @@ public:
 					{
 						cout << "规约成功!";
 						//AstRootNode = CatchStack.back();
-						AstStack;
-						AstNodeList;
+						//AstStack;
+						//AstNodeList;
 						return true;
 					}
 					else if(FindIter == LR1ItemSet[StautsStack.back()].NextStauts.end())
@@ -1166,7 +1198,7 @@ private:
 		int LeftSetIndex = AstStack.back();
 		AstStack.pop_back();
 		auto LeftSetPointer = dynamic_cast<CharSet*>( AstNodeList[LeftSetIndex] );
-		auto RightSetPointer = dynamic_cast<CharSet*>( AstNodeList[LeftSetIndex] );
+		auto RightSetPointer = dynamic_cast<CharSet*>( AstNodeList[RightSetIndex] );
 		set<pair<int, int>>NewSet;
 		set_union(LeftSetPointer->CharSetRange.begin(), LeftSetPointer->CharSetRange.end(), RightSetPointer->CharSetRange.begin(), RightSetPointer->CharSetRange.end(), inserter(NewSet, NewSet.begin()));
 		auto Index = AstNodeList.size();

@@ -11,7 +11,7 @@ _Continue意思是跳过当前捕获的字符(跳过空白等)
 #include <functional>
 //using std::pair;
 using std::shared_ptr;
-using std::wstring;
+using std::string;
 using std::function;
 using std::unordered_map;
 //</HeadFile>
@@ -26,7 +26,7 @@ enum class LexTag
 class Token
 {
 	LexTag Tag;
-	wstring MatchStr;
+	string MatchStr;
 	/*
 	需要token返回其他成员的另外添加
 	//int StartIndex;
@@ -40,7 +40,7 @@ int Line;
 //shared_ptr<Token>(int& ReStartIndex, wstring& CatchContent)
 //unordered_map<wstring, function<shared_ptr<Token>(int& ReStartIndex, wstring& CatchContent)>>ActionMap;
 //源码
-wstring SrcStr;
+string SrcStr;
 //</ClassMember>
 
 //<RegularTypedef>

@@ -352,6 +352,7 @@ public:
 	{
 		initFigureMap(AstRootIndex);
 		CreatDFA();
+		MinningDfa();
 		//PrintDfaMap();
 	}
 	DFA() = delete;
@@ -666,7 +667,142 @@ public:
 	//最小化DFA
 	void MinningDfa()
 	{
-		
+		auto StautsGroup = GetStautGroupList();
+		//看看有没有元素是有两个以上的DFA节点,有的话说明DFA需要最小化
+		for(auto& Iter = StautsGroup.begin(); Iter != StautsGroup.end();Iter++)
+		{
+			if (Iter->size() != 1)
+			{
+				set<string> CurrentSet = *Iter;
+				string NewStautsName = *CurrentSet.begin();
+				CurrentSet.erase(CurrentSet.begin());
+				ModifyDfaStauts(CurrentSet, NewStautsName);
+			}
+		}
+	}
+	void ModifyDfaStauts(set<string>& OldStautsName,string& NewStautsName)
+	{
+		for(auto& Iter = DfaMap.begin(); Iter != DfaMap.end();Iter++)
+		{
+			for(auto& NextIter = Iter->second.begin(); NextIter != Iter->second.end();NextIter++)
+			{
+				if (OldStautsName.find(NextIter->second) != OldStautsName.end())
+				{
+					DfaMap[Iter->first][NextIter->first] = NewStautsName;
+				}
+			}
+		}
+		for(auto& Iter = OldStautsName.begin(); Iter!= OldStautsName.end();Iter++)
+		{
+			DeleteDfaNode(*Iter);
+		}
+	}
+	bool DeleteDfaNode(const string& NodeName)
+	{
+		auto& FindIter = DfaMap.find(NodeName);
+		if (FindIter == DfaMap.end())
+		{
+			return false;
+		}
+		else
+		{
+			DfaMap.erase(FindIter->first);
+			return true;
+		}
+	}
+	//获取最小化的DFA状态集合分组;
+	set<set<string>> GetStautGroupList()
+	{
+		//获取接受状态和非接受状态做初始集合划分集合
+		auto AcceptSet = GetAcceptSet();
+		auto NonAcceptSet = GetNonAcceptSet();
+		set<set<string>>Result;
+		list<set<string>>Queue;
+		Queue.emplace_back(NonAcceptSet);
+		Queue.emplace_back(AcceptSet);
+		//	int c = 0;
+		while(!Queue.empty())
+		{
+			//快速跳出双重循环,使用了goto =.=
+
+
+			auto& CurrentSet = Queue.front();
+			for(auto i = 0; i < this->CharEndIndex; i++)
+			{
+				unordered_multimap<string, string>IndexToSetMap;
+				for(auto& Iter = CurrentSet.begin(); Iter != CurrentSet.end(); Iter++)
+				{
+					auto& FindIter = DfaMap[*Iter].find(i);
+					if(FindIter == DfaMap[*Iter].end())
+					{
+						//不存在这个索引上的转换
+						IndexToSetMap.insert(make_pair("", *Iter));
+					}
+					else
+					{
+						IndexToSetMap.insert(make_pair(DfaMap[*Iter][i], *Iter));
+					}
+				}
+				//查看是不是IndexToSetMap里面只有一种key
+				auto Count = 0;
+				for(auto& Iter = IndexToSetMap.begin(); Iter != IndexToSetMap.end(); Iter = IndexToSetMap.upper_bound(Iter->first))
+				{
+					Count++;
+				}
+				if(Count != 1)
+				{
+					//说明当前字符可以区分状态,
+					// 把分开后的状态加入list,当前状态从list删除,
+					// 然后不再执行之后的Char测试.直接开始查看下一个list头
+					for(auto& Iter = IndexToSetMap.begin(); Iter != IndexToSetMap.end();)
+					{
+						auto KeyCount = IndexToSetMap.count(Iter->first);
+						set<string>NewStauts;
+						for(auto j = 0; j < KeyCount; j++, Iter++)
+						{
+
+							NewStauts.insert(Iter->second);
+						}
+						Queue.push_back(move(NewStauts));
+					}
+					Queue.pop_front();
+					goto WhileEnd;
+				}
+			}
+			//如果能执行到这里,说明没有index能区分当前的状态集合;也就是说当前集合是最终的DFA节点的状态集合
+			Result.insert(move(Queue.front()));
+			Queue.pop_front();
+		WhileEnd:;
+		}
+		return std::move(Result);
+	}
+	//获取接受状态集合
+	set<string> GetAcceptSet()
+	{
+		set<string> Result;
+		string AcceptStr = to_string(this->AcceptIndex);
+		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end();Iter = DfaMap.upper_bound(Iter->first))
+		{
+			if (Iter->first.find(AcceptStr) != Iter->first.npos)
+			{
+				Result.insert(Iter->first);
+			}
+		}
+		return std::move(Result);
+	}
+	//获取非接受状态集合
+	set<string> GetNonAcceptSet()
+	{
+		set<string> Result;
+		string AcceptStr = to_string(this->AcceptIndex);
+		for(auto Iter = DfaMap.begin(); Iter != DfaMap.end(); Iter = DfaMap.upper_bound(Iter->first))
+		{
+			if(Iter->first.find(AcceptStr) == Iter->first.npos)
+			{
+				Result.insert(Iter->first);
+			}
+		}
+		return std::move(Result);
 	}
 private:
 	//是否已经存在了这个pair

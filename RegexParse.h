@@ -721,13 +721,9 @@ private:
 			auto i = 0;
 			for(auto MinIter = KeyIter; i < KeyCount; MinIter++, i++)
 			{
-				CurrentStauts.ItemList.push_back(MinIter->second);
+				CurrentStauts.ItemList.emplace_back(MinIter->second);
 			}
 			CurrentStauts.CoreItermNumber = KeyCount;
-			if(LR1ItemSet.size() == 11)
-			{
-				int a = 0;
-			}
 			CreatItemClourse(CurrentStauts.ItemList, SymbolMap);
 			//判断是否新状态在项集集合中;
 			auto result = HasThisItemSet(CurrentStauts);
@@ -879,11 +875,6 @@ public:
 		}
 		return false;
 	}
-public:
-	/*shared_ptr<Property>& GetAst()
-	{
-	return AstRootNode;
-	}*/
 private:
 
 private:

@@ -32,7 +32,8 @@ int main()
 	// 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+?dd)", "dsnbs");
 	//
 	auto start = clock();
-	TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
+	//TestRegexTrue("b|a", "b");
+	//TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
 	TestRegexTrue("[a-znb]*|1", "1");
 
 	TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "abca");
@@ -63,6 +64,6 @@ int main()
 	auto end = clock();
 	cout << (double)start - end;
 	int a = 0;
-	//cin >> a;
+	cin >> a;
 	return 0;
 }

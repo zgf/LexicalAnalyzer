@@ -1,4 +1,4 @@
-﻿生成启动时间为 4/9/2014 11:56:28 AM。
+﻿生成启动时间为 4/9/2014 12:01:58 PM。
      1>项目“F:\MyProjects\编译器工具集\Lexical analyzer generator\Lexical analyzer generator\Lexical analyzer generator.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
          E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
@@ -39,4 +39,4 @@
 
 生成成功。
 
-已用时间 00:00:08.15
+已用时间 00:00:08.03

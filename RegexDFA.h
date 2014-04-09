@@ -963,29 +963,71 @@ public:
 					//匹配失败,看看是否在终结状态了
 					if(CurrentStauts.find(EndStr) != CurrentStauts.npos)
 					{
-						return std::move(MatchInfo(Text.substr(j, i - j ), j, i));
+						//此时i位置是匹配失败的那个字符,索引匹配的内容i 要减 1
+						return std::move(MatchInfo(Text.substr(j, i - j ), j, i - 1));
 					}
 					i = Text.size();
 				}
 				else
 				{
 					CurrentStauts = DfaMap[CurrentStauts][CharMap[Text[i]]];
-					if (i == Text.size() - 1)
+					if(i == Text.size() - 1 && CurrentStauts.find(EndStr) != CurrentStauts.npos)
 					{
-						//说明整个text串都被匹配完了,如果这时候DFA也到了接受状态,就接受这个串
-						if(CurrentStauts.find(EndStr) != CurrentStauts.npos)
-						{
-							return std::move(MatchInfo(Text, j, i));
-						}
+						//说明整个text串都被DFA匹配完了,如果这时候DFA也到了接受状态,就接受这个串
+						return std::move(MatchInfo(Text, j, i));
 					}
 				}
-				
 			}
 		}
 		return std::move(MatchInfo("", -1, -1));
 	}
-
+	//线性搜索 
+	vector<MatchInfo> MatchAll(string& Text, int StartIndex = 0)
+	{
+		vector<MatchInfo>Result;
+		while(StartIndex < Text.size())
+		{
+			auto MatchInformation = Match(Text, StartIndex);
+			if (MatchInformation.StartIndex != -1)
+			{
+				Result.emplace_back(move(MatchInformation));
+				StartIndex = Result.back().EndIndex + 1;
+			}
+			else
+			{
+				StartIndex = INT_MAX;
+			}
+		}
+		return std::move(Result);
+	}
+	//替换正则匹配的第一个子串内容
+	string ReplaceMatch(string& Text,string& ReplaceData)
+	{
+		string Temp;
+		auto& FindInfo = Match(Temp);
+		if (FindInfo.MatchContent == "")
+		{
+			return std::move(Temp);
+		}
+		else
+		{
+			return std::move(Temp.replace(FindInfo.StartIndex, FindInfo.EndIndex - FindInfo.StartIndex + 1, ReplaceData));
+		}
+	}
+	//线性替换
+	string ReplaceMatches(string& Text, string& ReplaceData)
+	{
+		auto FindList = MatchAll(Text);
+		auto Temp = Text;
+		for(auto i = 0; i < FindList.size();i++)
+		{
+			auto& FindInfo = FindList[i];
+			Temp = Temp.replace(FindInfo.StartIndex, FindInfo.EndIndex - FindInfo.StartIndex + 1, ReplaceData);
+		}
+		return std::move(Temp);
+	}
 };
+
 void AstNode::Accept(FA& Dfa, int CurrentIndex)
 {
 	abort();

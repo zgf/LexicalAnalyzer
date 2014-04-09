@@ -48,8 +48,8 @@ int main()
 	//TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
 	//TestRegexTrue("[a-znb]*|1", "1");
 
-	GetMatchContent("[a-znb]*", "ewqabcaerwrw");
-	//GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
+	//GetMatchContent("[a-znb]*", "ewqabcaerwrw");
+	GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
 	/*
 	TestRegexTrue("a*", "aaaa");
 	TestRegexTrue("ba*", "b");

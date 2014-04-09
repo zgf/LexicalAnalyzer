@@ -1026,6 +1026,28 @@ public:
 		}
 		return std::move(Temp);
 	}
+	
+	//根据匹配的字符为分界符,将text拆分成数组
+	vector<string> Split(string& Text)
+	{
+		vector<string> Result;
+		auto& InfoList = MatchAll(Text);
+		auto StartIndex = 0;
+		if(InfoList.front().StartIndex != 0)
+		{
+			Result.emplace_back(Text.substr(0, InfoList.front().StartIndex));
+		}
+		for(auto i = 0; i < InfoList.size();i++)
+		{
+			Result.emplace_back(Text.substr(InfoList[i].EndIndex + 1, InfoList[i + 1].StartIndex - ( InfoList[i].EndIndex + 1 )));
+			
+		}
+		if (InfoList.back().EndIndex != Text.size() - 1)
+		{
+			Result.emplace_back(Text.substr(InfoList.back().EndIndex + 1));
+		}
+		return std::move(Result);
+	}
 };
 
 void AstNode::Accept(FA& Dfa, int CurrentIndex)

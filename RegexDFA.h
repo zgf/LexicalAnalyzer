@@ -1048,6 +1048,22 @@ public:
 		}
 		return std::move(Result);
 	}
+	////发现字符串中的索引所在行号和列号 , 文本,索引,换行符.行号和列号都是从1开始算
+	pair<int, int> FindColsAndRows(string& Text, int Index, const char* SignSymbol = "\r\n")
+	{
+		auto FindIter = 0;
+		auto Rows = 0;
+		auto RowIndex = 0;
+		while(FindIter < Index)
+		{
+			Rows++;
+			RowIndex = FindIter;
+			FindIter = Text.find(SignSymbol, FindIter);
+			FindIter += strlen(SignSymbol);
+		}
+		auto Cols = Index - RowIndex + 1;
+		return std::move(pair<int, int>(Rows, Cols));
+	}
 };
 
 void AstNode::Accept(FA& Dfa, int CurrentIndex)

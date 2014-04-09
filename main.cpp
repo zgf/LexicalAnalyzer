@@ -38,18 +38,20 @@ void GetMatchContent(const char* tPattern, const char* tText)
 	cout << Info.MatchContent<<endl;
 	cout << Info.StartIndex<<" "<<Info.EndIndex<<endl;
 }
+
 int main()
 {
 	//[a-znb]*|ab(c[a\\b]|cb+?dd)
 	// 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+?dd)", "dsnbs");
 	//
 	auto start = clock();
+	FindColsAndRows(string("asdada\ndasdsads\ndsadsadqe\n"), 13, "\n");
 	//TestRegexTrue("b|a", "b");
 	//TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
 	//TestRegexTrue("[a-znb]*|1", "1");
 
 	//GetMatchContent("[a-znb]*", "ewqabcaerwrw");
-	GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
+//	GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
 	/*
 	TestRegexTrue("a*", "aaaa");
 	TestRegexTrue("ba*", "b");

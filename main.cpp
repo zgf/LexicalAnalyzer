@@ -26,6 +26,18 @@ void TestRegexFalse(const char* tPattern, const char* tText)
 {
 	TestRegex(tPattern, tText, false);
 }
+void GetMatchContent(const char* tPattern, const char* tText)
+{
+	string Pattern(tPattern);
+	LexParse Lex(Pattern);
+	RegexParse Parse;
+	Parse.ParsingRegex(Lex.TokenStream);
+	DFA DfaMachine(Parse.GetCharMap(), Parse.GetAst(), Parse.GetAstRootIndex(), Parse.GetAstNodeList(), Parse.GetCharEndIndex());
+	string Text(tText);
+	auto Info = DfaMachine.Match(Text);
+	cout << Info.MatchContent<<endl;
+	cout << Info.StartIndex<<" "<<Info.EndIndex<<endl;
+}
 int main()
 {
 	//[a-znb]*|ab(c[a\\b]|cb+?dd)
@@ -34,10 +46,11 @@ int main()
 	auto start = clock();
 	//TestRegexTrue("b|a", "b");
 	//TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
-	TestRegexTrue("[a-znb]*|1", "1");
+	//TestRegexTrue("[a-znb]*|1", "1");
 
-	TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "abca");
-	
+	GetMatchContent("[a-znb]*", "ewqabcaerwrw");
+	//GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
+	/*
 	TestRegexTrue("a*", "aaaa");
 	TestRegexTrue("ba*", "b");
 	TestRegexTrue("a+", "a");
@@ -60,9 +73,9 @@ int main()
 	TestRegexTrue("[ABVD]", "D");
 	TestRegexTrue("(c|b)|a", "ba");
 	TestRegexTrue("(c|b)|a", "ca");
-	TestRegexTrue("[^a-zA]", "C");
+	TestRegexTrue("[^a-zA]", "C");*/
 	auto end = clock();
-	cout << (double)start - end;
+	cout << (double)end - start;
 	int a = 0;
 	cin >> a;
 	return 0;

@@ -27,6 +27,16 @@ public:
 	{
 	}
 };
+struct MatchInfo
+{
+	string MatchContent;
+	int StartIndex;
+	int EndIndex;
+	MatchInfo(string tMatchContent, int tStartIndex, int tEndIndex) :MatchContent(tMatchContent), StartIndex(tStartIndex), EndIndex(tEndIndex)
+	{
+
+	}
+};
 
 class NfaNode
 {
@@ -914,6 +924,67 @@ private:
 	{
 		return AstNodeList[CurrentIndex]->RightNodeIndex != -1;
 	}
+public:
+//正则匹配函数
+	bool IsMatch(string& Text,int StartIndex = 0)
+	{
+		string EndStr = to_string(AcceptIndex);
+		auto CurrentStauts = DfaStart;
+		for(auto j = StartIndex; j < Text.size(); j++)
+		{
+			for(auto i = j; i < Text.size(); i++)
+			{
+				if(DfaMap[CurrentStauts].find(CharMap[Text[i]]) == DfaMap[CurrentStauts].end())
+				{
+					i = Text.size();
+				}
+				else
+				{
+					CurrentStauts = DfaMap[CurrentStauts][CharMap[Text[i]]];
+				}
+				if(CurrentStauts.find(EndStr) != CurrentStauts.npos)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	MatchInfo Match(string& Text, int StartIndex = 0)
+	{
+		string EndStr = to_string(AcceptIndex);
+		auto CurrentStauts = DfaStart;
+		for(auto j = StartIndex; j < Text.size(); j++)
+		{
+			for(auto i = j; i < Text.size(); i++)
+			{
+				if(DfaMap[CurrentStauts].find(CharMap[Text[i]]) == DfaMap[CurrentStauts].end())
+				{
+					//匹配失败,看看是否在终结状态了
+					if(CurrentStauts.find(EndStr) != CurrentStauts.npos)
+					{
+						return std::move(MatchInfo(Text.substr(j, i - j ), j, i));
+					}
+					i = Text.size();
+				}
+				else
+				{
+					CurrentStauts = DfaMap[CurrentStauts][CharMap[Text[i]]];
+					if (i == Text.size() - 1)
+					{
+						//说明整个text串都被匹配完了,如果这时候DFA也到了接受状态,就接受这个串
+						if(CurrentStauts.find(EndStr) != CurrentStauts.npos)
+						{
+							return std::move(MatchInfo(Text, j, i));
+						}
+					}
+				}
+				
+			}
+		}
+		return std::move(MatchInfo("", -1, -1));
+	}
+
 };
 void AstNode::Accept(FA& Dfa, int CurrentIndex)
 {

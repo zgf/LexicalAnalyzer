@@ -15,14 +15,14 @@ using std::string;
 using std::function;
 using std::unordered_map;
 //</HeadFile>
+//<PreClassGlobal>
+//</PreClassGlobal>
+// LexTag是enum class类型
+//<LexTag>
 
-//<ClassMember>
-//这里的内容会直接拷贝到LexParse 类里面做私有成员
 
-enum class LexTag
-{
-	/*这里添加Tag*/
-};
+
+//</LexTag>
 class Token
 {
 	LexTag Tag;
@@ -32,26 +32,32 @@ class Token
 	//int StartIndex;
 	*/
 };
-//行号
+//<ClassMember>
+//这里的内容会直接拷贝到LexParse 类里面做私有成员
+
+
+//行号从1开始
 int Line;
+//列号从1开始
+int ColsIndex;
 //动作表
 //执行动作的函数签名
 //函数签名是定死的,但是想扩展可以在类的私有成员上做手脚=.=以及token的扩展内容上做变化
 //shared_ptr<Token>(int& ReStartIndex, wstring& CatchContent)
-//unordered_map<wstring, function<shared_ptr<Token>(int& ReStartIndex, wstring& CatchContent)>>ActionMap;
+//unordered_map<wstring, function<shared_ptr<Token>(int& ReStartIndex, string& CatchContent)>>ActionMap;
 //源码
 string SrcStr;
 //</ClassMember>
 
-//<RegularTypedef>
-//"模式别名" : "模式"
+//<RegularTypeDefine>
+//"模式别名" : "模式";
 
-//</RegularTypedef>
+//</RegularTypeDefine>
 
 //<Action>
-//"函数名": "模式" : {语义动作};
+//"模式" : {语义动作};
 //推荐直接使用LexTag名做函数名
-//"函数名" : 模式别名 : {语义动作};
+//模式别名 : {语义动作};
 //</Action>
 //<UserDefineFunction>
 //用户自定义函数位置

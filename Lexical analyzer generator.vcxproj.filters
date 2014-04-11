@@ -30,6 +30,9 @@
     <ClInclude Include="Test.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="LexTemplate.h">
+      <Filter>资源文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeGenComplier.cpp">
@@ -41,10 +44,5 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="RegexLexConfig">
-      <Filter>资源文件</Filter>
-    </None>
   </ItemGroup>
 </Project>

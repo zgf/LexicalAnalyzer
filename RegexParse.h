@@ -201,7 +201,7 @@ public:
 	}
 };
 
-class FA;
+class AutoMachine;
 class RegexParse;
 
 enum class AstTag
@@ -233,7 +233,7 @@ public:
 	{
 	}
 public:
-	virtual void Accept(FA& Dfa, int CurrentIndex) = 0;
+	virtual void Accept(AutoMachine& Dfa, int CurrentIndex) = 0;
 	virtual void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack) = 0;
 };
 class NormalChar :public AstNode
@@ -250,7 +250,7 @@ public:
 	~NormalChar()
 	{
 	}
-	void Accept(FA& Dfa, int CurrentIndex);
+	void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 class Nullable : public AstNode
@@ -271,7 +271,7 @@ public:
 	{
 	}
 public:
-	virtual void Accept(FA& Dfa, int CurrentIndex);
+	virtual void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 enum class OppsType
@@ -296,7 +296,7 @@ public:
 	~CharSet()
 	{
 	}
-	void Accept(FA& Dfa, int CurrentIndex);
+	void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 enum  class GreedyType
@@ -320,7 +320,7 @@ public:
 	~Repeat()
 	{
 	}
-	void Accept(FA& Dfa, int CurrentIndex);
+	void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 
@@ -337,7 +337,7 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
 	{
 	}
-	void Accept(FA& Dfa, int CurrentIndex);
+	void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 class StringTail : public AstNode
@@ -354,7 +354,7 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber), Val(Value)
 	{
 	}
-	void Accept(FA& Dfa, int CurrentIndex);
+	void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack)
 	{
 		abort();
@@ -373,7 +373,7 @@ public:
 		:AstNode(tTag, tLeftNodeIndex, tRightNodeIndex, tChildNumber)
 	{
 	}
-	void Accept(FA& Dfa, int CurrentIndex);
+	void Accept(AutoMachine& Dfa, int CurrentIndex);
 	void AdjustAst(RegexParse& Parse, int CurrentIndex, map<int, int>&NodeMap, list<int>& Stack);
 };
 

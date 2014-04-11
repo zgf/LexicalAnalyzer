@@ -45,7 +45,7 @@ int main()
 	// 	TestRegex("[a-znb]*|ab(c[a\\b]|cb+?dd)", "dsnbs");
 	//
 	auto start = clock();
-	FindColsAndRows(string("asdada\ndasdsads\ndsadsadqe\n"), 13, "\n");
+	//vector<int> ab({1,2,3,4});
 	//TestRegexTrue("b|a", "b");
 	//TestRegexTrue("[a-znb]*|ab(c[a\\b]|cb+dd)", "dsnbs");
 	//TestRegexTrue("[a-znb]*|1", "1");

@@ -17,21 +17,27 @@ using std::unordered_map;
 //</HeadFile>
 //<PreClassGlobal>
 //</PreClassGlobal>
+
+
+
 // LexTag是enum class类型
+
 //<LexTag>
 
 
 
 //</LexTag>
-class Token
-{
-	LexTag Tag;
-	string MatchStr;
-	/*
-	需要token返回其他成员的另外添加
-	//int StartIndex;
-	*/
-};
+
+// <TokenClass>
+// 需要token返回其他成员的另外添加
+//Tken类中 自带成员
+//  LexTag Tag;
+string Val;
+int FindIndex;
+
+
+// <TokenClass>
+
 //<ClassMember>
 //这里的内容会直接拷贝到LexParse 类里面做私有成员
 

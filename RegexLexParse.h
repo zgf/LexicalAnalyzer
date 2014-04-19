@@ -82,7 +82,19 @@ LexParse类结构
 #include <memory>
 #include <unordered_map>
 #include <iostream>
-using namespace std;
+using std::ifstream;
+using std::string;
+using std::istreambuf_iterator;
+using std::move;
+using std::vector;
+using std::ofstream;
+using std::shared_ptr;
+using std::set;
+using std::function;
+using std::unordered_map;
+using std::ofstream;
+using std::unordered_multimap;
+using std::make_pair;
 //这里是声明部分 RegexToken类型 enum类型都在这里定义
 
 //Tag名

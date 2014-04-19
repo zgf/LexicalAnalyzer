@@ -1,17 +1,105 @@
-#pragma once
 #include "RegexDFA.h"
-/*要支持取反字符集*/ //FINISH
-/*DFA状态最小化*/ //Finish
-/*错误处理 和调试信息支持*/
-/*工程结构分析和注释完善*/
-/*一些丑陋的函数和模块重构 学习下重构工具的使用*/
-/*要做cpp 和h文件分离*/ //Finish 换了种方式解决了visitor模式问题
-/*创建闭包哪里效率太低了- -*/ //已经改进了30%效率...也许用hash代替vector更快?0 0 使用Release模式更快不过那个goto函数哪里还是要继续优化
-/*Template中的耦合部分要改进*/
-/*NFA部分写成扩展正则部分的那种*/
 
-/*正则引擎应该能DFA的地方就DFA不能DFA地方再NFA*/
+#include <unordered_map>
+#include <string>
+#include <memory>
+#include <functional>
+using std::shared_ptr;
+using std::string;
+using std::function;
+using std::unordered_map;
+//<HeadFile>
+using std::string;
+enum class TokenTag
+{
+	Id,
+	Number,
+	Include,
+	HeadFile,
+	Add,
+	NullSpace,
+	//<TokenTag>
+};
+class Token;
 
-/*去完善NFA部分*/
-/*visitor模式批量生成工具*/
+class Token
+{
+public:
+	TokenTag Tag;
+	string Val;
+	int FindIndex;
+public:
+	Token(const TokenTag& tTag, const string& tVal, const int tFindIndex) :Tag(tTag), Val(tVal), FindIndex(tFindIndex)
+	{
+	}
+};
 
+//<TokenClass>
+
+//<PreClassGlobal>
+class LexParse
+{
+public:
+	LexParse(string& tPattern) :Pattern(tPattern)
+	{
+	}
+	void initRegexMap()
+	{
+		RegexMap.insert(make_pair(0, bind(&LexParse::Semantic0, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		RegexMap.insert(make_pair(1, bind(&LexParse::Semantic1, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		RegexMap.insert(make_pair(2, bind(&LexParse::Semantic2, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		RegexMap.insert(make_pair(3, bind(&LexParse::Semantic3, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		RegexMap.insert(make_pair(5, bind(&LexParse::Semantic5, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		RegexMap.insert(make_pair(6, bind(&LexParse::Semantic6, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3)));
+		//<initRegexMap>
+	}
+	void initRegexList()
+	{
+		RegexList.push_back("[0-9]+");
+		RegexList.push_back("\"{id}.h\"");
+		RegexList.push_back("<[A-Za-z]([A-Za-z]|[0-9])*.h>");
+		RegexList.push_back("\+");
+		RegexList.push_back("[\t\n]+");
+		RegexList.push_back("[A-Za-z]([A-Za-z]|[0-9])*");
+		RegexList.push_back("#include");
+		//<initRegexList>
+	}
+private:
+	shared_ptr<Token>Semantic0(const int& FindIndex, const string& CatchContent, const string& SrcStr)
+	{
+		return shared_ptr<Token>(new Token(TokenTag::Number, CatchContent, FindIndex));
+	}
+	shared_ptr<Token>Semantic1(const int& FindIndex, const string& CatchContent, const string& SrcStr)
+	{
+		return shared_ptr<Token>(new Token(TokenTag::HeadFile, CatchContent, FindIndex));
+	}
+	shared_ptr<Token>Semantic2(const int& FindIndex, const string& CatchContent, const string& SrcStr)
+	{
+		return shared_ptr<Token>(new Token(TokenTag::HeadFile, CatchContent, FindIndex));
+	}
+	shared_ptr<Token>Semantic3(const int& FindIndex, const string& CatchContent, const string& SrcStr)
+	{
+		return shared_ptr<Token>(new Token(TokenTag::Add, CatchContent, FindIndex));
+	}
+	shared_ptr<Token>Semantic5(const int& FindIndex, const string& CatchContent, const string& SrcStr)
+	{
+		return shared_ptr<Token>(new Token(TokenTag::Id, CatchContent, FindIndex));
+	}
+	shared_ptr<Token>Semantic6(const int& FindIndex, const string& CatchContent, const string& SrcStr)
+	{
+		return shared_ptr<Token>(new Token(TokenTag::Include, CatchContent, FindIndex));
+	}
+	//<initActionFunction>
+	void CreatDfa()
+	{
+
+	}
+private:
+	string Pattern;
+
+	//<ClassMember>
+private:
+	unordered_map<int, function<shared_ptr<Token>(const int& FindIndex, const string& CatchContent, const string& SrcStr)>>RegexMap;
+	vector<string> RegexList;
+	//<UserDefineFunction>
+};

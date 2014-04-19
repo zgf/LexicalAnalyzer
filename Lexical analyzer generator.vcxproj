@@ -44,6 +44,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -56,6 +58,8 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -66,7 +70,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CodeGenComplier.h" />
-    <ClInclude Include="LexTemplate.h" />
     <ClInclude Include="RegexDFA.h" />
     <ClInclude Include="RegexLexParse.h" />
     <ClInclude Include="RegexParse.h" />
@@ -74,8 +77,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CodeGenComplier.cpp" />
-    <ClCompile Include="LexConfigTemplate.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="LexConfigTemplate.h" />
+    <None Include="LexTemplate.h" />
+    <None Include="Test.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,7 +1,10 @@
 #pragma once
 #include "RegexParse.h"
 #include <fstream>
+using std::endl;
+using std::to_string;
 using std::ofstream;
+using std::cin;
 class FigureNode
 {
 public:

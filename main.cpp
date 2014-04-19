@@ -1,6 +1,5 @@
-#include "RegexDFA.h"
 #include <ctime>
-
+#include "CodeGenComplier.h"
 void TestRegex(const char* tPattern, const char* tText, bool Chose)
 {
 	string Pattern(tPattern);
@@ -35,8 +34,8 @@ void GetMatchContent(const char* tPattern, const char* tText)
 	DFA DfaMachine(Parse.GetCharMap(), Parse.GetAst(), Parse.GetAstRootIndex(), Parse.GetAstNodeList(), Parse.GetCharEndIndex());
 	string Text(tText);
 	auto Info = DfaMachine.Match(Text);
-	cout << Info.MatchContent<<endl;
-	cout << Info.StartIndex<<" "<<Info.EndIndex<<endl;
+	cout << Info.MatchContent << endl;
+	cout << Info.StartIndex << " " << Info.EndIndex << endl;
 }
 
 int main()
@@ -51,13 +50,13 @@ int main()
 	//TestRegexTrue("[a-znb]*|1", "1");
 
 	//GetMatchContent("[a-znb]*", "ewqabcaerwrw");
-//	GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
+	//	GetMatchContent("ab(c[a\\b]|cb+dd)", "ewqabcaerwrw");
 	/*
 	TestRegexTrue("a*", "aaaa");
 	TestRegexTrue("ba*", "b");
 	TestRegexTrue("a+", "a");
 	TestRegexTrue("a+", "aaaa");
-	
+
 	TestRegexFalse("[^a-z]", "b");
 	TestRegexTrue("[a-zAB]{4,5}|ab(c[a\\b]|cb+dd)", "abcbbdd");
 	TestRegexTrue("a?", "aa");
@@ -78,7 +77,6 @@ int main()
 	TestRegexTrue("[^a-zA]", "C");*/
 	auto end = clock();
 	cout << (double)end - start;
-	int a = 0;
-	cin >> a;
+	LexCodeGen A(string("LexConfigTemplate.h"), string("LexTemplate.h"));
 	return 0;
 }

@@ -1,42 +1,62 @@
-﻿生成启动时间为 4/10/2014 9:35:43 PM。
+﻿生成启动时间为 4/19/2014 10:20:40 PM。
      1>项目“F:\MyProjects\编译器工具集\Lexical analyzer generator\Lexical analyzer generator\Lexical analyzer generator.vcxproj”在节点 2 上(Build 个目标)。
      1>ClCompile:
-         E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
+         E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /MP /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /openmp /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt main.cpp
          main.cpp
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexlexparse.h(204): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexlexparse.h(244): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(145): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(163): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(482): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(491): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(616): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(668): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(722): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(745): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(761): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(785): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(805): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(973): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(989): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(1136): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(90): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexlexparse.h(216): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexlexparse.h(256): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(148): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(166): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(485): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(494): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(619): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(671): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(725): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(748): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(764): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(788): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(808): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(976): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(992): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexparse.h(1139): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(92): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(357): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(485): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(647): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(94): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(359): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(487): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(649): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(671): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(651): warning C4018: “<”: 有符号/无符号不匹配
      1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(673): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(702): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(736): warning C4018: “<”: 有符号/无符号不匹配
-     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(754): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(675): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(704): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(738): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\regexdfa.h(756): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(60): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(78): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(91): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(232): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(273): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(316): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(334): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(347): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(403): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(407): warning C4800: “int”: 将值强制为布尔值“true”或“false”(性能警告)
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(417): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(460): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(585): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(614): warning C4018: “<”: 有符号/无符号不匹配
+     1>f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(562): warning C4018: “<”: 有符号/无符号不匹配
+                 f:\myprojects\编译器工具集\lexical analyzer generator\lexical analyzer generator\codegencomplier.h(543): 参见对正在编译的函数 模板 实例化“int LexCodeGen::IsInTheRangeList<int>(std::vector<std::pair<int,int>,std::allocator<_Kty>> &,T &&)”的引用
+                 with
+                 [
+                     _Kty=std::pair<int,int>
+         ,            T=int
+                 ]
        Link:
          E:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"F:\MyProjects\编译器工具集\Lexical analyzer generator\Debug\Lexical analyzer generator.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"F:\MyProjects\编译器工具集\Lexical analyzer generator\Debug\Lexical analyzer generator.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"F:\MyProjects\编译器工具集\Lexical analyzer generator\Debug\Lexical analyzer generator.lib" /MACHINE:X86 Debug\CodeGenComplier.obj
-         Debug\LexConfigTemplate.obj
          Debug\main.obj
          Lexical analyzer generator.vcxproj -> F:\MyProjects\编译器工具集\Lexical analyzer generator\Debug\Lexical analyzer generator.exe
      1>已完成生成项目“F:\MyProjects\编译器工具集\Lexical analyzer generator\Lexical analyzer generator\Lexical analyzer generator.vcxproj”(Build 个目标)的操作。
 
 生成成功。
 
-已用时间 00:00:06.98
+已用时间 00:00:07.16

@@ -1,6 +1,9 @@
 #pragma once
 #include "RegexLexParse.h"
-using std::unordered_multimap;
+using std::list;
+using std::map;
+using std::pair;
+using std::cout;
 // 文法符号enum类
 enum class ParseTag
 {
@@ -816,7 +819,7 @@ public:
 				if(ResultIndex == -1)
 				{
 					//出现错误字符
-					cout << "Error! Index:" << TokenStream[i]->GetIndex() << " Data:" << TokenStream[i]->GetData() << endl;
+					cout << "Error! Index:" << TokenStream[i]->GetIndex() << " Data:" << TokenStream[i]->GetData() << std::endl;
 					abort();
 					//这里应该对错误进行处理
 					// TO DO
